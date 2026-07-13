@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <filter id="grain"><feTurbulence baseFrequency=".72" numOctaves="4" seed="7"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .18 0"/></filter>
+    <radialGradient id="fog"><stop stop-color="#d6d6d6"/><stop offset="1" stop-color="#080808"/></radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="#000"/>
+  <ellipse cx="490" cy="470" rx="610" ry="390" fill="url(#fog)" opacity=".9"/>
+  <path d="M0 760C190 540 270 288 445 164c127-89 267-81 356 44 60 84 70 211 139 292 90 106 234 80 330-38-106 192-242 299-440 303-243 5-491-127-830-5Z" fill="#b8b8b8"/>
+  <path d="M398 590c-96-128-76-282 28-374 104-92 286-92 386 9 73 73 77 182 43 271-40 106-147 189-263 197-79 6-145-35-194-103Z" fill="#111"/>
+  <path d="M461 350c55-103 202-165 314-82 75 55 92 166 54 246-40-65-97-100-167-121-79-23-133-19-201-43Z" fill="#ddd"/>
+  <path d="M459 359c32-104 172-155 282-103-80 7-126 39-163 111l-119-8Z" fill="#111"/>
+  <path d="M463 471c96 41 187 50 282 13-32 124-235 138-282-13Z" fill="#d5d5d5" opacity=".5"/>
+  <rect width="1600" height="900" filter="url(#grain)" opacity=".55"/>
+</svg>

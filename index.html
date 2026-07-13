@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="A personal archive." />
+  <title>YOURNAME — archive</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="scene" id="scene">
+    <div class="background-image" id="backgroundImage" aria-hidden="true"></div>
+    <div class="ink-wash" aria-hidden="true"></div>
+    <div class="halftone" aria-hidden="true"></div>
+    <div class="scratches" aria-hidden="true"></div>
+
+    <header class="corner-nav">
+      <button class="wire-button" id="returnButton" type="button">← return</button>
+      <div class="nav-right">
+        <button class="wire-button" id="imageButton" type="button">change image</button>
+        <button class="wire-button" id="resetButton" type="button">reset</button>
+        <button class="wire-button" id="archiveButton" type="button">archives</button>
+      </div>
+    </header>
+
+    <input id="backgroundPicker" type="file" accept="image/*" hidden />
+
+    <section class="intro" aria-label="Profile introduction">
+      <div class="portrait-frame">
+        <img data-main-image src="assets/profile-one.svg" alt="Profile portrait" draggable="false" />
+        <div class="portrait-grain" aria-hidden="true"></div>
+      </div>
+      <div class="profile-copy">
+        <span class="sigil" aria-hidden="true">//</span>
+        <h1 data-name>YOURNAME</h1>
+        <p class="quote" data-quote>How can a human lose their self-control?</p>
+        <nav class="profile-links" id="profileLinks" aria-label="Social links"></nav>
+      </div>
+    </section>
+
+    <section class="card-field" id="cardField" aria-label="Movable profile cards"></section>
+
+    <aside class="help" id="help">
+      <span>drag the cards</span>
+      <span>double-click to rotate</span>
+    </aside>
+
+    <footer class="bottom-bar">
+      <button class="wire-button" id="soundButton" type="button">ambient: off</button>
+      <p><i></i> interactive archive</p>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
