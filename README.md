@@ -18,9 +18,13 @@ The **change image** button is a quick local preview. To make that image visible
 ## Interactions
 
 - Drag cards with a mouse or finger.
-- Double-click a card to rotate it.
+- Click a card to spin it into the center and play its theme.
+- Click outside the open card, press Escape, or use return to close it.
+- Each card has a generated ambient theme by default. To use your own music, put an MP3 in `assets` and set that card's `audio` value in `config.js`, for example `audio: "assets/song.mp3"`.
 - Positions are saved in that visitor's browser.
 - Use **reset** to restore the layout from `config.js`.
+
+The image chooser remembers a compressed preview on the current device. For a background that every visitor sees, put the original image in `assets` and set `backgroundImage` in `config.js`.
 
 ## Publish
 

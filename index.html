@@ -15,6 +15,7 @@
     <div class="ink-wash" aria-hidden="true"></div>
     <div class="halftone" aria-hidden="true"></div>
     <div class="scratches" aria-hidden="true"></div>
+    <button class="focus-overlay" id="focusOverlay" type="button" aria-label="Close open card"></button>
 
     <header class="corner-nav">
       <button class="wire-button" id="returnButton" type="button">← return</button>
@@ -27,24 +28,19 @@
 
     <input id="backgroundPicker" type="file" accept="image/*" hidden />
 
-    <section class="intro" aria-label="Profile introduction">
-      <div class="portrait-frame">
-        <img data-main-image src="assets/profile-one.svg" alt="Profile portrait" draggable="false" />
-        <div class="portrait-grain" aria-hidden="true"></div>
-      </div>
-      <div class="profile-copy">
-        <span class="sigil" aria-hidden="true">//</span>
-        <h1 data-name>YOURNAME</h1>
-        <p class="quote" data-quote>How can a human lose their self-control?</p>
-        <nav class="profile-links" id="profileLinks" aria-label="Social links"></nav>
-      </div>
+    <section class="wordmark" aria-label="sogz">
+      <span class="sparkle sparkle-a" aria-hidden="true">✦</span>
+      <span class="sparkle sparkle-b" aria-hidden="true">✧</span>
+      <h1>sogz<span>'</span></h1>
+      <span class="sparkle sparkle-c" aria-hidden="true">⋆</span>
+      <p>choose a card</p>
     </section>
 
     <section class="card-field" id="cardField" aria-label="Movable profile cards"></section>
 
     <aside class="help" id="help">
       <span>drag the cards</span>
-      <span>double-click to rotate</span>
+      <span>click a card to play</span>
     </aside>
 
     <footer class="bottom-bar">
@@ -53,6 +49,8 @@
     </footer>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="plus-cursor" id="plusCursor" aria-hidden="true"></div>
+    <audio id="cardAudio" loop></audio>
   </main>
 
   <script src="config.js"></script>
