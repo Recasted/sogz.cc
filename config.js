@@ -17,7 +17,7 @@ window.ARCHIVE_CONFIG = {
       ]
     },
     { title: "EGO", subtitle: "archive 002", image: "assets/profile-one.svg", x: 36, y: 53, rotation: 3, theme: "glass", audio: "" },
-    { title: "VICE", subtitle: "archive 003", image: "assets/profile-three.svg", x: 57, y: 55, rotation: -2, theme: "void", audio: "" },
+    { title: "VICE", subtitle: "archive 003", image: "assets/card-03.png", x: 57, y: 55, rotation: -2, theme: "void", audio: "" },
     { title: "SOGZ", subtitle: "profile 000", image: "assets/card-04.jpg", x: 80, y: 53, rotation: 7, theme: "dream", audio: "" }
   ]
 };
