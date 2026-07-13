@@ -221,15 +221,13 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 }
 .bottom-bar p { display: flex; align-items: center; gap: 7px; margin: 0; color: rgba(255,255,255,.38); font-size: 9px; font-style: italic; letter-spacing: .08em; }
 .bottom-bar p i { width: 5px; height: 5px; border-radius: 50%; background: var(--blood); box-shadow: 0 0 7px var(--blood); }
+.music-controls { display: flex; align-items: center; gap: 7px; }
 
 .spotify-shell {
-  position: absolute;
-  left: 9%;
-  bottom: 54px;
-  z-index: 95;
+  position: relative;
   width: auto;
-  height: 25px;
-  padding: 4px 10px;
+  min-height: 27px;
+  padding: 5px 10px;
   overflow: hidden;
   border: 1px dotted rgba(255,255,255,.4);
   opacity: .72;
@@ -265,7 +263,7 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
   .profile-card.is-open .card-socials { transform: translate(-50%, 0); }
   .help { display: none; }
   .bottom-bar { padding-left: 10px; }
-  .spotify-shell { left: 10px; bottom: 52px; }
+  .music-controls { gap: 4px; }
 }
 
 @media (pointer: coarse) { body, button, a, .scene, .profile-card { cursor: auto; } .plus-cursor { display: none; } }
