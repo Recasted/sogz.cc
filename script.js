@@ -210,6 +210,11 @@ function updateSoundLabel() {
   document.querySelector("#soundButton").textContent = label;
 }
 
+function startDefaultAudioOnFirstInteraction() {
+  if (!audio.src || !audio.paused || muted) return;
+  audio.play().catch(() => updateSoundLabel());
+}
+
 function renderCard(element, state) {
   element.style.setProperty("--x", `${state.x}%`); element.style.setProperty("--y", `${state.y}%`);
   element.style.setProperty("--rotation", `${state.rotation}deg`);
@@ -277,6 +282,8 @@ document.querySelector("#resetButton").addEventListener("click", resetLayout);
 document.querySelector("#returnButton").addEventListener("click", closeCard);
 document.querySelector("#archiveButton").addEventListener("click", () => showToast("four playable archive cards"));
 document.querySelector("#soundButton").addEventListener("click", toggleMusic);
+document.addEventListener("pointerdown", startDefaultAudioOnFirstInteraction, { once: true, capture: true });
+document.addEventListener("keydown", startDefaultAudioOnFirstInteraction, { once: true, capture: true });
 audio.addEventListener("play", () => {
   audioStarted = true;
   muted = false;
