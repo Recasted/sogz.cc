@@ -110,7 +110,7 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 
 .wordmark {
   position: absolute;
-  top: 43%;
+  top: 27%;
   left: 50%;
   z-index: 12;
   width: 300px;
@@ -213,7 +213,7 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
   .nav-right { gap: 4px; }
   .wire-button { min-height: 25px; padding: 2px 8px; font-size: 11px; }
   #resetButton { display: none; }
-  .wordmark { top: 40%; }
+  .wordmark { top: 24%; }
   .profile-card { width: 128px; }
   .profile-card.is-open { width: min(62vw, 280px); }
   .help { display: none; }
