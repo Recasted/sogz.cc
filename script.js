@@ -11,13 +11,10 @@ let topLayer = 20;
 let openIndex = null;
 let muted = false;
 let synth = { context: null, timer: null, nodes: [] };
-let spotifyController = null;
-let spotifyReady = false;
-let spotifyStarted = false;
-let spotifySwitching = false;
-let spotifyQueue = [...(config.defaultSpotifyTracks || [])];
-let spotifyQueueIndex = 0;
-let spotifyLabel = "default";
+let audioQueue = [...(config.defaultAudioTracks || [])];
+let audioQueueIndex = 0;
+let audioLabel = "default";
+let audioStarted = false;
 
 document.title = "sogz' — archive";
 const rememberedBackground = localStorage.getItem(backgroundKey);
@@ -115,62 +112,44 @@ function closeCard() {
 }
 
 async function playCardMusic(card) {
-  stopSound();
-  if (card.spotifyTracks?.length) {
-    setSpotifyQueue(card.spotifyTracks, `card 0${openIndex + 1}`, true);
+  stopSynth();
+  if (card.audioTracks?.length) {
+    setAudioQueue(card.audioTracks, `card 0${openIndex + 1}`, true);
   } else if (card.audio) {
-    audio.src = card.audio; audio.volume = muted ? 0 : .55;
-    try { await audio.play(); } catch { showToast("tap once more to allow audio"); }
+    setAudioQueue([{ title: card.title, src: card.audio }], `card 0${openIndex + 1}`, true);
   } else {
+    audio.pause();
+    audio.removeAttribute("src");
     playSynthTheme(card.theme);
   }
   updateSoundLabel();
 }
 
-window.onSpotifyIframeApiReady = (IFrameAPI) => {
-  const element = document.querySelector("#spotifyEmbed");
-  if (!element || !spotifyQueue.length) return;
-  IFrameAPI.createController(element, {
-    url: spotifyQueue[0],
-    width: 320,
-    height: 80
-  }, (controller) => {
-    spotifyController = controller;
-    spotifyReady = true;
-    controller.addListener("playback_started", () => {
-      spotifyStarted = true;
-      muted = false;
-      updateSoundLabel();
-    });
-    controller.addListener("playback_update", (event) => {
-      const state = event.data || {};
-      const ended = state.duration > 0 && state.position >= state.duration - 750 && !state.isBuffering;
-      if (!ended || spotifySwitching || !spotifyQueue.length) return;
-      spotifySwitching = true;
-      spotifyQueueIndex = (spotifyQueueIndex + 1) % spotifyQueue.length;
-      loadSpotifyTrack(true);
-      window.setTimeout(() => { spotifySwitching = false; }, 1400);
-    });
-    loadSpotifyTrack(true);
-    updateSoundLabel();
-  });
-};
-
-function setSpotifyQueue(tracks, label, shouldPlay) {
-  const nextQueue = (tracks || []).filter(Boolean);
+function setAudioQueue(tracks, label, shouldPlay) {
+  const nextQueue = (tracks || []).filter((track) => track?.src);
   if (!nextQueue.length) return;
-  spotifyQueue = nextQueue;
-  spotifyQueueIndex = 0;
-  spotifyLabel = label;
-  spotifyStarted = false;
-  loadSpotifyTrack(shouldPlay);
+  audioQueue = nextQueue;
+  audioQueueIndex = 0;
+  audioLabel = label;
+  audioStarted = false;
+  loadAudioTrack(shouldPlay);
   updateSoundLabel();
 }
 
-function loadSpotifyTrack(shouldPlay) {
-  if (!spotifyReady || !spotifyController || !spotifyQueue.length) return;
-  spotifyController.loadEntity(spotifyQueue[spotifyQueueIndex], false, 0);
-  if (shouldPlay && !muted) spotifyController.play();
+function loadAudioTrack(shouldPlay) {
+  const track = audioQueue[audioQueueIndex];
+  if (!track) return;
+  audio.src = track.src;
+  audio.loop = false;
+  audio.volume = .55;
+  audio.load();
+  document.querySelector("#nowPlayingText").textContent = track.title;
+  if (shouldPlay && !muted) {
+    audio.play().catch(() => {
+      audioStarted = false;
+      updateSoundLabel();
+    });
+  }
 }
 
 function playSynthTheme(name) {
@@ -202,21 +181,20 @@ function playSynthTheme(name) {
   tick(); synth.timer = setInterval(tick, 520);
 }
 
-function stopSound() {
-  audio.pause(); audio.removeAttribute("src");
+function stopSynth() {
   clearInterval(synth.timer); synth.timer = null;
   synth.nodes.forEach((node) => { try { node.stop(); } catch {} }); synth.nodes = [];
   if (synth.context) { synth.context.close(); synth.context = null; }
 }
 
 function toggleMusic() {
-  if (spotifyController && spotifyReady) {
-    if (muted || !spotifyStarted) {
+  if (audio.src) {
+    if (audio.paused) {
       muted = false;
-      spotifyController.resume();
+      audio.play().catch(() => showToast("tap once more to allow audio"));
     } else {
       muted = true;
-      spotifyController.pause();
+      audio.pause();
     }
   } else {
     muted = !muted; audio.volume = muted ? 0 : .55;
@@ -226,8 +204,9 @@ function toggleMusic() {
 }
 
 function updateSoundLabel() {
-  let label = "music: loading spotify";
-  if (spotifyReady) label = muted ? "music: paused" : (spotifyStarted ? `music: ${spotifyLabel}` : "music: tap to start");
+  let label = "music: tap to start";
+  if (audioStarted && audio.paused) label = "music: paused";
+  else if (!audio.paused) label = `music: ${audioLabel}`;
   document.querySelector("#soundButton").textContent = label;
 }
 
@@ -298,4 +277,17 @@ document.querySelector("#resetButton").addEventListener("click", resetLayout);
 document.querySelector("#returnButton").addEventListener("click", closeCard);
 document.querySelector("#archiveButton").addEventListener("click", () => showToast("four playable archive cards"));
 document.querySelector("#soundButton").addEventListener("click", toggleMusic);
+audio.addEventListener("play", () => {
+  audioStarted = true;
+  muted = false;
+  updateSoundLabel();
+});
+audio.addEventListener("pause", updateSoundLabel);
+audio.addEventListener("ended", () => {
+  if (!audioQueue.length) return;
+  audioQueueIndex = (audioQueueIndex + 1) % audioQueue.length;
+  loadAudioTrack(true);
+});
+audio.addEventListener("error", () => showToast("this song could not be loaded"));
 document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeCard(); });
+setAudioQueue(config.defaultAudioTracks, "default", true);

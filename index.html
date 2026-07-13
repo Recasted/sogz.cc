@@ -7,7 +7,7 @@
   <meta name="description" content="A personal archive." />
   <title>sogz' — archive</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=19" />
+  <link rel="stylesheet" href="style.css?v=20" />
 </head>
 <body>
   <main class="scene" id="scene">
@@ -44,10 +44,10 @@
 
     <footer class="bottom-bar">
       <div class="music-controls">
-        <button class="wire-button" id="soundButton" type="button">music: loading spotify</button>
-        <div class="spotify-shell" aria-label="Spotify music player">
-          <span>now playing</span>
-          <div id="spotifyEmbed"></div>
+        <button class="wire-button" id="soundButton" type="button">music: tap to start</button>
+        <div class="now-playing" aria-live="polite">
+          <span>now playing:</span>
+          <strong id="nowPlayingText">Einfach Sein</strong>
         </div>
       </div>
       <p><i></i> interactive archive</p>
@@ -55,11 +55,10 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <div class="plus-cursor" id="plusCursor" aria-hidden="true"></div>
-    <audio id="cardAudio" loop></audio>
+    <audio id="cardAudio"></audio>
   </main>
 
-  <script src="config.js?v=19"></script>
-  <script src="script.js?v=19"></script>
-  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+  <script src="config.js?v=20"></script>
+  <script src="script.js?v=20"></script>
 </body>
 </html>
