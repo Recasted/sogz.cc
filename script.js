@@ -49,7 +49,7 @@ function makeInteractive(element, state, card, index) {
     originX = state.x; originY = state.y; moved = false;
     element.setPointerCapture(pointerId);
     element.classList.add("is-dragging");
-    element.style.zIndex = ++topLayer;
+    element.style.zIndex = nextCardLayer();
   });
   element.addEventListener("pointermove", (event) => {
     if (event.pointerId !== pointerId || !element.hasPointerCapture(pointerId)) return;
@@ -79,6 +79,7 @@ function openCard(index, card) {
   if (openIndex !== null) return;
   openIndex = index;
   const element = document.querySelector(`.profile-card[data-index="${index}"]`);
+  element.style.zIndex = "100";
   element.classList.add("is-open");
   scene.classList.add("card-open");
   playCardMusic(card);
@@ -89,6 +90,7 @@ function closeCard() {
   if (openIndex === null) return;
   const element = document.querySelector(`.profile-card[data-index="${openIndex}"]`);
   element.classList.remove("is-open");
+  element.style.zIndex = nextCardLayer();
   scene.classList.remove("card-open");
   openIndex = null;
 }
@@ -202,6 +204,10 @@ function showToast(message) {
   clearTimeout(window.archiveToast); window.archiveToast = setTimeout(() => toast.classList.remove("show"), 2200);
 }
 function clamp(value, min, max) { return Math.min(Math.max(value, min), max); }
+function nextCardLayer() {
+  topLayer = topLayer >= 60 ? 21 : topLayer + 1;
+  return String(topLayer);
+}
 
 document.addEventListener("pointermove", (event) => {
   const cursor = document.querySelector("#plusCursor"); cursor.style.left = `${event.clientX}px`; cursor.style.top = `${event.clientY}px`;
