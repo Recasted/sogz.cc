@@ -39,6 +39,15 @@ function createCard(card, index) {
     <strong class="card-title">${card.title}</strong>
     <span class="card-subtitle">${card.subtitle}</span>
   </div>${cardLinks}`;
+  const photo = element.querySelector(".card-photo");
+  const image = photo.querySelector("img");
+  const matchPhotoToImage = () => {
+    if (image.naturalWidth && image.naturalHeight) {
+      photo.style.setProperty("--photo-ratio", `${image.naturalWidth} / ${image.naturalHeight}`);
+    }
+  };
+  if (image.complete) matchPhotoToImage();
+  else image.addEventListener("load", matchPhotoToImage, { once: true });
   field.appendChild(element);
   makeInteractive(element, state, card, index);
 }
