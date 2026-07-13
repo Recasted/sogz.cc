@@ -3,8 +3,8 @@ const scene = document.querySelector("#scene");
 const field = document.querySelector("#cardField");
 const picker = document.querySelector("#backgroundPicker");
 const audio = document.querySelector("#cardAudio");
-const storageKey = "interactive-archive-layout-v3";
-const backgroundKey = "interactive-archive-background-v1";
+const storageKey = "interactive-archive-layout-v4";
+const backgroundKey = "interactive-archive-background-v2";
 const cardStates = [];
 let savedLayout = readLayout();
 let topLayer = 20;
@@ -15,6 +15,7 @@ let synth = { context: null, timer: null, nodes: [] };
 document.title = "sogz' — archive";
 const rememberedBackground = localStorage.getItem(backgroundKey);
 setBackground(rememberedBackground || config.backgroundImage);
+document.querySelector("#backgroundImage").style.setProperty("--scene-position", config.backgroundPosition || "center");
 config.cards.forEach((card, index) => createCard(card, index));
 
 function createCard(card, index) {

@@ -33,7 +33,7 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 .background-image::before,
 .background-image::after { content: ""; position: absolute; background-image: var(--scene-image, url("assets/background.svg")); background-position: center; background-repeat: no-repeat; }
 .background-image::before { inset: -6%; background-size: cover; filter: blur(24px) brightness(.72); opacity: .72; transform: scale(1.08); }
-.background-image::after { inset: 0; background-size: cover; }
+.background-image::after { inset: 0; background-size: cover; background-position: var(--scene-position, center); }
 
 .ink-wash {
   position: absolute;
@@ -133,10 +133,11 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 @keyframes wordFloat { 50% { transform: translate(-50%, calc(-50% - 9px)) rotate(.8deg); } }
 @keyframes twinkle { from { opacity: .25; transform: scale(.65) rotate(0); } to { opacity: 1; transform: scale(1.15) rotate(35deg); } }
 
-.card-field { position: absolute; inset: 45px 0 48px; z-index: 20; pointer-events: none; }
+.card-field { position: absolute; inset: 45px 0 48px; pointer-events: none; }
 
 .profile-card {
   position: absolute;
+  z-index: 20;
   left: var(--x);
   top: var(--y);
   width: clamp(128px, 12.5vw, 188px);
