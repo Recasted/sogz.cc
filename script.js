@@ -11,6 +11,13 @@ let topLayer = 20;
 let openIndex = null;
 let muted = false;
 let synth = { context: null, timer: null, nodes: [] };
+let spotifyController = null;
+let spotifyReady = false;
+let spotifyStarted = false;
+let spotifySwitching = false;
+let spotifyQueue = [...(config.defaultSpotifyTracks || [])];
+let spotifyQueueIndex = 0;
+let spotifyLabel = "default";
 
 document.title = "sogz' — archive";
 const rememberedBackground = localStorage.getItem(backgroundKey);
@@ -105,17 +112,68 @@ function closeCard() {
   element.style.zIndex = nextCardLayer();
   scene.classList.remove("card-open");
   openIndex = null;
+  setSpotifyQueue(config.defaultSpotifyTracks, "default", true);
 }
 
 async function playCardMusic(card) {
   stopSound();
-  if (card.audio) {
+  if (card.spotifyTracks?.length) {
+    setSpotifyQueue(card.spotifyTracks, `card 0${openIndex + 1}`, true);
+  } else if (card.audio) {
     audio.src = card.audio; audio.volume = muted ? 0 : .55;
     try { await audio.play(); } catch { showToast("tap once more to allow audio"); }
   } else {
     playSynthTheme(card.theme);
   }
   updateSoundLabel();
+}
+
+window.onSpotifyIframeApiReady = (IFrameAPI) => {
+  const element = document.querySelector("#spotifyEmbed");
+  if (!element || !spotifyQueue.length) return;
+  IFrameAPI.createController(element, {
+    url: spotifyQueue[0],
+    width: 320,
+    height: 80
+  }, (controller) => {
+    spotifyController = controller;
+    controller.addListener("ready", () => {
+      spotifyReady = true;
+      loadSpotifyTrack(true);
+      updateSoundLabel();
+    });
+    controller.addListener("playback_started", () => {
+      spotifyStarted = true;
+      muted = false;
+      updateSoundLabel();
+    });
+    controller.addListener("playback_update", (event) => {
+      const state = event.data || {};
+      const ended = state.duration > 0 && state.position >= state.duration - 750 && !state.isBuffering;
+      if (!ended || spotifySwitching || !spotifyQueue.length) return;
+      spotifySwitching = true;
+      spotifyQueueIndex = (spotifyQueueIndex + 1) % spotifyQueue.length;
+      loadSpotifyTrack(true);
+      window.setTimeout(() => { spotifySwitching = false; }, 1400);
+    });
+  });
+};
+
+function setSpotifyQueue(tracks, label, shouldPlay) {
+  const nextQueue = (tracks || []).filter(Boolean);
+  if (!nextQueue.length) return;
+  spotifyQueue = nextQueue;
+  spotifyQueueIndex = 0;
+  spotifyLabel = label;
+  spotifyStarted = false;
+  loadSpotifyTrack(shouldPlay);
+  updateSoundLabel();
+}
+
+function loadSpotifyTrack(shouldPlay) {
+  if (!spotifyReady || !spotifyController || !spotifyQueue.length) return;
+  spotifyController.loadEntity(spotifyQueue[spotifyQueueIndex], false, 0);
+  if (shouldPlay && !muted) spotifyController.play();
 }
 
 function playSynthTheme(name) {
@@ -154,14 +212,26 @@ function stopSound() {
   if (synth.context) { synth.context.close(); synth.context = null; }
 }
 
-function toggleMute() {
-  muted = !muted; audio.volume = muted ? 0 : .55;
-  if (synth.context) muted ? synth.context.suspend() : synth.context.resume();
+function toggleMusic() {
+  if (spotifyController && spotifyReady) {
+    if (muted || !spotifyStarted) {
+      muted = false;
+      spotifyController.resume();
+    } else {
+      muted = true;
+      spotifyController.pause();
+    }
+  } else {
+    muted = !muted; audio.volume = muted ? 0 : .55;
+    if (synth.context) muted ? synth.context.suspend() : synth.context.resume();
+  }
   updateSoundLabel();
 }
 
 function updateSoundLabel() {
-  document.querySelector("#soundButton").textContent = muted ? "music: muted" : (openIndex === null ? "music: choose a card" : "music: playing");
+  let label = "music: loading spotify";
+  if (spotifyReady) label = muted ? "music: paused" : (spotifyStarted ? `music: ${spotifyLabel}` : "music: tap to start");
+  document.querySelector("#soundButton").textContent = label;
 }
 
 function renderCard(element, state) {
@@ -230,5 +300,5 @@ picker.addEventListener("change", () => applyBackground(picker.files[0]));
 document.querySelector("#resetButton").addEventListener("click", resetLayout);
 document.querySelector("#returnButton").addEventListener("click", closeCard);
 document.querySelector("#archiveButton").addEventListener("click", () => showToast("four playable archive cards"));
-document.querySelector("#soundButton").addEventListener("click", toggleMute);
+document.querySelector("#soundButton").addEventListener("click", toggleMusic);
 document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeCard(); });

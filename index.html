@@ -7,7 +7,7 @@
   <meta name="description" content="A personal archive." />
   <title>sogz' — archive</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=15" />
+  <link rel="stylesheet" href="style.css?v=16" />
 </head>
 <body>
   <main class="scene" id="scene">
@@ -42,8 +42,12 @@
       <span>click a card to play</span>
     </aside>
 
+    <div class="spotify-shell" aria-label="Spotify music player">
+      <div id="spotifyEmbed"></div>
+    </div>
+
     <footer class="bottom-bar">
-      <button class="wire-button" id="soundButton" type="button">music: choose a card</button>
+      <button class="wire-button" id="soundButton" type="button">music: loading spotify</button>
       <p><i></i> interactive archive</p>
     </footer>
 
@@ -52,7 +56,8 @@
     <audio id="cardAudio" loop></audio>
   </main>
 
-  <script src="config.js?v=15"></script>
-  <script src="script.js?v=15"></script>
+  <script src="config.js?v=16"></script>
+  <script src="script.js?v=16"></script>
+  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 </body>
 </html>
