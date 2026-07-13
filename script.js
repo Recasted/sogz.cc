@@ -30,12 +30,15 @@ function createCard(card, index) {
   element.setAttribute("aria-label", `Open ${card.title} card and play its theme`);
   element.style.setProperty("--float-delay", `${index * -.85}s`);
   renderCard(element, state);
+  const cardLinks = card.links?.length ? `<nav class="card-socials" aria-label="${card.title} profile links">
+    ${card.links.map((link) => `<a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.label}</a>`).join("")}
+  </nav>` : "";
   element.innerHTML = `<div class="card-inner">
     <span class="card-index">0${index + 1}</span>
     <div class="card-photo"><img src="${card.image}" alt="${card.title}" draggable="false"></div>
     <strong class="card-title">${card.title}</strong>
     <span class="card-subtitle">${card.subtitle}</span>
-  </div>`;
+  </div>${cardLinks}`;
   field.appendChild(element);
   makeInteractive(element, state, card, index);
 }

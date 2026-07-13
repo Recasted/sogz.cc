@@ -173,6 +173,23 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 .card-subtitle { display: block; margin-top: 3px; opacity: .65; font-size: 8px; letter-spacing: .18em; text-align: center; text-transform: uppercase; }
 .card-index { position: absolute; top: 9px; right: 11px; z-index: 2; color: #fff; font-size: 9px; text-shadow: 0 1px 5px #000; }
 
+.card-socials {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 25px);
+  display: grid;
+  width: 108px;
+  gap: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-10px, -50%);
+  transition: opacity .25s ease, transform .3s ease;
+}
+.card-socials::before { content: "profiles"; margin-bottom: 2px; color: rgba(255,255,255,.5); font-size: 9px; font-style: italic; letter-spacing: .1em; text-align: center; }
+.card-socials a { display: block; padding: 7px 9px; border: 1px dotted rgba(255,255,255,.48); color: #fff; background: rgba(0,0,0,.72); font-size: 11px; letter-spacing: .05em; text-align: center; text-decoration: none; text-transform: lowercase; }
+.card-socials a:hover, .card-socials a:focus-visible { color: #000; background: #fff; outline: none; }
+.profile-card.is-open .card-socials { opacity: 1; pointer-events: auto; transform: translate(0, -50%); transition-delay: .5s; }
+
 .help {
   position: absolute;
   right: 18px;
@@ -221,6 +238,9 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
   .wordmark { top: 15%; }
   .profile-card { width: clamp(80px, 23vw, 112px); }
   .profile-card.is-open { width: min(62vw, 280px); }
+  .card-socials { top: calc(100% + 16px); left: 50%; width: min(78vw, 280px); grid-template-columns: repeat(3, 1fr); transform: translate(-50%, -8px); }
+  .card-socials::before { display: none; }
+  .profile-card.is-open .card-socials { transform: translate(-50%, 0); }
   .help { display: none; }
   .bottom-bar { padding-left: 10px; }
 }
