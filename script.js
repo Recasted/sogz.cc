@@ -183,7 +183,7 @@ function applyBackground(file) {
     const image = new Image();
     image.onload = () => {
       const canvas = document.createElement("canvas");
-      const scale = Math.min(1, 1800 / image.width);
+      const scale = Math.min(1, 1800 / image.width, 1800 / image.height);
       canvas.width = Math.round(image.width * scale); canvas.height = Math.round(image.height * scale);
       canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
       const data = canvas.toDataURL("image/jpeg", .78);
