@@ -112,7 +112,6 @@ function closeCard() {
   element.style.zIndex = nextCardLayer();
   scene.classList.remove("card-open");
   openIndex = null;
-  setSpotifyQueue(config.defaultSpotifyTracks, "default", true);
 }
 
 async function playCardMusic(card) {
@@ -137,11 +136,7 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
     height: 80
   }, (controller) => {
     spotifyController = controller;
-    controller.addListener("ready", () => {
-      spotifyReady = true;
-      loadSpotifyTrack(true);
-      updateSoundLabel();
-    });
+    spotifyReady = true;
     controller.addListener("playback_started", () => {
       spotifyStarted = true;
       muted = false;
@@ -156,6 +151,8 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
       loadSpotifyTrack(true);
       window.setTimeout(() => { spotifySwitching = false; }, 1400);
     });
+    loadSpotifyTrack(true);
+    updateSoundLabel();
   });
 };
 

@@ -227,18 +227,22 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
   left: 9%;
   bottom: 54px;
   z-index: 95;
-  width: min(320px, calc(100vw - 20px));
-  height: 80px;
+  width: auto;
+  height: 25px;
+  padding: 4px 10px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 12px;
-  opacity: .82;
-  background: #121212;
-  box-shadow: 12px 14px 0 rgba(0,0,0,.42);
+  border: 1px dotted rgba(255,255,255,.4);
+  opacity: .72;
+  color: #fff;
+  background: rgba(0,0,0,.7);
+  font-size: 11px;
+  font-style: italic;
+  letter-spacing: .04em;
   transition: opacity .25s ease, transform .25s ease;
 }
 .spotify-shell:hover, .spotify-shell:focus-within { opacity: 1; transform: translateY(-2px); }
-.spotify-shell iframe { display: block; width: 100% !important; height: 80px !important; border: 0; }
+.spotify-shell span { position: relative; z-index: 2; }
+#spotifyEmbed, .spotify-shell iframe { position: absolute !important; width: 1px !important; height: 1px !important; opacity: .001; pointer-events: none; }
 
 .toast { position: fixed; left: 50%; bottom: 58px; z-index: 200; padding: 6px 12px; border: 1px dotted #888; opacity: 0; color: #fff; background: #000; font-size: 11px; font-style: italic; transform: translate(-50%, 8px); transition: .2s; pointer-events: none; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
@@ -261,7 +265,7 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
   .profile-card.is-open .card-socials { transform: translate(-50%, 0); }
   .help { display: none; }
   .bottom-bar { padding-left: 10px; }
-  .spotify-shell { left: 10px; bottom: 52px; width: min(300px, calc(100vw - 20px)); }
+  .spotify-shell { left: 10px; bottom: 52px; }
 }
 
 @media (pointer: coarse) { body, button, a, .scene, .profile-card { cursor: auto; } .plus-cursor { display: none; } }
