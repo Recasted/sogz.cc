@@ -11,7 +11,7 @@ This is a GitHub Pages-ready interactive profile inspired by the supplied black-
 5. Use `mainImage` for the central portrait.
 6. Add, remove, or rename entries in `cards` for the movable archive cards.
 
-The site automatically converts the background to a harsh monochrome/halftone look with CSS. The entire background image stays visible at any aspect ratio; a darker blurred copy fills unused screen space. Card images intentionally use a centered crop so every source size fits the same card frame.
+The site automatically converts the background to a harsh monochrome/halftone look with CSS. Backgrounds fill the screen edge to edge without stretching; their outer edges may be cropped to match the screen ratio. Card images use a consistent centered crop so every source size fits the same card frame.
 
 The **change image** button is a quick local preview. To make that image visible to everybody on GitHub Pages, copy the image into `assets` and set its path in `config.js`.
 

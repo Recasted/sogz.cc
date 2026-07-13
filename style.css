@@ -32,8 +32,8 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 }
 .background-image::before,
 .background-image::after { content: ""; position: absolute; background-image: var(--scene-image, url("assets/background.svg")); background-position: center; background-repeat: no-repeat; }
-.background-image::before { inset: -6%; background-size: cover; filter: blur(34px) brightness(.42); opacity: .58; transform: scale(1.08); }
-.background-image::after { inset: 0; background-size: contain; }
+.background-image::before { inset: -6%; background-size: cover; filter: blur(24px) brightness(.72); opacity: .72; transform: scale(1.08); }
+.background-image::after { inset: 0; background-size: cover; }
 
 .ink-wash {
   position: absolute;
@@ -112,7 +112,7 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 
 .wordmark {
   position: absolute;
-  top: 27%;
+  top: 14%;
   left: 50%;
   z-index: 12;
   width: 300px;
@@ -158,7 +158,11 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 .profile-card.is-open { left: 50% !important; top: 50% !important; z-index: 100; width: clamp(245px, 23vw, 350px); }
 .profile-card.is-open .card-inner { animation: openSpin .7s cubic-bezier(.2,.78,.2,1) forwards; }
 .scene.card-open .profile-card:not(.is-open) { opacity: .1; filter: blur(3px); pointer-events: none; }
-@keyframes cardHover { 0%,100% { transform: rotate(var(--rotation)) translateY(0); } 50% { transform: rotate(calc(var(--rotation) + 1.2deg)) translateY(-12px); } }
+@keyframes cardHover {
+  0%,100% { transform: rotate(var(--rotation)) translate3d(0, 0, 0); }
+  30% { transform: rotate(calc(var(--rotation) + .8deg)) translate3d(4px, -9px, 0); }
+  65% { transform: rotate(calc(var(--rotation) - .6deg)) translate3d(-3px, -5px, 0); }
+}
 @keyframes openSpin { 0% { transform: rotate(var(--rotation)) rotateY(0) scale(.78); } 50% { transform: rotate(0) rotateY(180deg) scale(.92); } 100% { transform: rotate(0) rotateY(360deg) scale(1); } }
 .card-photo { position: relative; width: 100%; aspect-ratio: .84; overflow: hidden; background: #111; }
 .card-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: grayscale(1) contrast(2.05); pointer-events: none; }
@@ -213,8 +217,8 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
   .nav-right { gap: 4px; }
   .wire-button { min-height: 25px; padding: 2px 8px; font-size: 11px; }
   #resetButton { display: none; }
-  .wordmark { top: 24%; }
-  .profile-card { width: 128px; }
+  .wordmark { top: 15%; }
+  .profile-card { width: clamp(80px, 23vw, 112px); }
   .profile-card.is-open { width: min(62vw, 280px); }
   .help { display: none; }
   .bottom-bar { padding-left: 10px; }
