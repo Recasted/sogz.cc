@@ -334,6 +334,7 @@ $("#undoButton").addEventListener("click",undo);$("#redoButton").addEventListene
 document.addEventListener("keydown",(event)=>{if(!(event.ctrlKey||event.metaKey))return;const key=event.key.toLowerCase();if(key==="z"){event.preventDefault();if(event.shiftKey)redo();else undo();}else if(key==="y"){event.preventDefault();redo();}});
 zoomInput.addEventListener("input",()=>{const layer=selectedLayer();if(!layer)return;layer.zoom=Number(zoomInput.value)/100;zoomValue.value=`${zoomInput.value}%`;draw();});
 jpegButton.addEventListener("click",()=>download("image/jpeg"));pngButton.addEventListener("click",()=>download("image/png"));
+$("#exportButton").addEventListener("click",()=>download("image/png"));
 
 canvas.addEventListener("pointerdown",(event)=>{
   if(event.button!==0||!state.layers.length)return;const point=canvasPoint(event);
