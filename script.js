@@ -57,7 +57,7 @@ function createCard(card, index) {
   const titleTrack = element.querySelector(".card-title-track");
   const updateTitlePan = () => {
     const overflow = Math.max(0, Math.ceil(titleTrack.getBoundingClientRect().width - title.clientWidth));
-    title.style.setProperty("--title-overflow", `${overflow}px`);
+    title.style.setProperty("--title-overflow", `${overflow + 24}px`);
     title.classList.toggle("is-overflowing", overflow > 1);
   };
   new ResizeObserver(updateTitlePan).observe(title);

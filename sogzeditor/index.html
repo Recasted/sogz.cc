@@ -7,7 +7,7 @@
   <meta name="description" content="A private browser-based image cropper and wallpaper editor." />
   <title>sogz editor</title>
   <link rel="icon" href="../assets/favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=4" />
+  <link rel="stylesheet" href="style.css?v=5" />
 </head>
 <body>
   <header class="app-menu">
@@ -17,7 +17,7 @@
     <button type="button" id="centerMenuButton">Edit</button>
     <button type="button" id="screenButton">Screen</button>
     <span class="document-name" id="documentName">New Project</span>
-    <span class="privacy">local only · nothing uploads</span>
+    <a class="privacy support-link" href="https://ko-fi.com/sogz0/goal" target="_blank" rel="noopener noreferrer">support us</a>
   </header>
 
   <main class="new-project" id="newProjectView">
@@ -84,6 +84,8 @@
       <button type="button" id="toolbarRotate" title="Rotate clockwise">↻</button>
       <button type="button" id="toolbarFlip" title="Flip selected layer horizontally">⇋</button>
       <button type="button" id="toolbarDuplicate" class="tool-letter" title="Duplicate selected layer">D</button>
+      <button type="button" id="undoButton" title="Undo (Ctrl+Z)">↶</button>
+      <button type="button" id="redoButton" title="Redo (Ctrl+Y)">↷</button>
       <button type="button" id="colorPanelButton" class="tool-letter" title="Color wheel and tint">C</button>
       <i class="tool-divider"></i>
       <button type="button" data-filter="bw" title="Black and white">◐</button>
@@ -165,18 +167,18 @@
             <option value="vintage">Vintage color</option>
           </select>
         </label>
-        <label>Brightness <output id="brightnessValue">100%</output><input id="brightnessInput" type="range" min="40" max="160" value="100" /></label>
-        <label>Contrast <output id="contrastValue">100%</output><input id="contrastInput" type="range" min="50" max="250" value="100" /></label>
-        <label>Exposure <output id="exposureValue">0.0</output><input id="exposureInput" type="range" min="-20" max="20" value="0" /></label>
-        <label>Saturation <output id="saturationValue">100%</output><input id="saturationInput" type="range" min="0" max="250" value="100" /></label>
-        <label>Hue <output id="hueValue">0°</output><input id="hueInput" type="range" min="-180" max="180" value="0" /></label>
-        <label>Sepia <output id="sepiaValue">0%</output><input id="sepiaInput" type="range" min="0" max="100" value="0" /></label>
-        <label>Blur <output id="blurValue">0px</output><input id="blurInput" type="range" min="0" max="20" value="0" /></label>
-        <label>Tint <output id="tintValue">0%</output><input id="tintInput" type="range" min="0" max="100" value="0" /></label>
+        <label class="has-reset">Brightness <output id="brightnessValue">100%</output><button class="mini-reset" type="button" data-reset="brightness" title="Reset brightness">reset</button><input id="brightnessInput" type="range" min="40" max="160" value="100" /></label>
+        <label class="has-reset">Contrast <output id="contrastValue">100%</output><button class="mini-reset" type="button" data-reset="contrast" title="Reset contrast">reset</button><input id="contrastInput" type="range" min="50" max="250" value="100" /></label>
+        <label class="has-reset">Exposure <output id="exposureValue">0.0</output><button class="mini-reset" type="button" data-reset="exposure" title="Reset exposure">reset</button><input id="exposureInput" type="range" min="-20" max="20" value="0" /></label>
+        <label class="has-reset">Saturation <output id="saturationValue">100%</output><button class="mini-reset" type="button" data-reset="saturation" title="Reset saturation">reset</button><input id="saturationInput" type="range" min="0" max="250" value="100" /></label>
+        <label class="has-reset">Hue <output id="hueValue">0°</output><button class="mini-reset" type="button" data-reset="hue" title="Reset hue">reset</button><input id="hueInput" type="range" min="-180" max="180" value="0" /></label>
+        <label class="has-reset">Sepia <output id="sepiaValue">0%</output><button class="mini-reset" type="button" data-reset="sepia" title="Reset sepia">reset</button><input id="sepiaInput" type="range" min="0" max="100" value="0" /></label>
+        <label class="has-reset">Blur <output id="blurValue">0px</output><button class="mini-reset" type="button" data-reset="blur" title="Reset blur">reset</button><input id="blurInput" type="range" min="0" max="20" value="0" /></label>
+        <label class="has-reset">Tint <output id="tintValue">0%</output><button class="mini-reset" type="button" data-reset="tintStrength" title="Reset tint">reset</button><input id="tintInput" type="range" min="0" max="100" value="0" /></label>
         <button type="button" id="openColorButton">Choose tint color / HEX</button>
         <button type="button" id="resetAdjustmentsButton">Reset color adjustments</button>
-        <label class="dot-control">Dot size <output id="dotSizeValue">6px</output><input id="dotSizeInput" type="range" min="3" max="24" value="6" /></label>
-        <label class="check-label"><input id="halftoneInput" type="checkbox" /> dotted halftone</label>
+        <label class="dot-control has-reset">Dot size <output id="dotSizeValue">6px</output><button class="mini-reset" type="button" data-reset="dotSize" title="Reset dot size">reset</button><input id="dotSizeInput" type="range" min="3" max="24" value="6" /></label>
+        <label class="check-label"><input id="halftoneInput" type="checkbox" /> dotted halftone <button class="mini-reset" type="button" data-reset="halftone" title="Reset dotted halftone">reset</button></label>
       </section>
       <section class="panel cut-panel">
         <h2>Cut tool</h2>
@@ -197,7 +199,14 @@
     </aside>
   </main>
 
+  <aside class="support-popup" id="supportPopup" role="dialog" aria-label="Support sogz editor">
+    <button type="button" class="support-close" id="supportClose" aria-label="Close support message">×</button>
+    <strong>support sogz editor</strong>
+    <p>Making sogz editor takes time, energy, and support. I’ve set a goal to help me keep creating, and I’d love for you to be part of it!</p>
+    <a href="https://ko-fi.com/sogz0/goal" target="_blank" rel="noopener noreferrer">support us on ko-fi</a>
+  </aside>
+
   <input id="imageInput" type="file" accept="image/*" multiple hidden />
-  <script src="script.js?v=9"></script>
+  <script src="script.js?v=10"></script>
 </body>
 </html>
