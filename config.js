@@ -42,7 +42,7 @@ window.ARCHIVE_CONFIG = {
         { title: "reminding", src: "assets/audio/03-2-reminding.mp3" }
       ],
       links: [
-        { label: "image generator", url: "imagegen/" }
+        { label: "sogz editor", url: "imagegen/" }
       ]
     },
     {

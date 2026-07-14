@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#1d1d1d" />
+  <meta name="description" content="A private browser-based image cropper and wallpaper editor." />
+  <title>sogz editor</title>
+  <link rel="icon" href="../assets/favicon.svg?v=2" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css?v=3" />
+</head>
+<body>
+  <header class="app-menu">
+    <a href="../" class="brand">sogz'</a>
+    <button type="button" id="newButton">File</button>
+    <button type="button" id="openButton">Open</button>
+    <button type="button" id="centerMenuButton">Edit</button>
+    <button type="button" id="screenButton">Screen</button>
+    <span class="document-name" id="documentName">New Project</span>
+    <span class="privacy">local only · nothing uploads</span>
+  </header>
+
+  <main class="new-project" id="newProjectView">
+    <section class="preset-browser">
+      <nav class="category-tabs" aria-label="Preset categories">
+        <button type="button" class="active" data-category="social">Social</button>
+        <button type="button" data-category="screen">Screen</button>
+        <button type="button" data-category="mobile">Mobile</button>
+      </nav>
+      <div class="preset-grid" id="presetGrid">
+        <button class="preset-card" type="button" data-category="social" data-size="1640x664"><i style="--ratio:1640/664"></i><strong>FB Page Cover</strong><span>1640 × 664 px</span></button>
+        <button class="preset-card" type="button" data-category="social" data-size="1920x1080"><i style="--ratio:1920/1080"></i><strong>FB Event Image</strong><span>1920 × 1080 px</span></button>
+        <button class="preset-card" type="button" data-category="social" data-size="1640x856"><i style="--ratio:1640/856"></i><strong>FB Group Header</strong><span>1640 × 856 px</span></button>
+        <button class="preset-card" type="button" data-category="social" data-size="1080x1080"><i style="--ratio:1"></i><strong>Instagram</strong><span>1080 × 1080 px</span></button>
+        <button class="preset-card" type="button" data-category="social" data-size="1080x1920"><i style="--ratio:1080/1920"></i><strong>Insta Story</strong><span>1080 × 1920 px</span></button>
+        <button class="preset-card" type="button" data-category="social" data-size="1080x1350"><i style="--ratio:1080/1350"></i><strong>Insta Portrait</strong><span>1080 × 1350 px</span></button>
+        <button class="preset-card" type="button" data-category="social" data-size="1280x720"><i style="--ratio:16/9"></i><strong>YouTube Thumbnail</strong><span>1280 × 720 px</span></button>
+        <button class="preset-card" type="button" data-category="social" data-size="800x800"><i style="--ratio:1"></i><strong>YouTube Profile</strong><span>800 × 800 px</span></button>
+        <button class="preset-card" type="button" data-category="social" data-size="2560x1440"><i style="--ratio:16/9"></i><strong>YouTube Cover</strong><span>2560 × 1440 px</span></button>
+        <button class="preset-card" type="button" data-category="social" data-size="400x400"><i style="--ratio:1"></i><strong>X Profile</strong><span>400 × 400 px</span></button>
+        <button class="preset-card" type="button" data-category="social" data-size="1500x500"><i style="--ratio:3/1"></i><strong>X Header</strong><span>1500 × 500 px</span></button>
+
+        <button class="preset-card hidden" type="button" data-category="screen" data-size="1920x1080"><i style="--ratio:16/9"></i><strong>Full HD</strong><span>1920 × 1080 px</span></button>
+        <button class="preset-card hidden" type="button" data-category="screen" data-size="2560x1440"><i style="--ratio:16/9"></i><strong>QHD Desktop</strong><span>2560 × 1440 px</span></button>
+        <button class="preset-card hidden" type="button" data-category="screen" data-size="3840x2160"><i style="--ratio:16/9"></i><strong>4K Desktop</strong><span>3840 × 2160 px</span></button>
+        <button class="preset-card hidden" type="button" data-category="screen" data-size="3440x1440"><i style="--ratio:43/18"></i><strong>Ultrawide</strong><span>3440 × 1440 px</span></button>
+        <button class="preset-card hidden" type="button" data-category="screen" data-preset="current"><i style="--ratio:16/9"></i><strong>This Screen</strong><span>match this device</span></button>
+
+        <button class="preset-card hidden" type="button" data-category="mobile" data-size="1080x1920"><i style="--ratio:9/16"></i><strong>Phone Full HD</strong><span>1080 × 1920 px</span></button>
+        <button class="preset-card hidden" type="button" data-category="mobile" data-size="1170x2532"><i style="--ratio:1170/2532"></i><strong>iPhone Portrait</strong><span>1170 × 2532 px</span></button>
+        <button class="preset-card hidden" type="button" data-category="mobile" data-size="1440x3200"><i style="--ratio:9/20"></i><strong>Tall Android</strong><span>1440 × 3200 px</span></button>
+        <button class="preset-card hidden" type="button" data-category="mobile" data-size="2048x2732"><i style="--ratio:3/4"></i><strong>Tablet Portrait</strong><span>2048 × 2732 px</span></button>
+      </div>
+    </section>
+
+    <aside class="project-settings">
+      <label class="field-label">Name<input id="projectName" type="text" value="New Project" maxlength="60" /></label>
+      <div class="dimension-row">
+        <label class="field-label">Width<input id="widthInput" type="number" min="320" max="4096" value="1280" /></label>
+        <button type="button" id="swapButton" aria-label="Swap width and height">⇆</button>
+        <label class="field-label">Height<input id="heightInput" type="number" min="320" max="4096" value="720" /></label>
+        <span class="unit">Pixels</span>
+      </div>
+      <label class="field-label">Background
+        <select id="backgroundInput">
+          <option value="#ffffff">White</option>
+          <option value="#000000" selected>Black</option>
+          <option value="transparent">Transparent</option>
+        </select>
+      </label>
+      <div class="details"><span>Mode</span><strong>RGB · 8 bit · sRGB</strong></div>
+      <button class="create-button" id="createButton" type="button">Create</button>
+      <p>Images are edited locally in your browser and never sent to a server.</p>
+    </aside>
+  </main>
+
+  <main class="editor" id="editorView" hidden>
+    <aside class="toolbar" aria-label="Tools">
+      <button type="button" class="active" title="Move image">✥</button>
+      <button type="button" id="toolbarOpen" title="Open image">▧</button>
+      <button type="button" id="toolbarCenter" title="Center crop">⌗</button>
+      <button type="button" id="toolbarRotate" title="Rotate clockwise">↻</button>
+      <i class="tool-divider"></i>
+      <button type="button" data-filter="bw" title="Black and white">◐</button>
+      <button type="button" data-filter="archive" title="Archive halftone">⠿</button>
+      <button type="button" data-filter="invert" title="Invert">◒</button>
+      <button type="button" data-filter="warm" title="Warm fade">◉</button>
+    </aside>
+
+    <section class="canvas-area" id="dropZone">
+      <div class="canvas-stage">
+        <canvas id="canvas" width="1280" height="720" aria-label="Image editor canvas"></canvas>
+        <div class="empty-canvas" id="emptyState">
+          <strong>OPEN OR DROP AN IMAGE</strong>
+          <span>it will crop to fill the whole canvas</span>
+        </div>
+      </div>
+      <div class="status-bar"><span id="zoomStatus">100%</span><span id="resolutionLabel">1280 × 720 px</span><span>RGB / 8</span></div>
+    </section>
+
+    <aside class="side-panels">
+      <section class="panel">
+        <h2>Properties</h2>
+        <label>Zoom <output id="zoomValue">100%</output><input id="zoomInput" type="range" min="100" max="300" value="100" /></label>
+        <button type="button" id="centerButton">Center &amp; fill</button>
+        <button type="button" id="replaceButton">Replace image</button>
+      </section>
+      <section class="panel filters-panel">
+        <h2>Filters</h2>
+        <label class="select-label">Preset
+          <select id="filterSelect">
+            <option value="none">Original</option>
+            <option value="bw">Black &amp; white</option>
+            <option value="archive">Archive dots</option>
+            <option value="invert">Invert</option>
+            <option value="warm">Warm fade</option>
+          </select>
+        </label>
+        <label>Brightness <output id="brightnessValue">100%</output><input id="brightnessInput" type="range" min="40" max="160" value="100" /></label>
+        <label>Contrast <output id="contrastValue">100%</output><input id="contrastInput" type="range" min="50" max="250" value="100" /></label>
+        <label class="dot-control">Dot size <output id="dotSizeValue">6px</output><input id="dotSizeInput" type="range" min="3" max="24" value="6" /></label>
+        <label class="check-label"><input id="halftoneInput" type="checkbox" /> dotted halftone</label>
+      </section>
+      <section class="panel layers-panel">
+        <h2>Layers</h2>
+        <div class="layer active"><i id="layerThumb"></i><span id="layerName">Background</span><b>▣</b></div>
+      </section>
+      <section class="panel export-panel">
+        <h2>Export</h2>
+        <button type="button" id="jpegButton" disabled>Save as JPEG</button>
+        <button type="button" id="pngButton" disabled>Save as PNG</button>
+      </section>
+    </aside>
+  </main>
+
+  <input id="imageInput" type="file" accept="image/*" hidden />
+  <script src="script.js?v=3"></script>
+</body>
+</html>
