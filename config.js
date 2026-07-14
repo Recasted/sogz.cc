@@ -36,13 +36,14 @@ window.ARCHIVE_CONFIG = {
       ]
     },
     {
-      title: "PROJECTS", subtitle: "projects 003", image: "assets/card-03.png", x: 57, y: 55, rotation: -2, theme: "void", audio: "",
+      title: "PROJECTS / TOOLS", subtitle: "projects & tools 003", image: "assets/card-03.png", x: 57, y: 55, rotation: -2, theme: "void", audio: "",
       audioTracks: [
         { title: "RUN", src: "assets/audio/03-1-run.mp3" },
         { title: "reminding", src: "assets/audio/03-2-reminding.mp3" }
       ],
       links: [
-        { label: "sogz editor", url: "sogzeditor/" }
+        { label: "sogz editor", url: "sogzeditor/" },
+        { label: "osint", url: "https://osintforge.dev" }
       ]
     },
     {
