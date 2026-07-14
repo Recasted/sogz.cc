@@ -1,7 +1,7 @@
 // PERSONALIZE THE SITE HERE.
 // Put your own images in the assets folder, then update the paths below.
 window.ARCHIVE_CONFIG = {
-  backgroundImage: "assets/default-background.jpg",
+  backgroundImage: "assets/default-background-eyes.png",
   backgroundPosition: "center center",
   defaultAudioTracks: [
     { title: "Einfach Sein", src: "assets/audio/default.mp3" }
@@ -36,12 +36,13 @@ window.ARCHIVE_CONFIG = {
       ]
     },
     {
-      title: "PROJECTS / TOOLS", subtitle: "projects & tools 003", image: "assets/card-03.png", x: 57, y: 55, rotation: -2, theme: "void", audio: "",
+      title: "CREATIVE / TOOLS", subtitle: "draw - edit - explore 003", image: "assets/card-03.png", x: 57, y: 55, rotation: -2, theme: "void", audio: "",
       audioTracks: [
         { title: "RUN", src: "assets/audio/03-1-run.mp3" },
         { title: "reminding", src: "assets/audio/03-2-reminding.mp3" }
       ],
       links: [
+        { label: "SogSketch", url: "sogsketch/" },
         { label: "sogz editor", url: "sogzeditor/" },
         { label: "osint", url: "https://osintforge.dev" }
       ]
