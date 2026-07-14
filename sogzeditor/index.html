@@ -7,7 +7,7 @@
   <meta name="description" content="A private browser-based image cropper and wallpaper editor." />
   <title>sogz editor</title>
   <link rel="icon" href="../assets/favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
 </head>
 <body>
   <header class="app-menu">
@@ -82,12 +82,19 @@
       <button type="button" id="toolbarOpen" title="Open image">▧</button>
       <button type="button" id="toolbarCenter" title="Center crop">⌗</button>
       <button type="button" id="toolbarRotate" title="Rotate clockwise">↻</button>
+      <button type="button" id="toolbarFlip" title="Flip selected layer horizontally">⇋</button>
+      <button type="button" id="toolbarDuplicate" class="tool-letter" title="Duplicate selected layer">D</button>
+      <button type="button" id="colorPanelButton" class="tool-letter" title="Color wheel and tint">C</button>
       <i class="tool-divider"></i>
       <button type="button" data-filter="bw" title="Black and white">◐</button>
       <button type="button" data-filter="archive" title="Archive halftone">⠿</button>
       <button type="button" data-filter="triptych" title="Three repeated bars">☰</button>
+      <button type="button" data-filter="duo" class="tool-letter" title="Side-by-side repeat">II</button>
       <button type="button" data-filter="invert" title="Invert">◒</button>
       <button type="button" data-filter="warm" title="Warm fade">◉</button>
+      <button type="button" data-filter="cool" class="tool-letter" title="Cool tone">B</button>
+      <button type="button" data-filter="soft" class="tool-letter" title="Soft glow">S</button>
+      <button type="button" data-filter="vintage" class="tool-letter" title="Vintage color">V</button>
     </aside>
     <div class="triptych-flyout" id="triptychFlyout" hidden>
       <div class="triptych-position-control">
@@ -98,6 +105,27 @@
       <div class="triptych-extra-controls">
         <label>bars <output id="triptychCountValue">3</output><input id="triptychCountInput" type="range" min="1" max="8" value="3" /></label>
         <label>image size <output id="triptychSizeValue">100%</output><input id="triptychSizeInput" type="range" min="100" max="250" value="100" /></label>
+      </div>
+    </div>
+    <div class="tool-flyout duo-flyout" id="duoFlyout" hidden>
+      <h3>side-by-side repeat</h3>
+      <div class="flyout-grid">
+        <label>panels <output id="duoCountValue">2</output><input id="duoCountInput" type="range" min="2" max="6" value="2" /></label>
+        <label>image size <output id="duoSizeValue">100%</output><input id="duoSizeInput" type="range" min="100" max="250" value="100" /></label>
+        <label>horizontal crop <output id="duoXValue">50%</output><input id="duoXInput" type="range" min="0" max="100" value="50" /></label>
+        <label>vertical crop <output id="duoYValue">50%</output><input id="duoYInput" type="range" min="0" max="100" value="50" /></label>
+        <label class="flyout-check"><input id="duoMirrorInput" type="checkbox" /> mirror every second panel</label>
+      </div>
+    </div>
+    <div class="tool-flyout color-flyout" id="colorFlyout" hidden>
+      <h3>color</h3>
+      <div class="color-picker-row">
+        <input id="tintColorInput" type="color" value="#ff4f92" aria-label="Tint color wheel" />
+        <input id="tintHexInput" type="text" value="#ff4f92" maxlength="7" spellcheck="false" aria-label="Tint HEX color" />
+      </div>
+      <div class="flyout-grid">
+        <label>hue <output id="hueFlyoutValue">0°</output><input id="hueFlyoutInput" type="range" min="-180" max="180" value="0" /></label>
+        <label>tint strength <output id="tintFlyoutValue">0%</output><input id="tintFlyoutInput" type="range" min="0" max="100" value="0" /></label>
       </div>
     </div>
 
@@ -129,12 +157,24 @@
             <option value="bw">Black &amp; white</option>
             <option value="archive">Archive dots</option>
             <option value="triptych">3 repeated bars</option>
+            <option value="duo">Side-by-side repeat</option>
             <option value="invert">Invert</option>
             <option value="warm">Warm fade</option>
+            <option value="cool">Cool tone</option>
+            <option value="soft">Soft glow</option>
+            <option value="vintage">Vintage color</option>
           </select>
         </label>
         <label>Brightness <output id="brightnessValue">100%</output><input id="brightnessInput" type="range" min="40" max="160" value="100" /></label>
         <label>Contrast <output id="contrastValue">100%</output><input id="contrastInput" type="range" min="50" max="250" value="100" /></label>
+        <label>Exposure <output id="exposureValue">0.0</output><input id="exposureInput" type="range" min="-20" max="20" value="0" /></label>
+        <label>Saturation <output id="saturationValue">100%</output><input id="saturationInput" type="range" min="0" max="250" value="100" /></label>
+        <label>Hue <output id="hueValue">0°</output><input id="hueInput" type="range" min="-180" max="180" value="0" /></label>
+        <label>Sepia <output id="sepiaValue">0%</output><input id="sepiaInput" type="range" min="0" max="100" value="0" /></label>
+        <label>Blur <output id="blurValue">0px</output><input id="blurInput" type="range" min="0" max="20" value="0" /></label>
+        <label>Tint <output id="tintValue">0%</output><input id="tintInput" type="range" min="0" max="100" value="0" /></label>
+        <button type="button" id="openColorButton">Choose tint color / HEX</button>
+        <button type="button" id="resetAdjustmentsButton">Reset color adjustments</button>
         <label class="dot-control">Dot size <output id="dotSizeValue">6px</output><input id="dotSizeInput" type="range" min="3" max="24" value="6" /></label>
         <label class="check-label"><input id="halftoneInput" type="checkbox" /> dotted halftone</label>
       </section>
@@ -158,6 +198,6 @@
   </main>
 
   <input id="imageInput" type="file" accept="image/*" multiple hidden />
-  <script src="script.js?v=8"></script>
+  <script src="script.js?v=9"></script>
 </body>
 </html>
