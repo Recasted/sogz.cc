@@ -43,10 +43,16 @@ window.ARCHIVE_CONFIG = {
       ]
     },
     {
-      title: "SOGZ", subtitle: "profile 000", image: "assets/card-04.jpg", x: 80, y: 53, rotation: 7, theme: "dream", audio: "",
+      title: "SOCIALS", subtitle: "profiles 004", image: "assets/card-04.jpg", x: 80, y: 53, rotation: 7, theme: "dream", audio: "",
       audioTracks: [
         { title: "I SELL CRACK!", src: "assets/audio/04-1-i-sell-crack.mp3" },
         { title: "BEAM!", src: "assets/audio/04-2-beam.mp3" }
+      ],
+      links: [
+        { label: "instagram", url: "https://www.instagram.com/_sogz0/" },
+        { label: "instagram alt", url: "https://www.instagram.com/24.9.15.12.5/" },
+        { label: "twitch", url: "https://www.twitch.tv/p62_" },
+        { label: "youtube", url: "https://www.youtube.com/@ForageCR" }
       ]
     }
   ]
