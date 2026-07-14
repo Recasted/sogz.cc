@@ -52,7 +52,8 @@ window.ARCHIVE_CONFIG = {
         { label: "instagram", url: "https://www.instagram.com/_sogz0/" },
         { label: "instagram alt", url: "https://www.instagram.com/24.9.15.12.5/" },
         { label: "twitch", url: "https://www.twitch.tv/p62_" },
-        { label: "youtube", url: "https://www.youtube.com/@ForageCR" }
+        { label: "youtube", url: "https://www.youtube.com/@ForageCR" },
+        { label: "doxbin", url: "https://doxbin.com/user/k1ck" }
       ]
     }
   ]
