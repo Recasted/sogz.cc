@@ -51,6 +51,7 @@ canvas { display:block; max-width:100%; max-height:calc(100vh - 128px); width:au
 canvas.dragging { cursor:grabbing; }
 .canvas-area.hand, .canvas-area.hand canvas { cursor:grab; }
 .canvas-area.panning, .canvas-area.panning canvas { cursor:grabbing; }
+.canvas-area.cut canvas { cursor:crosshair; }
 .empty-canvas { position:absolute; display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none; color:#aaa; }
 .canvas-area.empty { cursor:pointer; }
 .canvas-area.empty .canvas-stage:hover .empty-canvas strong { color:#fff; }
@@ -71,11 +72,14 @@ canvas.dragging { cursor:grabbing; }
 .panel button { width:100%; min-height:30px; margin-top:6px; border:1px solid #222; border-radius:2px; background:#4b4b4b; }
 .panel button:hover:not(:disabled) { background:#616161; }
 .panel button:disabled { opacity:.35; }
-.layer { display:grid; grid-template-columns:38px 1fr auto; align-items:center; gap:8px; padding:5px; border:1px solid transparent; }
+.layer-list { display:flex; flex-direction:column; gap:3px; max-height:220px; overflow:auto; }
+.layer { display:grid; grid-template-columns:38px 1fr auto; align-items:center; gap:8px; width:100%; padding:5px; border:1px solid transparent; color:#ddd; text-align:left; background:transparent; }
 .layer.active { border-color:#666; background:#454545; }
 .layer i { width:38px; height:30px; border:1px solid #222; background:#111 center/cover no-repeat; }
 .layer span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .layer b { font-weight:400; }
+.layer.muted { opacity:.38; }
+.cut-panel p { color:#aaa; font-size:10px; line-height:1.45; }
 .export-panel { margin-top:16px; }
 
 @media (max-width:800px) {

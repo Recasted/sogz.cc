@@ -78,12 +78,14 @@
     <aside class="toolbar" aria-label="Tools">
       <button type="button" class="active" id="moveTool" title="Move image">✥</button>
       <button type="button" id="handTool" title="Pan workspace">✋</button>
+      <button type="button" id="cutTool" title="Cut transparent holes">✂</button>
       <button type="button" id="toolbarOpen" title="Open image">▧</button>
       <button type="button" id="toolbarCenter" title="Center crop">⌗</button>
       <button type="button" id="toolbarRotate" title="Rotate clockwise">↻</button>
       <i class="tool-divider"></i>
       <button type="button" data-filter="bw" title="Black and white">◐</button>
       <button type="button" data-filter="archive" title="Archive halftone">⠿</button>
+      <button type="button" data-filter="triptych" title="Three repeated bars">☰</button>
       <button type="button" data-filter="invert" title="Invert">◒</button>
       <button type="button" data-filter="warm" title="Warm fade">◉</button>
     </aside>
@@ -115,6 +117,7 @@
             <option value="none">Original</option>
             <option value="bw">Black &amp; white</option>
             <option value="archive">Archive dots</option>
+            <option value="triptych">3 repeated bars</option>
             <option value="invert">Invert</option>
             <option value="warm">Warm fade</option>
           </select>
@@ -124,9 +127,16 @@
         <label class="dot-control">Dot size <output id="dotSizeValue">6px</output><input id="dotSizeInput" type="range" min="3" max="24" value="6" /></label>
         <label class="check-label"><input id="halftoneInput" type="checkbox" /> dotted halftone</label>
       </section>
+      <section class="panel cut-panel">
+        <h2>Cut tool</h2>
+        <label>Brush size <output id="brushSizeValue">60px</output><input id="brushSizeInput" type="range" min="8" max="300" value="60" /></label>
+        <p>Choose a layer, select ✂, then paint over it to cut transparent PNG holes.</p>
+      </section>
       <section class="panel layers-panel">
         <h2>Layers</h2>
-        <div class="layer active"><i id="layerThumb"></i><span id="layerName">Background</span><b>▣</b></div>
+        <div class="layer-list" id="layerList"></div>
+        <button type="button" id="addLayerButton">+ Add image layer</button>
+        <button type="button" id="deleteLayerButton" disabled>− Delete selected</button>
       </section>
       <section class="panel export-panel">
         <h2>Export</h2>
@@ -136,7 +146,7 @@
     </aside>
   </main>
 
-  <input id="imageInput" type="file" accept="image/*" hidden />
-  <script src="script.js?v=4"></script>
+  <input id="imageInput" type="file" accept="image/*" multiple hidden />
+  <script src="script.js?v=6"></script>
 </body>
 </html>
