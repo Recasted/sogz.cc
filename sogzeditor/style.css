@@ -55,6 +55,8 @@ button { border:0; }
 .toolbar .tool-letter { font-size:12px; font-weight:700; letter-spacing:-.04em; }
 .tool-divider { display:block; width:28px; height:1px; margin:5px 0; background:#181818; }
 .triptych-flyout { position:absolute; z-index:12; top:256px; left:42px; display:flex; align-items:stretch; gap:10px; width:178px; padding:10px 8px; border:1px solid #151515; background:#3b3b3b; box-shadow:8px 9px 18px rgba(0,0,0,.45); }
+.flyout-close { position:absolute; z-index:2; top:4px; right:4px; width:24px; height:24px; padding:0; border:0; color:#bbb; background:rgba(25,25,25,.72); font-size:18px; line-height:24px; }
+.flyout-close:hover { color:#fff; background:#5b3a43; }
 .triptych-position-control { display:flex; flex-direction:column; align-items:center; gap:8px; }
 .triptych-flyout span { color:#bbb; font-size:9px; line-height:1.2; text-align:center; text-transform:uppercase; }
 .triptych-position-control input { width:18px; height:150px; margin:0; writing-mode:vertical-lr; direction:rtl; accent-color:#ddd; }
@@ -63,7 +65,7 @@ button { border:0; }
 .triptych-extra-controls label { display:grid; grid-template-columns:1fr auto; gap:5px; color:#bbb; font-size:9px; text-transform:uppercase; }
 .triptych-extra-controls input { grid-column:1/-1; width:100%; margin:3px 0 0; accent-color:#ddd; }
 .tool-flyout { position:absolute; z-index:13; left:42px; width:230px; padding:10px; border:1px solid #151515; background:#3b3b3b; box-shadow:8px 9px 18px rgba(0,0,0,.45); }
-.tool-flyout h3 { margin:-10px -10px 11px; padding:8px 10px; border-bottom:1px solid #242424; color:#ddd; background:#333; font-size:10px; font-weight:400; letter-spacing:.08em; text-transform:uppercase; }
+.tool-flyout h3 { margin:-10px -10px 11px; padding:8px 38px 8px 10px; border-bottom:1px solid #242424; color:#ddd; background:#333; font-size:10px; font-weight:400; letter-spacing:.08em; text-transform:uppercase; }
 .duo-flyout { top:310px; }
 .color-flyout { top:220px; }
 .flyout-grid { display:grid; gap:12px; }

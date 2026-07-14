@@ -7,7 +7,7 @@
   <meta name="description" content="A private browser-based image cropper and wallpaper editor." />
   <title>sogz editor</title>
   <link rel="icon" href="../assets/favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
   <header class="app-menu">
@@ -100,6 +100,7 @@
       <button type="button" data-filter="vintage" class="tool-letter" title="Vintage color">V</button>
     </aside>
     <div class="triptych-flyout" id="triptychFlyout" hidden>
+      <button type="button" class="flyout-close" data-close-flyout aria-label="Close repeated bars controls">×</button>
       <div class="triptych-position-control">
         <span>position</span>
         <input id="triptychPositionInput" type="range" min="0" max="100" value="50" aria-label="Bars vertical crop position" />
@@ -111,6 +112,7 @@
       </div>
     </div>
     <div class="tool-flyout duo-flyout" id="duoFlyout" hidden>
+      <button type="button" class="flyout-close" data-close-flyout aria-label="Close side-by-side controls">×</button>
       <h3>side-by-side repeat</h3>
       <div class="flyout-grid">
         <label>panels <output id="duoCountValue">2</output><input id="duoCountInput" type="range" min="2" max="6" value="2" /></label>
@@ -121,6 +123,7 @@
       </div>
     </div>
     <div class="tool-flyout color-flyout" id="colorFlyout" hidden>
+      <button type="button" class="flyout-close" data-close-flyout aria-label="Close color controls">×</button>
       <h3>color</h3>
       <div class="color-picker-row">
         <input id="tintColorInput" type="color" value="#ff4f92" aria-label="Tint color wheel" />
@@ -208,6 +211,6 @@
   </aside>
 
   <input id="imageInput" type="file" accept="image/*" multiple hidden />
-  <script src="script.js?v=11"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>

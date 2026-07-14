@@ -52,6 +52,8 @@ const hueFlyoutInput = $("#hueFlyoutInput");
 const tintFlyoutInput = $("#tintFlyoutInput");
 
 $("#supportClose").addEventListener("click",()=>{$("#supportPopup").hidden=true;});
+document.querySelectorAll("[data-close-flyout]").forEach((button)=>button.addEventListener("click",()=>{button.closest(".triptych-flyout, .tool-flyout").hidden=true;colorPanelButton?.classList.remove("active");}));
+document.addEventListener("keydown",(event)=>{if(event.key!=="Escape")return;document.querySelectorAll(".triptych-flyout, .tool-flyout").forEach((flyout)=>flyout.hidden=true);colorPanelButton?.classList.remove("active");});
 
 const state = {
   layers:[], selectedLayerId:null, nextLayerId:1, background:"#000000", tool:"move",
