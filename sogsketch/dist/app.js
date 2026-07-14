@@ -6,8 +6,8 @@ const fileInput = qs("#fileInput"), layerList = qs("#layerList"), historyList = 
 const fgInput = qs("#fgColor"), bgInput = qs("#bgColor"), hexInput = qs("#hexInput"), rInput = qs("#rInput"), gInput = qs("#gInput"), bInput = qs("#bInput"), hInput = qs("#hInput"), sInput = qs("#sInput"), lInput = qs("#lInput");
 const toolLabels = { brush: "Freehand brush", pencil: "Pencil", eraser: "Eraser", line: "Line", rectangle: "Rectangle", ellipse: "Ellipse", polygon: "Polygon", polyline: "Polyline", path: "Bezier path", fill: "Fill bucket", gradient: "Gradient", picker: "Color picker", move: "Move layer", transform: "Transform layer", crop: "Crop canvas", selectRect: "Rectangle selection", selectEllipse: "Ellipse selection", text: "Text", pan: "Pan canvas", zoom: "Zoom" };
 const defaultPresets = [{ id: "ink", name: "Ink", size: 12, opacity: 100, flow: 100, hardness: 100, spacing: 8, smoothing: 45 }, { id: "paint", name: "Paint", size: 38, opacity: 92, flow: 70, hardness: 78, spacing: 12, smoothing: 55 }, { id: "air", name: "Airbrush", size: 95, opacity: 40, flow: 28, hardness: 10, spacing: 7, smoothing: 30 }, { id: "pencil", name: "Pencil", size: 4, opacity: 100, flow: 100, hardness: 100, spacing: 5, smoothing: 18 }, { id: "marker", name: "Marker", size: 28, opacity: 72, flow: 85, hardness: 88, spacing: 10, smoothing: 40 }, { id: "soft", name: "Soft", size: 140, opacity: 25, flow: 20, hardness: 0, spacing: 7, smoothing: 25 }];
-const state = { width: 1600, height: 1000, resolution: 72, name: "Untitled", background: "transparent", layers: [], selectedLayerId: null, nextLayerId: 1, tool: "brush", brush: { size: 24, opacity: 100, flow: 100, hardness: 85, spacing: 12, smoothing: 35, stabilizer: 4, eraserMode: false, symmetry: false }, foreground: "#FFFFFF", backgroundColor: "#000000", recentColors: ["#FFFFFF", "#000000"], selection: null, guides: [], view: { zoom: .65, panX: 0, panY: 0, rotation: 0, flipX: 1, flipY: 1, grid: false, rulers: false, snap: true }, autosave: true };
-let drawing = false, startPoint = { x: 0, y: 0, pressure: 1 }, lastPoint = { x: 0, y: 0, pressure: 1 }, panStart = { x: 0, y: 0, panX: 0, panY: 0 }, moveStart = { x: 0, y: 0, layerX: 0, layerY: 0 }, pathPoints = [], strokeBefore = null, textPoint = null, historyBusy = false, autosaveTimer = 0;
+const state = { width: 1600, height: 1000, resolution: 72, name: "Untitled", background: "#FFFFFF", layers: [], selectedLayerId: null, nextLayerId: 1, tool: "brush", brush: { size: 24, opacity: 100, flow: 100, hardness: 85, spacing: 12, smoothing: 35, stabilizer: 4, eraserMode: false, symmetry: false }, foreground: "#000000", backgroundColor: "#FFFFFF", recentColors: ["#000000", "#FFFFFF"], selection: null, guides: [], view: { zoom: .65, panX: 0, panY: 0, rotation: 0, flipX: 1, flipY: 1, grid: false, rulers: false, snap: true }, autosave: true };
+let drawing = false, workspacePanning = false, startPoint = { x: 0, y: 0, pressure: 1 }, lastPoint = { x: 0, y: 0, pressure: 1 }, panStart = { x: 0, y: 0, panX: 0, panY: 0 }, moveStart = { x: 0, y: 0, layerX: 0, layerY: 0 }, pathPoints = [], strokeBefore = null, textPoint = null, historyBusy = false, autosaveTimer = 0;
 const history = new HistoryManager(24, renderHistory);
 function makeLayer(name, background = false) { const canvas = document.createElement("canvas"); canvas.width = state.width; canvas.height = state.height; return { id: state.nextLayerId++, name, canvas, visible: true, locked: false, opacity: 100, blendMode: "source-over", alphaInherit: false, groupId: null, x: 0, y: 0, scaleX: 1, scaleY: 1 }; }
 function selectedLayer() { return state.layers.find(layer => layer.id === state.selectedLayerId) ?? null; }
@@ -103,6 +103,11 @@ function pointFromEvent(event) { const rect = overlay.getBoundingClientRect(); l
 function layerPoint(point, layer) { return { x: (point.x - state.width / 2 - layer.x) / layer.scaleX + state.width / 2, y: (point.y - state.height / 2 - layer.y) / layer.scaleY + state.height / 2, pressure: point.pressure }; }
 function inSelection(point) { const s = state.selection; if (!s)
     return true; const x = (point.x - s.x) / s.width, y = (point.y - s.y) / s.height; return s.ellipse ? ((x - .5) ** 2 + (y - .5) ** 2 <= .25) : x >= 0 && x <= 1 && y >= 0 && y <= 1; }
+function clipToSelection(ctx) { const s = state.selection; if (!s)
+    return; ctx.beginPath(); if (s.ellipse)
+    ctx.ellipse(s.x + s.width / 2, s.y + s.height / 2, Math.abs(s.width / 2), Math.abs(s.height / 2), 0, 0, Math.PI * 2);
+else
+    ctx.rect(s.x, s.y, s.width, s.height); ctx.clip(); }
 function brushStamp(ctx, point, size, color, erase) { if (!inSelection(point))
     return; const radius = Math.max(.5, size * point.pressure / 2), hardness = state.tool === "pencil" ? 100 : state.brush.hardness; ctx.save(); ctx.globalAlpha = (state.brush.opacity / 100) * (state.brush.flow / 100); ctx.globalCompositeOperation = erase ? "destination-out" : "source-over"; if (hardness >= 98) {
     ctx.fillStyle = color;
@@ -113,13 +118,26 @@ else {
     gradient.addColorStop(1, "transparent");
     ctx.fillStyle = gradient;
 } ctx.beginPath(); ctx.arc(point.x, point.y, radius, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
+function strokeLine(ctx, a, b, size, color, erase) { ctx.save(); clipToSelection(ctx); ctx.globalAlpha = (state.brush.opacity / 100) * (state.brush.flow / 100); ctx.globalCompositeOperation = erase ? "destination-out" : "source-over"; ctx.strokeStyle = color; ctx.lineCap = "round"; ctx.lineJoin = "round"; const hardness = state.tool === "pencil" ? 100 : state.brush.hardness; if (hardness < 95 && !erase) {
+    ctx.shadowColor = color;
+    ctx.shadowBlur = (1 - hardness / 100) * size * .45;
+} const distance = Math.hypot(b.x - a.x, b.y - a.y), parts = Math.max(1, Math.ceil(distance / Math.max(2, size * .65))); let previous = a; for (let i = 1; i <= parts; i++) {
+    const t = i / parts, next = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, pressure: a.pressure + (b.pressure - a.pressure) * t };
+    ctx.lineWidth = Math.max(.5, size * ((previous.pressure + next.pressure) / 2));
+    ctx.beginPath();
+    ctx.moveTo(previous.x, previous.y);
+    ctx.lineTo(next.x, next.y);
+    ctx.stroke();
+    previous = next;
+} ctx.restore(); }
 function drawBrushSegment(from, to) { const layer = selectedLayer(); if (!layer || layer.locked)
-    return; const ctx = layer.canvas.getContext("2d"), a = layerPoint(from, layer), b = layerPoint(to, layer), distance = Math.hypot(b.x - a.x, b.y - a.y), size = state.tool === "pencil" ? Math.min(state.brush.size, 8) : state.brush.size, step = Math.max(1, size * state.brush.spacing / 100), count = Math.max(1, Math.ceil(distance / step)), erase = state.tool === "eraser" || state.brush.eraserMode; for (let i = 0; i <= count; i++) {
-    const t = i / count, p = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, pressure: a.pressure + (b.pressure - a.pressure) * t };
-    brushStamp(ctx, p, size, state.foreground, erase);
+    return; const ctx = layer.canvas.getContext("2d"), a = layerPoint(from, layer), b = layerPoint(to, layer), size = state.tool === "pencil" ? Math.min(state.brush.size, 8) : state.brush.size, erase = state.tool === "eraser" || state.brush.eraserMode; if (Math.hypot(b.x - a.x, b.y - a.y) < .5) {
+    brushStamp(ctx, a, size, state.foreground, erase);
     if (state.brush.symmetry)
-        brushStamp(ctx, { ...p, x: state.width - p.x }, size, state.foreground, erase);
-} }
+        brushStamp(ctx, { ...a, x: state.width - a.x }, size, state.foreground, erase);
+    return;
+} strokeLine(ctx, a, b, size, state.foreground, erase); if (state.brush.symmetry)
+    strokeLine(ctx, { ...a, x: state.width - a.x }, { ...b, x: state.width - b.x }, size, state.foreground, erase); }
 function withLayerContext(draw) { const layer = selectedLayer(); if (!layer || layer.locked)
     return; const ctx = layer.canvas.getContext("2d"); ctx.save(); ctx.globalAlpha = state.brush.opacity / 100; ctx.strokeStyle = state.foreground; ctx.fillStyle = state.foreground; ctx.lineWidth = state.brush.size; ctx.lineCap = "round"; ctx.lineJoin = "round"; draw(ctx); ctx.restore(); composite(); }
 function previewShape(point) { overlayCtx.clearRect(0, 0, state.width, state.height); overlayCtx.save(); overlayCtx.strokeStyle = state.foreground; overlayCtx.lineWidth = state.brush.size / state.view.zoom; overlayCtx.globalAlpha = state.brush.opacity / 100; overlayCtx.setLineDash(state.tool.startsWith("select") || state.tool === "crop" ? [8, 6] : []); const x = startPoint.x, y = startPoint.y, w = point.x - x, h = point.y - y; overlayCtx.beginPath(); if (state.tool === "line")
@@ -193,9 +211,10 @@ function clearSelectionOrLayer() { const layer = selectedLayer(); if (!layer || 
     ctx.clearRect(state.selection.x, state.selection.y, state.selection.width, state.selection.height);
 else
     ctx.clearRect(0, 0, state.width, state.height); composite(); }
-function pointerDown(event) { event.preventDefault(); const point = pointFromEvent(event); startPoint = lastPoint = point; overlay.setPointerCapture(event.pointerId); if (state.tool === "pan" || event.button === 1 || event.altKey) {
+function pointerDown(event) { event.preventDefault(); event.stopPropagation(); const point = pointFromEvent(event); startPoint = lastPoint = point; overlay.setPointerCapture(event.pointerId); if (state.tool === "pan" || event.button === 1 || event.altKey) {
     drawing = true;
     panStart = { x: event.clientX, y: event.clientY, panX: state.view.panX, panY: state.view.panY };
+    viewport.classList.add("panning");
     return;
 } if (state.tool === "zoom") {
     setZoom(state.view.zoom * (event.shiftKey ? .8 : 1.25));
@@ -257,9 +276,17 @@ function pointerMove(event) { const point = pointFromEvent(event); qs("#pointerS
     return;
 } previewShape(point); }
 function pointerUp(event) { if (!drawing)
-    return; const point = pointFromEvent(event); drawing = false; if (overlay.hasPointerCapture(event.pointerId))
+    return; const point = pointFromEvent(event); drawing = false; viewport.classList.remove("panning"); if (overlay.hasPointerCapture(event.pointerId))
     overlay.releasePointerCapture(event.pointerId); if (["line", "rectangle", "ellipse", "path", "gradient", "crop", "selectRect", "selectEllipse"].includes(state.tool))
     commitShape(point); strokeBefore = null; drawSelection(); }
+function viewportPointerDown(event) { if (event.target === overlay)
+    return; if (event.button !== 1 && state.tool !== "pan" && !event.altKey)
+    return; event.preventDefault(); workspacePanning = true; panStart = { x: event.clientX, y: event.clientY, panX: state.view.panX, panY: state.view.panY }; viewport.setPointerCapture(event.pointerId); viewport.classList.add("panning"); }
+function viewportPointerMove(event) { if (!workspacePanning)
+    return; event.preventDefault(); state.view.panX = panStart.panX + event.clientX - panStart.x; state.view.panY = panStart.panY + event.clientY - panStart.y; syncView(); }
+function viewportPointerUp(event) { if (!workspacePanning)
+    return; workspacePanning = false; viewport.classList.remove("panning"); if (viewport.hasPointerCapture(event.pointerId))
+    viewport.releasePointerCapture(event.pointerId); }
 function cropToSelection() { const s = state.selection; if (!s || s.width < 2 || s.height < 2)
     return; checkpoint("Crop canvas"); const x = Math.round(s.x), y = Math.round(s.y), width = Math.round(s.width), height = Math.round(s.height); for (const layer of state.layers) {
     const copy = canvasCopy(layer.canvas);
@@ -361,12 +388,7 @@ catch {
 async function recover() { const raw = localStorage.getItem("sogsketch-recovery"); if (!raw || !confirm("Recover your last SogSketch document?"))
     return; await openProject(new File([raw], "recovery.sogsketch", { type: "application/json" })); }
 function newDocument() { qs("#newDialog").showModal(); }
-function createDocument() { const width = Number(qs("#newWidth").value), height = Number(qs("#newHeight").value); state.name = qs("#newName").value.trim() || "Untitled"; state.resolution = Number(qs("#newResolution").value) || 72; const background = qs("#newBackground").value; state.background = background === "custom" ? qs("#newBackgroundColor").value : background; state.layers = []; state.nextLayerId = 1; state.selection = null; setCanvasSize(width, height); const layer = makeLayer(state.background === "transparent" ? "Paint Layer 1" : "Background", state.background !== "transparent"); if (state.background !== "transparent") {
-    const ctx = layer.canvas.getContext("2d");
-    ctx.fillStyle = state.background;
-    ctx.fillRect(0, 0, state.width, state.height);
-    state.background = "transparent";
-} state.layers = [layer]; state.selectedLayerId = layer.id; history.reset(); updateTitle(); renderLayers(); composite(); fitCanvas(); setStatus("New document"); }
+function createDocument() { const width = Number(qs("#newWidth").value), height = Number(qs("#newHeight").value); state.name = qs("#newName").value.trim() || "Untitled"; state.resolution = Number(qs("#newResolution").value) || 72; const background = qs("#newBackground").value; state.background = background === "custom" ? qs("#newBackgroundColor").value : background; state.layers = []; state.nextLayerId = 1; state.selection = null; setCanvasSize(width, height); const layer = makeLayer("Paint Layer 1"); state.layers = [layer]; state.selectedLayerId = layer.id; history.reset(); updateTitle(); renderLayers(); composite(); fitCanvas(); setStatus("New document"); }
 function showMessage(title, html) { qs("#messageTitle").textContent = title; qs("#messageBody").innerHTML = html; qs("#messageDialog").showModal(); }
 const commands = { new: newDocument, open: () => fileInput.click(), saveProject, exportPng: () => exportImage("image/png"), exportJpg: () => exportImage("image/jpeg"), exportWebp: () => exportImage("image/webp"), undo, redo, clear: clearSelectionOrLayer, selectAll: () => { state.selection = { x: 0, y: 0, width: state.width, height: state.height, ellipse: false }; drawSelection(); }, selectNone: () => { state.selection = null; drawSelection(); }, invertSelection: () => { state.selection = state.selection ? null : { x: 0, y: 0, width: state.width, height: state.height, ellipse: false }; drawSelection(); }, fit: fitCanvas, zoomIn: () => setZoom(state.view.zoom * 1.25), zoomOut: () => setZoom(state.view.zoom * .8), toggleGrid: () => { state.view.grid = !state.view.grid; syncView(); }, toggleRulers: () => { state.view.rulers = !state.view.rulers; syncView(); }, fullscreen: () => { document.body.classList.toggle("canvas-only"); }, resize: () => { const width = Number(prompt("New width", String(state.width))), height = Number(prompt("New height", String(state.height))); if (width && height)
         resizeDocument(width, height); }, rotateLeft: () => { state.view.rotation -= 15; syncView(); }, rotateRight: () => { state.view.rotation += 15; syncView(); }, flipH: () => { state.view.flipX *= -1; syncView(); }, flipV: () => { state.view.flipY *= -1; syncView(); }, addLayer, duplicateLayer, renameLayer, groupLayer, mergeDown, flatten, deleteLayer, filterGray: () => applyFilter("Grayscale"), filterInvert: () => applyFilter("Invert colors"), filterSepia: () => applyFilter("Sepia"), filterBlur: () => applyFilter("Soft blur"), saveWorkspace: () => { localStorage.setItem("sogsketch-workspace", JSON.stringify({ dock: !qs("#dock").classList.contains("mobile-hidden"), tools: !qs("#toolbar").classList.contains("mobile-hidden") })); setStatus("Workspace saved"); }, resetWorkspace: () => { localStorage.removeItem("sogsketch-workspace"); qs("#dock").classList.remove("mobile-hidden"); qs("#toolbar").classList.remove("mobile-hidden"); }, shortcuts: () => showMessage("Keyboard shortcuts", "<p><b>B/P/E</b> brush, pencil, eraser · <b>L/R/O</b> line, rectangle, ellipse · <b>F/G/I</b> fill, gradient, picker · <b>M/T/H/Z</b> move, text, pan, zoom · <b>Ctrl+Z/Y</b> undo/redo · <b>[ ]</b> brush size · <b>Space</b> temporary pan · <b>Enter</b> finish polygon · <b>Tab</b> canvas-only mode.</p>"), about: () => showMessage("About SogSketch", "<p>SogSketch is a lightweight, local-first drawing and painting studio. Your images stay in your browser unless you export them.</p>") };
@@ -383,7 +405,7 @@ function restoreWorkspacePreferences() { const saved = JSON.parse(localStorage.g
 function bindUi() { document.querySelectorAll("[data-tool]").forEach(button => button.addEventListener("click", () => setTool(button.dataset.tool))); document.querySelectorAll("[data-tool-command]").forEach(button => button.addEventListener("click", () => setTool(button.dataset.toolCommand))); document.querySelectorAll("[data-command]").forEach(button => button.addEventListener("click", () => { const command = button.dataset.command; if (command)
     void commands[command]?.(); button.closest(".menus details")?.removeAttribute("open"); })); for (const key of ["size", "opacity", "flow", "hardness", "spacing", "smoothing", "stabilizer"]) {
     qs(`#${key}Input`).addEventListener("input", event => { state.brush[key] = Number(event.target.value); syncBrushInputs(); });
-} qs("#eraserModeButton").addEventListener("click", () => { state.brush.eraserMode = !state.brush.eraserMode; syncBrushInputs(); }); qs("#symmetryButton").addEventListener("click", () => { state.brush.symmetry = !state.brush.symmetry; syncBrushInputs(); }); overlay.addEventListener("pointerdown", pointerDown); overlay.addEventListener("pointermove", pointerMove); overlay.addEventListener("pointerup", pointerUp); overlay.addEventListener("pointercancel", pointerUp); overlay.addEventListener("dblclick", finishPath); viewport.addEventListener("wheel", event => { event.preventDefault(); setZoom(state.view.zoom * (event.deltaY < 0 ? 1.12 : .89)); }, { passive: false }); qs("#zoomInput").addEventListener("input", event => setZoom(Number(event.target.value) / 100)); fileInput.addEventListener("change", async () => { for (const file of [...(fileInput.files ?? [])]) {
+} qs("#eraserModeButton").addEventListener("click", () => { state.brush.eraserMode = !state.brush.eraserMode; syncBrushInputs(); }); qs("#symmetryButton").addEventListener("click", () => { state.brush.symmetry = !state.brush.symmetry; syncBrushInputs(); }); overlay.addEventListener("pointerdown", pointerDown); overlay.addEventListener("pointermove", pointerMove); overlay.addEventListener("pointerup", pointerUp); overlay.addEventListener("pointercancel", pointerUp); overlay.addEventListener("dblclick", finishPath); viewport.addEventListener("pointerdown", viewportPointerDown); viewport.addEventListener("pointermove", viewportPointerMove); viewport.addEventListener("pointerup", viewportPointerUp); viewport.addEventListener("pointercancel", viewportPointerUp); viewport.addEventListener("wheel", event => { event.preventDefault(); setZoom(state.view.zoom * (event.deltaY < 0 ? 1.12 : .89)); }, { passive: false }); qs("#zoomInput").addEventListener("input", event => setZoom(Number(event.target.value) / 100)); fileInput.addEventListener("change", async () => { for (const file of [...(fileInput.files ?? [])]) {
     if (file.name.endsWith(".sogsketch") || file.type === "application/json")
         await openProject(file);
     else if (file.type.startsWith("image/"))
@@ -400,7 +422,7 @@ function bindUi() { document.querySelectorAll("[data-tool]").forEach(button => b
 } }); fgInput.addEventListener("input", () => setForeground(fgInput.value)); bgInput.addEventListener("input", () => { state.backgroundColor = bgInput.value.toUpperCase(); }); hexInput.addEventListener("change", () => setForeground(hexInput.value)); for (const input of [rInput, gInput, bInput])
     input.addEventListener("change", () => setForeground(rgbToHex(Number(rInput.value), Number(gInput.value), Number(bInput.value)))); for (const input of [hInput, sInput, lInput])
     input.addEventListener("change", () => setForeground(rgbToHex(...hslToRgb(Number(hInput.value), Number(sInput.value), Number(lInput.value))))); qs("#swapColors").addEventListener("click", () => { [state.foreground, state.backgroundColor] = [state.backgroundColor, state.foreground]; syncColors(); }); qs("#resetColors").addEventListener("click", () => { state.foreground = "#000000"; state.backgroundColor = "#FFFFFF"; syncColors(); }); qs("#saveBrushPreset").addEventListener("click", saveBrushPreset); qs("#toolsToggle").addEventListener("click", () => qs("#toolbar").classList.toggle("mobile-hidden")); qs("#dockToggle").addEventListener("click", () => qs("#dock").classList.toggle("mobile-hidden")); qs("#autosaveToggle").addEventListener("change", event => { state.autosave = event.target.checked; }); qs("#newBackground").addEventListener("change", event => { qs("#customBackgroundLabel").hidden = event.target.value !== "custom"; }); qs("#newOrientation").addEventListener("change", event => { const width = qs("#newWidth"), height = qs("#newHeight"); const wantsPortrait = event.target.value === "portrait"; if ((Number(width.value) < Number(height.value)) !== wantsPortrait)
-    [width.value, height.value] = [height.value, width.value]; }); qs("#createDocument").addEventListener("click", createDocument); qs("#applyText").addEventListener("click", () => { if (!textPoint)
+    [width.value, height.value] = [height.value, width.value]; }); document.querySelectorAll("[data-preset-category]").forEach(button => button.addEventListener("click", () => { document.querySelectorAll("[data-preset-category]").forEach(item => item.classList.remove("active")); button.classList.add("active"); document.querySelectorAll(".preset-card").forEach(card => card.classList.toggle("hidden", card.dataset.category !== button.dataset.presetCategory)); })); document.querySelectorAll(".preset-card[data-size]").forEach(card => card.addEventListener("click", () => { document.querySelectorAll(".preset-card").forEach(item => item.classList.remove("selected")); card.classList.add("selected"); const [width, height] = card.dataset.size.split("x").map(Number); qs("#newWidth").value = String(width); qs("#newHeight").value = String(height); })); qs("#swapCanvasSize").addEventListener("click", () => { const width = qs("#newWidth"), height = qs("#newHeight"); [width.value, height.value] = [height.value, width.value]; }); qs("#supportClose").addEventListener("click", () => { qs("#supportPopup").hidden = true; }); qs("#createDocument").addEventListener("click", createDocument); qs("#applyText").addEventListener("click", () => { if (!textPoint)
     return; checkpoint("Text"); withLayerContext(ctx => { ctx.font = `${qs("#fontStyle").value} ${Number(qs("#fontSize").value)}px ${qs("#fontFamily").value}`; ctx.fillStyle = state.foreground; ctx.fillText(qs("#textValue").value, textPoint.x, textPoint.y); }); textPoint = null; }); window.addEventListener("resize", fitCanvas); document.addEventListener("pointerdown", event => { if (!event.target.closest(".menus details"))
     document.querySelectorAll(".menus details[open]").forEach(item => item.removeAttribute("open")); }); }
 function keyHandler(event) { const target = event.target; if (["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
