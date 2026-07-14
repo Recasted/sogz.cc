@@ -24,10 +24,15 @@ window.ARCHIVE_CONFIG = {
       ]
     },
     {
-      title: "EGO", subtitle: "archive 002", image: "assets/card-02.png", x: 36, y: 53, rotation: 3, theme: "glass", audio: "",
+      title: "GAMING", subtitle: "profiles 002", image: "assets/card-02.png", x: 36, y: 53, rotation: 3, theme: "glass", audio: "",
       audioTracks: [
         { title: "MARY JANE", src: "assets/audio/02-1-mary-jane.mp3" },
         { title: "a song about america", src: "assets/audio/02-2-a-song-about-america.mp3" }
+      ],
+      links: [
+        { label: "minecraft", url: "https://namemc.com/profile/amphlbia.1" },
+        { label: "steam", url: "https://steamcommunity.com/profiles/76561199219916593/" },
+        { label: "roblox", url: "https://www.roblox.com/users/3124131039/profile" }
       ]
     },
     {
