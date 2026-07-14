@@ -25,7 +25,3 @@ The **change image** button is a quick local preview. To make that image visible
 - Use **reset** to restore the layout from `config.js`.
 
 The image chooser remembers a compressed preview on the current device. For a background that every visitor sees, put the original image in `assets` and set `backgroundImage` in `config.js`.
-
-## Publish
-
-Upload everything in this directory to the root of a GitHub repository. In the repository, open **Settings → Pages**, choose **Deploy from a branch**, then select `main` and `/ (root)`.
