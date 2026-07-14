@@ -32,3 +32,7 @@
 .support-close:hover{color:#fff}
 @media(max-width:900px){.support-link{margin-left:auto;padding:6px 7px}.new-canvas-layout{grid-template-columns:1fr}.new-canvas-dialog .preset-browser{min-height:0;padding-right:0;border-right:0}.preset-grid-large{grid-template-columns:1fr 1fr;max-height:260px}.support-popup{right:10px;bottom:34px}}
 @media(max-width:520px){.support-link{max-width:82px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.preset-grid-large{grid-template-columns:1fr}.dimension-row{grid-template-columns:1fr 34px 1fr}.dimension-row span{display:none}}
+body.needs-document .canvas-stage{visibility:hidden}
+body.needs-document .canvas-hud{display:none}
+body.needs-document #newDialog button[value=cancel]{display:none}
+body.needs-document #newDialog::backdrop{background:rgba(0,0,0,.88)}
