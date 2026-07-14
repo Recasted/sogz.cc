@@ -40,7 +40,7 @@ function createCard(card, index) {
   element.innerHTML = `<div class="card-inner">
     <span class="card-index">0${index + 1}</span>
     <div class="card-photo"><img src="${card.image}" alt="${card.title}" draggable="false"></div>
-    <strong class="card-title">${card.title}</strong>
+    <strong class="card-title"><span class="card-title-track">${card.title}</span></strong>
     <span class="card-subtitle">${card.subtitle}</span>
   </div>${cardLinks}`;
   const photo = element.querySelector(".card-photo");
@@ -53,6 +53,15 @@ function createCard(card, index) {
   if (image.complete) matchPhotoToImage();
   else image.addEventListener("load", matchPhotoToImage, { once: true });
   field.appendChild(element);
+  const title = element.querySelector(".card-title");
+  const titleTrack = element.querySelector(".card-title-track");
+  const updateTitlePan = () => {
+    const overflow = Math.max(0, titleTrack.scrollWidth - title.clientWidth);
+    title.style.setProperty("--title-overflow", `${overflow}px`);
+    title.classList.toggle("is-overflowing", overflow > 1);
+  };
+  new ResizeObserver(updateTitlePan).observe(title);
+  requestAnimationFrame(updateTitlePan);
   makeInteractive(element, state, card, index);
 }
 

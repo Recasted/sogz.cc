@@ -169,7 +169,11 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 .card-photo img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; filter: grayscale(1) contrast(2.35) brightness(.62); pointer-events: none; }
 .card-photo::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(145deg, rgba(159,13,20,.2), transparent 42%, rgba(0,0,0,.42)); mix-blend-mode: color-burn; }
 .card-photo::after { content: ""; position: absolute; inset: 0; z-index: 2; opacity: .52; pointer-events: none; background: radial-gradient(circle, #000 1px, transparent 1.2px); background-size: 3px 3px; mix-blend-mode: multiply; }
-.card-title { display: block; margin-top: 11px; overflow: hidden; font-size: clamp(13px, 1.35vw, 19px); font-style: italic; font-weight: 700; letter-spacing: .04em; text-align: center; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.card-title { display: block; margin-top: 11px; overflow: hidden; font-size: clamp(13px, 1.35vw, 19px); font-style: italic; font-weight: 700; letter-spacing: .04em; text-align: center; text-transform: uppercase; white-space: nowrap; }
+.card-title-track { display: inline-block; }
+.card-title.is-overflowing .card-title-track { animation: titlePan 3.2s ease-in-out infinite alternate; }
+.profile-card.is-open .card-title-track { animation: none; transform: none; }
+@keyframes titlePan { from { transform: translateX(calc(var(--title-overflow) / 2)); } to { transform: translateX(calc(var(--title-overflow) / -2)); } }
 .card-subtitle { display: block; margin-top: 3px; opacity: .65; font-size: 8px; letter-spacing: .18em; text-align: center; text-transform: uppercase; }
 .card-index { position: absolute; top: 9px; right: 11px; z-index: 2; color: #fff; font-size: 9px; text-shadow: 0 1px 5px #000; }
 
