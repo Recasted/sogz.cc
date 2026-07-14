@@ -89,6 +89,17 @@
       <button type="button" data-filter="invert" title="Invert">◒</button>
       <button type="button" data-filter="warm" title="Warm fade">◉</button>
     </aside>
+    <div class="triptych-flyout" id="triptychFlyout" hidden>
+      <div class="triptych-position-control">
+        <span>position</span>
+        <input id="triptychPositionInput" type="range" min="0" max="100" value="50" aria-label="Bars vertical crop position" />
+        <output id="triptychPositionValue">50%</output>
+      </div>
+      <div class="triptych-extra-controls">
+        <label>bars <output id="triptychCountValue">3</output><input id="triptychCountInput" type="range" min="1" max="8" value="3" /></label>
+        <label>image size <output id="triptychSizeValue">100%</output><input id="triptychSizeInput" type="range" min="100" max="250" value="100" /></label>
+      </div>
+    </div>
 
     <section class="canvas-area" id="dropZone">
       <div class="canvas-stage">
@@ -147,6 +158,6 @@
   </main>
 
   <input id="imageInput" type="file" accept="image/*" multiple hidden />
-  <script src="script.js?v=6"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>

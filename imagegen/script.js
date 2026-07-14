@@ -28,10 +28,14 @@ const moveTool = $("#moveTool");
 const handTool = $("#handTool");
 const cutTool = $("#cutTool");
 const layerList = $("#layerList");
+const triptychFlyout = $("#triptychFlyout");
+const triptychPositionInput = $("#triptychPositionInput");
+const triptychCountInput = $("#triptychCountInput");
+const triptychSizeInput = $("#triptychSizeInput");
 
 const state = {
   layers:[], selectedLayerId:null, nextLayerId:1, background:"#000000", tool:"move",
-  filter:"none", brightness:100, contrast:100, halftone:false, dotSize:6, brushSize:60,
+  filter:"none", brightness:100, contrast:100, halftone:false, dotSize:6, brushSize:60, triptychPosition:50, triptychCount:3, triptychSize:100,
   viewZoom:1, viewX:0, viewY:0, viewDragging:false, layerDragging:false, cutting:false
 };
 
@@ -83,18 +87,32 @@ function draw() {
     context.filter=buildCanvasFilter(); context.imageSmoothingEnabled=true; context.imageSmoothingQuality="high";
     context.drawImage(layer.surface,-layer.surface.width*scale/2,-layer.surface.height*scale/2,layer.surface.width*scale,layer.surface.height*scale); context.restore();
   });
-  if(state.halftone&&state.layers.length)drawHalftone();
   if(state.filter==="triptych"&&state.layers.length)drawTriptych();
+  if(state.halftone&&state.layers.length)drawHalftone();
 }
 
 function drawTriptych() {
-  const snapshot=document.createElement("canvas");snapshot.width=canvas.width;snapshot.height=canvas.height;snapshot.getContext("2d").drawImage(canvas,0,0);
-  const bandHeight=canvas.height/3;const sourceHeight=Math.max(1,canvas.height/3);const sourceY=(canvas.height-sourceHeight)/2;
-  context.clearRect(0,0,canvas.width,canvas.height);
-  for(let index=0;index<3;index++){
-    context.drawImage(snapshot,0,sourceY,canvas.width,sourceHeight,0,index*bandHeight,canvas.width,bandHeight);
+  const layer=selectedLayer()||[...state.layers].reverse().find((item)=>item.visible);
+  if(!layer)return;
+  const bandHeight=canvas.height/state.triptychCount;
+  const targetRatio=canvas.width/bandHeight;
+  const sourceRatio=layer.surface.width/layer.surface.height;
+  let sourceX=0,sourceY=0,sourceWidth=layer.surface.width,sourceHeight=layer.surface.height;
+  if(sourceRatio>targetRatio){sourceWidth=sourceHeight*targetRatio;sourceX=(layer.surface.width-sourceWidth)/2;}
+  else{sourceHeight=sourceWidth/targetRatio;sourceY=(layer.surface.height-sourceHeight)*(state.triptychPosition/100);}
+  const cropScale=100/state.triptychSize;
+  const originalSourceWidth=sourceWidth,originalSourceHeight=sourceHeight;
+  sourceWidth*=cropScale;sourceHeight*=cropScale;
+  sourceX+=(originalSourceWidth-sourceWidth)/2;
+  const availableY=layer.surface.height-sourceHeight;
+  sourceY=Math.max(0,availableY*(state.triptychPosition/100));
+  drawBackground();
+  context.save();context.filter=buildCanvasFilter();
+  for(let index=0;index<state.triptychCount;index++){
+    context.drawImage(layer.surface,sourceX,sourceY,sourceWidth,sourceHeight,0,index*bandHeight,canvas.width,bandHeight);
     if(index>0){context.fillStyle="rgba(255,255,255,.18)";context.fillRect(0,index*bandHeight,canvas.width,Math.max(1,canvas.height/900));}
   }
+  context.restore();
 }
 
 function drawHalftone() {
@@ -146,7 +164,7 @@ function cutAt(event){
   layerContext.save();layerContext.globalCompositeOperation="destination-out";layerContext.beginPath();layerContext.arc(local.x,local.y,state.brushSize/layerScale(layer)/2,0,Math.PI*2);layerContext.fill();layerContext.restore();draw();
 }
 
-function updateFilterControls(){filterSelect.value=state.filter;brightnessInput.value=state.brightness;contrastInput.value=state.contrast;dotSizeInput.value=state.dotSize;halftoneInput.checked=state.halftone;$("#brightnessValue").value=`${state.brightness}%`;$("#contrastValue").value=`${state.contrast}%`;$("#dotSizeValue").value=`${state.dotSize}px`;$(".dot-control").classList.toggle("disabled",!state.halftone);document.querySelectorAll("[data-filter]").forEach((button)=>button.classList.toggle("active",button.dataset.filter===state.filter));}
+function updateFilterControls(){filterSelect.value=state.filter;brightnessInput.value=state.brightness;contrastInput.value=state.contrast;dotSizeInput.value=state.dotSize;halftoneInput.checked=state.halftone;$("#brightnessValue").value=`${state.brightness}%`;$("#contrastValue").value=`${state.contrast}%`;$("#dotSizeValue").value=`${state.dotSize}px`;$(".dot-control").classList.toggle("disabled",!state.halftone);triptychFlyout.hidden=state.filter!=="triptych";document.querySelectorAll("[data-filter]").forEach((button)=>button.classList.toggle("active",button.dataset.filter===state.filter));}
 function applyFilterPreset(name){state.filter=name;if(name==="archive"){state.brightness=68;state.contrast=215;state.halftone=true;}else if(name==="bw"){state.brightness=100;state.contrast=115;state.halftone=false;}else if(name==="warm"){state.brightness=104;state.contrast=92;state.halftone=false;}else{state.brightness=100;state.contrast=100;state.halftone=false;}updateFilterControls();draw();}
 
 function updateWorkspaceView(){canvasDocument.style.setProperty("--view-zoom",state.viewZoom);canvasDocument.style.setProperty("--view-x",`${state.viewX}px`);canvasDocument.style.setProperty("--view-y",`${state.viewY}px`);zoomStatus.textContent=`${Math.round(state.viewZoom*100)}%`;}
@@ -175,6 +193,9 @@ contrastInput.addEventListener("input",()=>{state.contrast=Number(contrastInput.
 dotSizeInput.addEventListener("input",()=>{state.dotSize=Number(dotSizeInput.value);updateFilterControls();draw();});
 halftoneInput.addEventListener("change",()=>{state.halftone=halftoneInput.checked;updateFilterControls();draw();});
 brushSizeInput.addEventListener("input",()=>{state.brushSize=Number(brushSizeInput.value);$("#brushSizeValue").value=`${state.brushSize}px`;});
+triptychPositionInput.addEventListener("input",()=>{state.triptychPosition=Number(triptychPositionInput.value);$("#triptychPositionValue").value=`${state.triptychPosition}%`;draw();});
+triptychCountInput.addEventListener("input",()=>{state.triptychCount=Number(triptychCountInput.value);$("#triptychCountValue").value=String(state.triptychCount);draw();});
+triptychSizeInput.addEventListener("input",()=>{state.triptychSize=Number(triptychSizeInput.value);$("#triptychSizeValue").value=`${state.triptychSize}%`;draw();});
 zoomInput.addEventListener("input",()=>{const layer=selectedLayer();if(!layer)return;layer.zoom=Number(zoomInput.value)/100;zoomValue.value=`${zoomInput.value}%`;draw();});
 jpegButton.addEventListener("click",()=>download("image/jpeg"));pngButton.addEventListener("click",()=>download("image/png"));
 
