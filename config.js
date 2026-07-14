@@ -40,6 +40,9 @@ window.ARCHIVE_CONFIG = {
       audioTracks: [
         { title: "RUN", src: "assets/audio/03-1-run.mp3" },
         { title: "reminding", src: "assets/audio/03-2-reminding.mp3" }
+      ],
+      links: [
+        { label: "image generator", url: "imagegen/" }
       ]
     },
     {
