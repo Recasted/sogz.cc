@@ -1,8 +1,8 @@
 // PERSONALIZE THE SITE HERE.
 // Put your own images in the assets folder, then update the paths below.
 window.ARCHIVE_CONFIG = {
-  backgroundImage: "assets/default-background.png",
-  backgroundPosition: "center 38%",
+  backgroundImage: "assets/default-background.jpg",
+  backgroundPosition: "center center",
   defaultAudioTracks: [
     { title: "Einfach Sein", src: "assets/audio/default.mp3" }
   ],
