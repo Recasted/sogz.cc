@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#1d1d1d" />
   <meta name="description" content="A private browser-based image cropper and wallpaper editor." />
-  <title>sogz' — image editor</title>
+  <title>sogz editor</title>
   <link rel="icon" href="../assets/favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
 <body>
   <header class="app-menu">
@@ -76,18 +76,26 @@
 
   <main class="editor" id="editorView" hidden>
     <aside class="toolbar" aria-label="Tools">
-      <button type="button" class="active" title="Move image">✥</button>
+      <button type="button" class="active" id="moveTool" title="Move image">✥</button>
+      <button type="button" id="handTool" title="Pan workspace">✋</button>
       <button type="button" id="toolbarOpen" title="Open image">▧</button>
       <button type="button" id="toolbarCenter" title="Center crop">⌗</button>
       <button type="button" id="toolbarRotate" title="Rotate clockwise">↻</button>
+      <i class="tool-divider"></i>
+      <button type="button" data-filter="bw" title="Black and white">◐</button>
+      <button type="button" data-filter="archive" title="Archive halftone">⠿</button>
+      <button type="button" data-filter="invert" title="Invert">◒</button>
+      <button type="button" data-filter="warm" title="Warm fade">◉</button>
     </aside>
 
     <section class="canvas-area" id="dropZone">
       <div class="canvas-stage">
-        <canvas id="canvas" width="1280" height="720" aria-label="Image editor canvas"></canvas>
-        <div class="empty-canvas" id="emptyState">
-          <strong>OPEN OR DROP AN IMAGE</strong>
-          <span>it will crop to fill the whole canvas</span>
+        <div class="canvas-document" id="canvasDocument">
+          <canvas id="canvas" width="1280" height="720" aria-label="Image editor canvas"></canvas>
+          <div class="empty-canvas" id="emptyState">
+            <strong>OPEN OR DROP AN IMAGE</strong>
+            <span>it will crop to fill the whole canvas</span>
+          </div>
         </div>
       </div>
       <div class="status-bar"><span id="zoomStatus">100%</span><span id="resolutionLabel">1280 × 720 px</span><span>RGB / 8</span></div>
@@ -96,9 +104,25 @@
     <aside class="side-panels">
       <section class="panel">
         <h2>Properties</h2>
-        <label>Zoom <output id="zoomValue">100%</output><input id="zoomInput" type="range" min="100" max="300" value="100" /></label>
+        <label>Image zoom <output id="zoomValue">100%</output><input id="zoomInput" type="range" min="100" max="300" value="100" /></label>
         <button type="button" id="centerButton">Center &amp; fill</button>
         <button type="button" id="replaceButton">Replace image</button>
+      </section>
+      <section class="panel filters-panel">
+        <h2>Filters</h2>
+        <label class="select-label">Preset
+          <select id="filterSelect">
+            <option value="none">Original</option>
+            <option value="bw">Black &amp; white</option>
+            <option value="archive">Archive dots</option>
+            <option value="invert">Invert</option>
+            <option value="warm">Warm fade</option>
+          </select>
+        </label>
+        <label>Brightness <output id="brightnessValue">100%</output><input id="brightnessInput" type="range" min="40" max="160" value="100" /></label>
+        <label>Contrast <output id="contrastValue">100%</output><input id="contrastInput" type="range" min="50" max="250" value="100" /></label>
+        <label class="dot-control">Dot size <output id="dotSizeValue">6px</output><input id="dotSizeInput" type="range" min="3" max="24" value="6" /></label>
+        <label class="check-label"><input id="halftoneInput" type="checkbox" /> dotted halftone</label>
       </section>
       <section class="panel layers-panel">
         <h2>Layers</h2>
@@ -113,6 +137,6 @@
   </main>
 
   <input id="imageInput" type="file" accept="image/*" hidden />
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>
