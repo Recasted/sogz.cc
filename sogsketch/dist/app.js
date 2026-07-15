@@ -8,7 +8,7 @@ const fileInput = qs("#fileInput"), layerList = qs("#layerList"), historyList = 
 const fgInput = qs("#fgColor"), bgInput = qs("#bgColor"), hexInput = qs("#hexInput"), rInput = qs("#rInput"), gInput = qs("#gInput"), bInput = qs("#bInput"), hInput = qs("#hInput"), sInput = qs("#sInput"), lInput = qs("#lInput");
 const toolLabels = { brush: "Freehand brush", pencil: "Pencil", eraser: "Eraser", smudge: "Blend / Smudge", line: "Line", rectangle: "Rectangle", ellipse: "Ellipse", polygon: "Polygon", polyline: "Polyline", path: "Bezier path", fill: "Fill bucket", gradient: "Gradient", picker: "Color picker", move: "Move layer", transform: "Transform layer", crop: "Crop canvas", selectRect: "Rectangle selection", selectEllipse: "Ellipse selection", text: "Text", pan: "Pan canvas", zoom: "Zoom" };
 const state = { width: 1600, height: 1000, resolution: 72, name: "Untitled", background: "#FFFFFF", layers: [], selectedLayerId: null, nextLayerId: 1, tool: "brush", brush: { size: 24, opacity: 100, flow: 100, hardness: 85, spacing: 12, smoothing: 35, stabilizer: 4, rotation: 0, angle: 0, randomSize: 0, randomOpacity: 0, randomRotation: 0, blendStrength: 55, tip: "round", texture: "none", eraserMode: false, symmetry: false }, foreground: "#000000", backgroundColor: "#FFFFFF", recentColors: ["#000000", "#FFFFFF"], selection: null, guides: [], view: { zoom: .65, panX: 0, panY: 0, rotation: 0, flipX: 1, flipY: 1, grid: false, rulers: false, snap: true }, autosave: true };
-let drawing = false, workspacePanning = false, startPoint = { x: 0, y: 0, pressure: 1 }, lastPoint = { x: 0, y: 0, pressure: 1 }, panStart = { x: 0, y: 0, panX: 0, panY: 0 }, moveStart = { x: 0, y: 0, layerX: 0, layerY: 0 }, pathPoints = [], strokeBefore = null, textPoint = null, historyBusy = false, autosaveTimer = 0, activeBrushId = localStorage.getItem("sogsketch-active-brush") ?? "hard-round", smudgeBuffer = null;
+let drawing = false, workspacePanning = false, startPoint = { x: 0, y: 0, pressure: 1 }, lastPoint = { x: 0, y: 0, pressure: 1 }, panStart = { x: 0, y: 0, panX: 0, panY: 0 }, moveStart = { x: 0, y: 0, layerX: 0, layerY: 0 }, pathPoints = [], strokePoints = [], strokeBefore = null, textPoint = null, historyBusy = false, autosaveTimer = 0, activeBrushId = localStorage.getItem("sogsketch-active-brush") ?? "hard-round", smudgeBuffer = null;
 const history = new HistoryManager(24, renderHistory);
 let brushLibrary;
 function makeLayer(name, background = false) { const canvas = document.createElement("canvas"); canvas.width = state.width; canvas.height = state.height; return { id: state.nextLayerId++, name, canvas, visible: true, locked: false, opacity: 100, blendMode: "source-over", alphaInherit: false, groupId: null, x: 0, y: 0, scaleX: 1, scaleY: 1 }; }
@@ -164,6 +164,30 @@ function drawBrushSegment(from, to) { const layer = selectedLayer(); if (!layer 
     return;
 } const ctx = layer.canvas.getContext("2d"), a = layerPoint(from, layer), b = layerPoint(to, layer), size = state.brush.size, erase = state.tool === "eraser" || state.brush.eraserMode; strokeLine(ctx, a, b, size, state.foreground, erase); if (state.brush.symmetry)
     strokeLine(ctx, { ...a, x: state.width - a.x }, { ...b, x: state.width - b.x }, size, state.foreground, erase); }
+function renderContinuousStroke() { const layer = selectedLayer(); if (!layer || layer.locked || !strokeBefore || strokePoints.length < 2)
+    return; const ctx = layer.canvas.getContext("2d"), points = strokePoints.map(point => layerPoint(point, layer)), erase = state.tool === "eraser" || state.brush.eraserMode, averagePressure = points.reduce((sum, point) => sum + point.pressure, 0) / points.length, width = Math.max(.5, state.brush.size * averagePressure), opacity = (state.brush.opacity / 100) * (state.brush.flow / 100), direction = Math.atan2(points.at(-1).y - points[0].y, points.at(-1).x - points[0].x), angle = (state.brush.angle + state.brush.rotation) * Math.PI / 180; ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height); ctx.drawImage(strokeBefore, 0, 0); const trace = (offset = 0) => { const normalX = -Math.sin(direction) * offset, normalY = Math.cos(direction) * offset; ctx.beginPath(); ctx.moveTo(points[0].x + normalX, points[0].y + normalY); for (let index = 1; index < points.length - 1; index++) {
+    const current = points[index], next = points[index + 1], midX = (current.x + next.x) / 2, midY = (current.y + next.y) / 2;
+    ctx.quadraticCurveTo(current.x + normalX, current.y + normalY, midX + normalX, midY + normalY);
+} const last = points.at(-1); ctx.lineTo(last.x + normalX, last.y + normalY); ctx.stroke(); }; ctx.save(); clipToSelection(ctx); ctx.globalCompositeOperation = erase ? "destination-out" : "source-over"; ctx.strokeStyle = state.foreground; ctx.globalAlpha = opacity; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.lineWidth = state.brush.tip === "chisel" ? width * (.22 + .78 * Math.abs(Math.sin(direction - angle))) : state.brush.tip === "flat" ? width * .72 : width; const softness = 1 - state.brush.hardness / 100; if (softness > .05 && !erase) {
+    ctx.shadowColor = state.foreground;
+    ctx.shadowBlur = width * softness * .55;
+    if (state.brush.hardness < 20) {
+        ctx.globalAlpha = opacity * .48;
+        ctx.lineWidth = width * (.5 + state.brush.hardness / 100);
+    }
+} trace(); if (state.brush.tip === "bristle" && !erase) {
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = opacity * .18;
+    ctx.lineWidth = Math.max(.5, width / 10);
+    for (const offset of [-.32, -.2, -.1, .1, .2, .32])
+        trace(width * offset);
+} if (state.brush.symmetry) {
+    ctx.save();
+    ctx.translate(state.width, 0);
+    ctx.scale(-1, 1);
+    trace();
+    ctx.restore();
+} ctx.restore(); }
 function withLayerContext(draw) { const layer = selectedLayer(); if (!layer || layer.locked)
     return; const ctx = layer.canvas.getContext("2d"); ctx.save(); ctx.globalAlpha = state.brush.opacity / 100; ctx.strokeStyle = state.foreground; ctx.fillStyle = state.foreground; ctx.lineWidth = state.brush.size; ctx.lineCap = "round"; ctx.lineJoin = "round"; draw(ctx); ctx.restore(); composite(); }
 function previewShape(point) { overlayCtx.clearRect(0, 0, state.width, state.height); overlayCtx.save(); overlayCtx.strokeStyle = state.foreground; overlayCtx.lineWidth = state.brush.size / state.view.zoom; overlayCtx.globalAlpha = state.brush.opacity / 100; overlayCtx.setLineDash(state.tool.startsWith("select") || state.tool === "crop" ? [8, 6] : []); const x = startPoint.x, y = startPoint.y, w = point.x - x, h = point.y - y; overlayCtx.beginPath(); if (state.tool === "line")
@@ -263,7 +287,8 @@ function pointerDown(event) { event.preventDefault(); event.stopPropagation(); c
     return; drawing = true; if (["brush", "pencil", "eraser", "smudge"].includes(state.tool)) {
     checkpoint(toolLabels[state.tool]);
     strokeBefore = canvasCopy(layer.canvas);
-    if (state.tool !== "smudge")
+    strokePoints = [point];
+    if (state.tool !== "smudge" && ["scatter", "leaf", "grass", "cloud"].includes(state.brush.tip))
         drawBrushSegment(point, point);
     composite();
 }
@@ -297,7 +322,12 @@ function pointerMove(event) { const point = pointFromEvent(event); qs("#pointerS
     return;
 } if (["brush", "pencil", "eraser", "smudge"].includes(state.tool)) {
     const smooth = Math.max(state.brush.smoothing / 100, state.brush.stabilizer / 30 * .88), filtered = { x: lastPoint.x * smooth + point.x * (1 - smooth), y: lastPoint.y * smooth + point.y * (1 - smooth), pressure: point.pressure };
-    drawBrushSegment(lastPoint, filtered);
+    if (state.tool === "smudge" || ["scatter", "leaf", "grass", "cloud"].includes(state.brush.tip))
+        drawBrushSegment(lastPoint, filtered);
+    else {
+        strokePoints.push(filtered);
+        renderContinuousStroke();
+    }
     lastPoint = filtered;
     composite();
     return;
