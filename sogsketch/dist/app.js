@@ -539,16 +539,16 @@ function bindUi() { document.querySelectorAll("[data-tool]").forEach(button => b
     [width.value, height.value] = [height.value, width.value]; }); document.querySelectorAll("[data-preset-category]").forEach(button => button.addEventListener("click", () => { document.querySelectorAll("[data-preset-category]").forEach(item => item.classList.remove("active")); button.classList.add("active"); document.querySelectorAll(".preset-card").forEach(card => card.classList.toggle("hidden", card.dataset.category !== button.dataset.presetCategory)); })); document.querySelectorAll(".preset-card[data-size]").forEach(card => card.addEventListener("click", () => { document.querySelectorAll(".preset-card").forEach(item => item.classList.remove("selected")); card.classList.add("selected"); const [width, height] = card.dataset.size.split("x").map(Number); qs("#newWidth").value = String(width); qs("#newHeight").value = String(height); })); qs("#swapCanvasSize").addEventListener("click", () => { const width = qs("#newWidth"), height = qs("#newHeight"); [width.value, height.value] = [height.value, width.value]; }); qs("#supportClose").addEventListener("click", () => { qs("#supportPopup").hidden = true; }); qs("#createDocument").addEventListener("click", createDocument); qs("#applyText").addEventListener("click", () => { if (!textPoint)
     return; checkpoint("Text"); withLayerContext(ctx => { ctx.font = `${qs("#fontStyle").value} ${Number(qs("#fontSize").value)}px ${qs("#fontFamily").value}`; ctx.fillStyle = state.foreground; ctx.fillText(qs("#textValue").value, textPoint.x, textPoint.y); }); textPoint = null; }); window.addEventListener("resize", fitCanvas); document.addEventListener("pointerdown", event => { if (!event.target.closest(".menus details"))
     document.querySelectorAll(".menus details[open]").forEach(item => item.removeAttribute("open")); }); }
-function keyHandler(event) { const target = event.target; if (["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
-    return; const mod = event.ctrlKey || event.metaKey, key = event.key.toLowerCase(); if (mod && key === "z") {
+function keyHandler(event) { const target = event.target, mod = event.ctrlKey || event.metaKey, key = event.key.toLowerCase(), editingText = target.matches('textarea,[contenteditable="true"],input:not([type]),input[type="text"],input[type="search"],input[type="number"],input[type="email"],input[type="url"],input[type="tel"],input[type="password"]'); if (mod && key === "z" && !editingText) {
     event.preventDefault();
     void (event.shiftKey ? redo() : undo());
     return;
-} if (mod && key === "y") {
+} if (mod && key === "y" && !editingText) {
     event.preventDefault();
     void redo();
     return;
-} if (mod && key === "s") {
+} if (["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
+    return; if (mod && key === "s") {
     event.preventDefault();
     saveProject();
     return;
