@@ -7,7 +7,7 @@
   <meta name="description" content="SogSketch — a free browser-based drawing and painting studio." />
   <title>SogSketch</title>
   <link rel="icon" href="../assets/favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=4" />
+  <link rel="stylesheet" href="style.css?v=5" />
 </head>
 <body>
   <div class="app" id="app">
@@ -25,8 +25,10 @@
         <details><summary>Help</summary><div class="menu"><button data-command="shortcuts">Keyboard shortcuts</button><button data-command="about">About SogSketch</button></div></details>
       </nav>
       <a class="support-link" href="https://ko-fi.com/sogz0/goal" target="_blank" rel="noopener noreferrer">support us</a>
+      <button class="mobile-toggle mobile-step" data-command="undo" title="Undo">&lt;</button>
+      <button class="mobile-toggle mobile-step" data-command="redo" title="Redo">&gt;</button>
       <button class="mobile-toggle" id="toolsToggle" title="Toggle tools">Tools</button>
-      <button class="mobile-toggle dock-open" id="dockToggle" title="Open edit panels">=</button>
+      <button class="mobile-toggle dock-open" id="dockToggle" title="Open or close edit panels" aria-expanded="false">=</button>
       <span class="doc-title" id="docTitle">Untitled.sogsketch</span>
     </header>
 
@@ -116,6 +118,6 @@
   </aside>
 
   <input id="fileInput" type="file" accept="image/*,.sogsketch,application/json" multiple hidden>
-  <script type="module" src="dist/app.js?v=4"></script>
+  <script type="module" src="dist/app.js?v=5"></script>
 </body>
 </html>
