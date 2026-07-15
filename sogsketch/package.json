@@ -1,12 +1,25 @@
 {
   "name": "sogsketch",
+  "type": "module",
   "private": true,
   "version": "1.0.0",
+  "main": "electron/main.cjs",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "check": "tsc -p tsconfig.json --noEmit"
+    "check": "tsc -p tsconfig.json --noEmit",
+    "desktop": "npm run build && electron .",
+    "desktop:build": "npm run build && electron-builder --win portable"
   },
   "devDependencies": {
+    "electron": "31.7.7",
+    "electron-builder": "24.13.3",
     "typescript": "^5.8.3"
+  },
+  "build": {
+    "appId": "art.sogsketch.desktop",
+    "productName": "SogSketch",
+    "directories": {"output": "release"},
+    "files": ["index.html", "style.css", "dist/**/*", "electron/**/*", "package.json"],
+    "win": {"target": "portable", "artifactName": "SogSketch-${version}-Windows.${ext}"}
   }
 }

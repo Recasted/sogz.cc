@@ -1,5 +1,5 @@
 import { brushCategories, defaultBrushes, getBrushStamp, presetToSettings, validateBrushes } from "./brushEngine.js";
-const CUSTOM_KEY = "sogsketch-brushes-v2", FAVOURITES_KEY = "sogsketch-brush-favourites", RECENT_KEY = "sogsketch-recent-brushes", OPEN_KEY = "sogsketch-brush-library-open";
+const CUSTOM_KEY = "sogsketch-brushes-v3", FAVOURITES_KEY = "sogsketch-brush-favourites-v3", RECENT_KEY = "sogsketch-recent-brushes-v3", OPEN_KEY = "sogsketch-brush-library-open";
 const byId = (id, items) => items.find(item => item.id === id);
 export class BrushLibrary {
     getSettings;
@@ -18,6 +18,11 @@ export class BrushLibrary {
         this.onSelect = onSelect;
         this.load();
         this.bind();
+        const selected = this.active;
+        if (selected) {
+            this.applySettings(presetToSettings(selected, this.getSettings()));
+            this.onSelect?.(selected);
+        }
         this.render();
         if (localStorage.getItem(OPEN_KEY) === "true")
             this.setOpen(true);
@@ -41,7 +46,7 @@ export class BrushLibrary {
     }
     catch {
         this.recent = [];
-    } this.activeId = localStorage.getItem("sogsketch-active-brush") ?? this.activeId; }
+    } const saved = localStorage.getItem("sogsketch-active-brush"); this.activeId = saved && byId(saved, this.all) ? saved : "hard-round"; localStorage.setItem("sogsketch-active-brush", this.activeId); }
     save() { localStorage.setItem(CUSTOM_KEY, JSON.stringify(this.custom)); localStorage.setItem(FAVOURITES_KEY, JSON.stringify([...this.favourites])); localStorage.setItem(RECENT_KEY, JSON.stringify(this.recent)); localStorage.setItem("sogsketch-active-brush", this.activeId); }
     setOpen(open) { const panel = document.querySelector("#brushLibrary"), button = document.querySelector("#openBrushLibrary"); panel.classList.toggle("open", open); panel.setAttribute("aria-hidden", String(!open)); button.setAttribute("aria-expanded", String(open)); button.textContent = open ? "Close Brush Library" : "Open Brush Library"; localStorage.setItem(OPEN_KEY, String(open)); }
     toggle() { this.setOpen(!document.querySelector("#brushLibrary")?.classList.contains("open")); }

@@ -1,16 +1,16 @@
 import {brushCategories,defaultBrushes,getBrushStamp,presetToSettings,validateBrushes} from "./brushEngine.js";
 import type {BrushPreset,BrushSettings} from "./types.js";
 
-const CUSTOM_KEY="sogsketch-brushes-v2",FAVOURITES_KEY="sogsketch-brush-favourites",RECENT_KEY="sogsketch-recent-brushes",OPEN_KEY="sogsketch-brush-library-open";
+const CUSTOM_KEY="sogsketch-brushes-v3",FAVOURITES_KEY="sogsketch-brush-favourites-v3",RECENT_KEY="sogsketch-recent-brushes-v3",OPEN_KEY="sogsketch-brush-library-open";
 const byId=(id:string,items:BrushPreset[]):BrushPreset|undefined=>items.find(item=>item.id===id);
 
 export class BrushLibrary{
  private custom:BrushPreset[]=[];private favourites=new Set<string>();private recent:string[]=[];private activeId="hard-round";private filter="All";private favouritesOnly=false;private recentOnly=false;
- constructor(private getSettings:()=>BrushSettings,private applySettings:(settings:BrushSettings)=>void,private onSelect?:(preset:BrushPreset)=>void){this.load();this.bind();this.render();if(localStorage.getItem(OPEN_KEY)==="true")this.setOpen(true)}
+ constructor(private getSettings:()=>BrushSettings,private applySettings:(settings:BrushSettings)=>void,private onSelect?:(preset:BrushPreset)=>void){this.load();this.bind();const selected=this.active;if(selected){this.applySettings(presetToSettings(selected,this.getSettings()));this.onSelect?.(selected)}this.render();if(localStorage.getItem(OPEN_KEY)==="true")this.setOpen(true)}
  get all():BrushPreset[]{return[...defaultBrushes,...this.custom]}
  get active():BrushPreset|undefined{return byId(this.activeId,this.all)}
  selectById(id:string):void{const preset=byId(id,this.all);if(preset)this.select(preset)}
- private load():void{try{this.custom=JSON.parse(localStorage.getItem(CUSTOM_KEY)??"[]") as BrushPreset[]}catch{this.custom=[]}try{this.favourites=new Set(JSON.parse(localStorage.getItem(FAVOURITES_KEY)??"[]") as string[])}catch{this.favourites=new Set()}try{this.recent=JSON.parse(localStorage.getItem(RECENT_KEY)??"[]") as string[]}catch{this.recent=[]}this.activeId=localStorage.getItem("sogsketch-active-brush")??this.activeId}
+ private load():void{try{this.custom=JSON.parse(localStorage.getItem(CUSTOM_KEY)??"[]") as BrushPreset[]}catch{this.custom=[]}try{this.favourites=new Set(JSON.parse(localStorage.getItem(FAVOURITES_KEY)??"[]") as string[])}catch{this.favourites=new Set()}try{this.recent=JSON.parse(localStorage.getItem(RECENT_KEY)??"[]") as string[]}catch{this.recent=[]}const saved=localStorage.getItem("sogsketch-active-brush");this.activeId=saved&&byId(saved,this.all)?saved:"hard-round";localStorage.setItem("sogsketch-active-brush",this.activeId)}
  private save():void{localStorage.setItem(CUSTOM_KEY,JSON.stringify(this.custom));localStorage.setItem(FAVOURITES_KEY,JSON.stringify([...this.favourites]));localStorage.setItem(RECENT_KEY,JSON.stringify(this.recent));localStorage.setItem("sogsketch-active-brush",this.activeId)}
  setOpen(open:boolean):void{const panel=document.querySelector<HTMLElement>("#brushLibrary")!,button=document.querySelector<HTMLButtonElement>("#openBrushLibrary")!;panel.classList.toggle("open",open);panel.setAttribute("aria-hidden",String(!open));button.setAttribute("aria-expanded",String(open));button.textContent=open?"Close Brush Library":"Open Brush Library";localStorage.setItem(OPEN_KEY,String(open))}
  toggle():void{this.setOpen(!document.querySelector("#brushLibrary")?.classList.contains("open"))}

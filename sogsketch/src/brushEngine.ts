@@ -1,48 +1,22 @@
 import type {BrushCategory,BrushPreset,BrushSettings,BrushTexture,BrushTip} from "./types.js";
 
-const base:Omit<BrushPreset,"id"|"name"|"category">={size:24,opacity:100,flow:100,hardness:90,spacing:10,smoothing:35,stabilizer:4,rotation:0,angle:0,randomSize:0,randomOpacity:0,randomRotation:0,blendStrength:55,tip:"round",texture:"none"};
+const base:Omit<BrushPreset,"id"|"name"|"category">={size:24,opacity:100,flow:100,hardness:90,spacing:10,smoothing:35,stabilizer:4,pressureCurve:50,rotation:0,angle:0,randomSize:0,randomOpacity:0,randomRotation:0,blendStrength:55,tip:"round",texture:"none"};
 const p=(category:BrushCategory,id:string,name:string,changes:Partial<typeof base>):BrushPreset=>({id,name,category,...base,...changes});
 
 export const defaultBrushes:BrushPreset[]=[
- p("Pencil","hb-pencil","HB Pencil",{size:4,flow:82,hardness:92,spacing:7,smoothing:18,texture:"paper"}),
- p("Pencil","2b-pencil","2B Pencil",{size:7,opacity:88,flow:74,hardness:76,spacing:8,smoothing:20,texture:"grain",randomOpacity:8}),
- p("Pencil","6b-pencil","6B Pencil",{size:13,opacity:82,flow:60,hardness:55,spacing:9,smoothing:15,texture:"charcoal",randomSize:8,randomOpacity:12}),
- p("Pencil","mechanical-pencil","Mechanical Pencil",{size:2,hardness:100,spacing:5,smoothing:28,stabilizer:6}),
- p("Pencil","rough-sketch","Rough Sketch",{size:8,opacity:72,flow:58,hardness:65,spacing:12,smoothing:10,texture:"paper",randomSize:16,randomOpacity:18}),
- p("Ink","fine-liner","Fine Liner",{size:5,hardness:100,spacing:5,smoothing:62,stabilizer:8}),
- p("Ink","ink-pen","Ink Pen",{size:15,hardness:96,spacing:6,smoothing:66,stabilizer:7,tip:"bristle",angle:8}),
- p("Ink","g-pen","G Pen",{size:12,hardness:100,spacing:4,smoothing:72,stabilizer:10,tip:"chisel",angle:28}),
- p("Ink","comic-pen","Comic Pen",{size:18,hardness:100,spacing:5,smoothing:78,stabilizer:12,tip:"chisel",angle:42}),
- p("Ink","technical-pen","Technical Pen",{size:3,hardness:100,spacing:3,smoothing:82,stabilizer:14}),
- p("Paint","soft-round","Soft Round",{size:90,opacity:55,flow:28,hardness:5,spacing:6,smoothing:45}),
- p("Paint","hard-round","Hard Round",{size:36,hardness:100,spacing:5,smoothing:48}),
- p("Paint","airbrush","Airbrush",{size:135,opacity:35,flow:16,hardness:0,spacing:5,smoothing:38}),
- p("Paint","gouache","Gouache",{size:58,opacity:94,flow:76,hardness:72,spacing:9,smoothing:48,tip:"round",texture:"paper",randomOpacity:3}),
- p("Paint","acrylic","Acrylic",{size:64,opacity:96,flow:84,hardness:82,spacing:8,smoothing:32,tip:"flat",texture:"canvas",angle:18}),
- p("Paint","oil-paint","Oil Paint",{size:72,opacity:92,flow:64,hardness:68,spacing:7,smoothing:44,tip:"bristle",texture:"canvas",randomRotation:8}),
- p("Paint","flat-brush","Flat Brush",{size:80,hardness:94,spacing:6,smoothing:42,tip:"flat",angle:25}),
- p("Paint","wet-paint","Wet Paint",{size:76,opacity:80,flow:48,hardness:38,spacing:6,smoothing:52,tip:"bristle",texture:"wet",blendStrength:32}),
- p("Marker","alcohol-marker","Alcohol Marker",{size:52,opacity:60,flow:52,hardness:72,spacing:5,smoothing:60,tip:"chisel",angle:34}),
- p("Marker","chisel-marker","Chisel Marker",{size:44,opacity:88,flow:78,hardness:92,spacing:5,smoothing:55,tip:"chisel",angle:45}),
- p("Marker","round-marker","Round Marker",{size:32,opacity:82,flow:72,hardness:88,spacing:5,smoothing:55}),
- p("Marker","soft-marker","Soft Marker",{size:56,opacity:48,flow:35,hardness:28,spacing:6,smoothing:62}),
- p("Watercolor","soft-watercolor","Soft Watercolor",{size:110,opacity:34,flow:20,hardness:10,spacing:8,smoothing:48,texture:"paper",randomOpacity:10}),
- p("Watercolor","wet-watercolor","Wet Watercolor",{size:125,opacity:38,flow:18,hardness:4,spacing:7,smoothing:55,texture:"wet",randomSize:8,randomOpacity:14}),
- p("Watercolor","dry-watercolor","Dry Watercolor",{size:72,opacity:55,flow:34,hardness:48,spacing:12,smoothing:38,tip:"bristle",texture:"paper",randomOpacity:18}),
- p("Watercolor","wash-brush","Wash Brush",{size:180,opacity:22,flow:12,hardness:0,spacing:5,smoothing:65,tip:"flat",texture:"wet"}),
- p("Texture","chalk","Chalk",{size:48,opacity:76,flow:62,hardness:68,spacing:14,smoothing:24,texture:"chalk",randomSize:12,randomOpacity:18,randomRotation:25}),
- p("Texture","charcoal","Charcoal",{size:66,opacity:78,flow:52,hardness:45,spacing:13,smoothing:18,tip:"bristle",texture:"charcoal",randomSize:18,randomOpacity:22,randomRotation:35}),
- p("Texture","pastel","Pastel",{size:54,opacity:68,flow:50,hardness:42,spacing:11,smoothing:26,texture:"grain",randomOpacity:14}),
- p("Texture","sponge","Sponge",{size:95,opacity:62,flow:45,hardness:55,spacing:24,smoothing:12,tip:"scatter",texture:"grain",randomSize:30,randomOpacity:25,randomRotation:100}),
- p("Texture","grain-brush","Grain Brush",{size:70,opacity:70,flow:48,hardness:58,spacing:12,smoothing:30,texture:"grain",randomSize:12,randomOpacity:20}),
- p("Effects","glow","Glow",{size:100,opacity:54,flow:30,hardness:0,spacing:5,smoothing:52}),
- p("Effects","scatter","Scatter",{size:52,opacity:78,flow:70,hardness:90,spacing:30,smoothing:8,tip:"scatter",randomSize:55,randomOpacity:35,randomRotation:100}),
- p("Effects","leaves","Leaves",{size:42,opacity:92,flow:82,hardness:100,spacing:42,smoothing:15,tip:"leaf",randomSize:38,randomOpacity:16,randomRotation:100}),
- p("Effects","grass","Grass",{size:64,opacity:88,flow:82,hardness:94,spacing:18,smoothing:22,tip:"grass",randomSize:28,randomOpacity:14,randomRotation:15}),
- p("Effects","clouds","Clouds",{size:160,opacity:28,flow:18,hardness:2,spacing:18,smoothing:48,tip:"cloud",randomSize:35,randomOpacity:25,randomRotation:100})
+ p("Core Brushes","hard-round","Hard Round",{size:24,hardness:100,spacing:8,smoothing:28}),
+ p("Core Brushes","soft-round","Soft Round",{size:72,opacity:55,flow:35,hardness:0,spacing:3,smoothing:32}),
+ p("Core Brushes","pencil","Pencil",{size:3,opacity:82,flow:100,hardness:100,spacing:6,smoothing:22,texture:"paper"}),
+ p("Core Brushes","pressure-ink","Pressure Ink",{size:14,hardness:100,spacing:5,smoothing:48,stabilizer:7,pressureCurve:58}),
+ p("Core Brushes","flat-paint","Flat Paint Brush",{size:54,opacity:92,flow:82,hardness:100,spacing:5,smoothing:32,tip:"flat",angle:25}),
+ p("Specialty Brushes","sponge","Sponge",{size:70,opacity:58,flow:70,hardness:70,spacing:38,smoothing:12,tip:"scatter",texture:"grain",randomSize:22,randomOpacity:15,randomRotation:45}),
+ p("Specialty Brushes","grass","Grass",{size:48,opacity:88,flow:90,hardness:100,spacing:32,smoothing:18,tip:"grass",randomSize:18,randomOpacity:8,randomRotation:8}),
+ p("Specialty Brushes","leaves","Leaves",{size:34,opacity:90,flow:90,hardness:100,spacing:48,smoothing:16,tip:"leaf",randomSize:24,randomOpacity:10,randomRotation:38}),
+ p("Specialty Brushes","clouds","Clouds",{size:120,opacity:24,flow:35,hardness:0,spacing:24,smoothing:30,tip:"cloud",randomSize:20,randomOpacity:12,randomRotation:25}),
+ p("Specialty Brushes","scatter","Scatter",{size:32,opacity:72,flow:78,hardness:100,spacing:48,smoothing:8,tip:"scatter",randomSize:35,randomOpacity:20,randomRotation:90})
 ];
 
-export const brushCategories:BrushCategory[]=["Pencil","Ink","Paint","Marker","Watercolor","Texture","Effects","Custom"];
+export const brushCategories:BrushCategory[]=["Core Brushes","Specialty Brushes","Custom"];
 
 const stampCache=new Map<string,HTMLCanvasElement>();
 const hash=(text:string):number=>{let value=2166136261;for(let i=0;i<text.length;i++)value=Math.imul(value^text.charCodeAt(i),16777619);return value>>>0};
@@ -60,5 +34,114 @@ export function getBrushStamp(settings:BrushSettings,color:string,size:number):H
  stampCache.set(key,canvas);if(stampCache.size>180)stampCache.delete(stampCache.keys().next().value!);return canvas
 }
 
-export function presetToSettings(preset:BrushPreset,current:BrushSettings):BrushSettings{return{...current,...preset,eraserMode:false,symmetry:current.symmetry}}
+export function presetToSettings(preset:BrushPreset,current:BrushSettings):BrushSettings{return{...current,...preset,pressureCurve:preset.pressureCurve??current.pressureCurve??50,eraserMode:false,symmetry:current.symmetry}}
 export function validateBrushes(presets:BrushPreset[]):string[]{const ids=new Set<string>();return presets.flatMap(brush=>{const errors:string[]=[];if(!brush.id||ids.has(brush.id))errors.push(`Invalid or duplicate id: ${brush.id}`);ids.add(brush.id);if(brush.size<=0||brush.opacity<1||brush.opacity>100||brush.spacing<1)errors.push(`Invalid settings: ${brush.name}`);return errors})}
+
+export interface StrokePoint {x:number;y:number;pressure:number}
+export interface StrokeOptions {settings:BrushSettings;color:string;erase:boolean;clip?:(ctx:CanvasRenderingContext2D)=>void;seed?:number}
+
+const effectTips=new Set<BrushTip>(["scatter","leaf","grass","cloud"]);
+const pressureValue=(raw:number,curve:number):number=>{
+ const p=Math.min(1,Math.max(.02,raw));
+ const exponent=Math.pow(2,(50-Math.min(100,Math.max(0,curve)))/50);
+ return Math.pow(p,exponent);
+};
+
+/** A stroke-local, distance driven dab renderer. It never depends on event rate. */
+export class StrokeRenderer{
+ private previous:StrokePoint|null=null;
+ private filtered:StrokePoint|null=null;
+ private carry=0;
+ private dabIndex=0;
+ private random:()=>number;
+ constructor(private readonly ctx:CanvasRenderingContext2D,private readonly options:StrokeOptions){this.random=randomFactory(options.seed??((Date.now()^Math.floor(Math.random()*0xffffffff))>>>0))}
+ private get usesStampPath():boolean{return effectTips.has(this.options.settings.tip)||this.options.settings.hardness<45}
+ begin(point:StrokePoint):void{this.previous={...point};this.filtered={...point};if(this.usesStampPath)this.paint(point,0,true);else this.drawStart(point)}
+ add(point:StrokePoint):void{
+  if(!this.previous||!this.filtered){this.begin(point);return}
+  const rawDistance=Math.hypot(point.x-this.previous.x,point.y-this.previous.y);
+  if(rawDistance<.01)return;
+  const settings=this.options.settings;
+  const smoothing=Math.min(.88,(settings.smoothing/100)*.58+(settings.stabilizer/30)*.3);
+  const follow=1-smoothing;
+  const target={x:this.filtered.x+(point.x-this.filtered.x)*follow,y:this.filtered.y+(point.y-this.filtered.y)*follow,pressure:this.filtered.pressure+(point.pressure-this.filtered.pressure)*Math.max(.28,follow)};
+  if(this.usesStampPath)this.emitSegment(this.filtered,target);else this.drawContinuous(this.filtered,target);
+  this.previous={...point};this.filtered=target;
+ }
+ private drawStart(point:StrokePoint):void{const s=this.options.settings,p=pressureValue(point.pressure,s.pressureCurve),radius=Math.max(.25,s.size*p/2),alpha=(s.opacity/100)*(s.flow/100);this.ctx.save();this.options.clip?.(this.ctx);this.ctx.globalCompositeOperation=this.options.erase?"destination-out":"source-over";this.ctx.globalAlpha=alpha;this.ctx.fillStyle=this.options.color;this.ctx.beginPath();if(s.tip==="flat"){const angle=(s.angle+s.rotation)*Math.PI/180,w=radius,h=Math.max(.5,radius*.24),c=Math.cos(angle),n=Math.sin(angle);this.ctx.ellipse(point.x,point.y,w,h,angle,0,Math.PI*2)}else this.ctx.arc(point.x,point.y,radius,0,Math.PI*2);this.ctx.fill();this.ctx.restore()}
+ private drawContinuous(a:StrokePoint,b:StrokePoint):void{
+  const s=this.options.settings,pa=pressureValue(a.pressure,s.pressureCurve),pb=pressureValue(b.pressure,s.pressureCurve),ra=Math.max(.25,s.size*pa/2),rb=Math.max(.25,s.size*pb/2),alpha=(s.opacity/100)*(s.flow/100),angle=(s.angle+s.rotation)*Math.PI/180;
+  const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);if(d<.01)return;
+  const nx=-dy/d,ny=dx/d;
+  let wa=ra,wb=rb;
+  if(s.tip==="flat"){
+   const nibX=Math.cos(angle),nibY=Math.sin(angle),sideX=-nibY,sideY=nibX,minor=.28;
+   const projection=Math.sqrt((nx*nibX+ny*nibY)**2+minor**2*(nx*sideX+ny*sideY)**2);
+   wa=Math.max(.4,ra*projection);wb=Math.max(.4,rb*projection);
+  }
+  this.ctx.save();this.options.clip?.(this.ctx);this.ctx.globalCompositeOperation=this.options.erase?"destination-out":"source-over";this.ctx.globalAlpha=alpha;this.ctx.fillStyle=this.options.color;this.ctx.beginPath();this.ctx.moveTo(a.x+nx*wa,a.y+ny*wa);this.ctx.lineTo(b.x+nx*wb,b.y+ny*wb);this.ctx.lineTo(b.x-nx*wb,b.y-ny*wb);this.ctx.lineTo(a.x-nx*wa,a.y-ny*wa);this.ctx.closePath();this.ctx.fill();
+  this.ctx.beginPath();if(s.tip==="flat")this.ctx.ellipse(b.x,b.y,rb,Math.max(.4,rb*.32),angle,0,Math.PI*2);else this.ctx.arc(b.x,b.y,rb,0,Math.PI*2);this.ctx.fill();this.ctx.restore();
+ }
+ end(point?:StrokePoint):void{
+  if(point)this.add(point);
+  this.previous=null;this.filtered=null;
+ }
+ private emitSegment(a:StrokePoint,b:StrokePoint,finish=false):void{
+  const distance=Math.hypot(b.x-a.x,b.y-a.y);if(distance<.01)return;
+  const direction=Math.atan2(b.y-a.y,b.x-a.x);
+  let travelled=0;
+  while(true){
+   const t=Math.min(1,travelled/distance),pressure=pressureValue(a.pressure+(b.pressure-a.pressure)*t,this.options.settings.pressureCurve);
+   const diameter=Math.max(.5,this.options.settings.size*pressure);
+   const spacing=Math.max(.45,diameter*this.options.settings.spacing/100);
+   const needed=this.dabIndex===0?0:spacing-this.carry;
+   if(travelled+needed>distance)break;
+   travelled+=needed;
+   const at=travelled/distance;
+   this.paint({x:a.x+(b.x-a.x)*at,y:a.y+(b.y-a.y)*at,pressure:a.pressure+(b.pressure-a.pressure)*at},direction);
+   this.carry=0;
+  }
+  this.carry+=Math.max(0,distance-travelled);
+  if(finish&&this.carry>Math.max(.5,this.options.settings.size*.08)){this.paint(b,direction);this.carry=0}
+ }
+ private paint(point:StrokePoint,direction:number,initial=false):void{
+  const s=this.options.settings,pressure=pressureValue(point.pressure,s.pressureCurve),isEffect=effectTips.has(s.tip);
+  const sizeJitter=isEffect?s.randomSize/100:Math.min(.08,s.randomSize/500);
+  const diameter=Math.max(.5,s.size*pressure*(1+(this.random()*2-1)*sizeJitter));
+  const stamp=getBrushStamp(s,this.options.color,diameter);
+  const directionAngle=(s.tip==="grass"||s.tip==="leaf")?direction:0;
+  const randomAngle=isEffect?(this.random()*2-1)*s.randomRotation*Math.PI/180:0;
+  const angle=(s.angle+s.rotation)*Math.PI/180+directionAngle+randomAngle;
+  const opacityJitter=isEffect?s.randomOpacity/100:Math.min(.08,s.randomOpacity/500);
+  const baseAlpha=(s.opacity/100)*(s.flow/100)*(1-this.random()*opacityJitter);
+  const alpha=initial?Math.min(1,baseAlpha):1-Math.pow(1-Math.min(.99,baseAlpha),Math.max(.25,s.spacing/12));
+  this.ctx.save();this.options.clip?.(this.ctx);this.ctx.globalCompositeOperation=this.options.erase?"destination-out":"source-over";this.ctx.globalAlpha=alpha;this.ctx.translate(point.x,point.y);this.ctx.rotate(angle);this.ctx.drawImage(stamp,-stamp.width/2,-stamp.height/2);this.ctx.restore();this.dabIndex++;
+ }
+}
+
+/** Persistent colour-pickup smudge. The carried patch is deposited and refreshed at each distance-spaced dab. */
+export class SmudgeRenderer{
+ private previous:StrokePoint|null=null;private carry=0;private pickup=document.createElement("canvas");private mask=document.createElement("canvas");
+ constructor(private readonly ctx:CanvasRenderingContext2D,private readonly settings:BrushSettings,private readonly clip?:(ctx:CanvasRenderingContext2D)=>void){}
+ begin(point:StrokePoint):void{this.previous={...point};this.capture(point)}
+ add(point:StrokePoint):void{if(!this.previous){this.begin(point);return}const a=this.previous,distance=Math.hypot(point.x-a.x,point.y-a.y);if(distance<.01)return;const step=Math.max(1,this.settings.size*Math.max(.05,this.settings.spacing/100)*.45);let d=step-this.carry;while(d<=distance){const t=d/distance;this.dab({x:a.x+(point.x-a.x)*t,y:a.y+(point.y-a.y)*t,pressure:a.pressure+(point.pressure-a.pressure)*t});d+=step}this.carry=Math.max(0,distance-(d-step));this.previous={...point}}
+ end(point?:StrokePoint):void{if(point)this.add(point);this.previous=null}
+ private ensure(size:number):void{if(this.pickup.width===size)return;this.pickup.width=this.pickup.height=this.mask.width=this.mask.height=size;const m=this.mask.getContext("2d")!,r=size/2,g=m.createRadialGradient(r,r,0,r,r,r);g.addColorStop(0,"rgba(255,255,255,1)");g.addColorStop(Math.max(.05,this.settings.hardness/100),"rgba(255,255,255,.94)");g.addColorStop(1,"rgba(255,255,255,0)");m.fillStyle=g;m.fillRect(0,0,size,size)}
+ private capture(point:StrokePoint):void{const size=Math.max(4,Math.ceil(this.settings.size*pressureValue(point.pressure,this.settings.pressureCurve)));this.ensure(size);const p=this.pickup.getContext("2d")!;p.clearRect(0,0,size,size);p.drawImage(this.ctx.canvas,point.x-size/2,point.y-size/2,size,size,0,0,size,size);p.globalCompositeOperation="destination-in";p.drawImage(this.mask,0,0);p.globalCompositeOperation="source-over"}
+ private dab(point:StrokePoint):void{const size=this.pickup.width;if(!size)return;const strength=(this.settings.blendStrength/100)*pressureValue(point.pressure,this.settings.pressureCurve);this.ctx.save();this.clip?.(this.ctx);this.ctx.globalAlpha=Math.min(.92,strength);this.ctx.drawImage(this.pickup,point.x-size/2,point.y-size/2);this.ctx.restore();const p=this.pickup.getContext("2d")!;p.globalAlpha=Math.max(.08,1-strength*.72);p.globalCompositeOperation="source-over";p.drawImage(this.ctx.canvas,point.x-size/2,point.y-size/2,size,size,0,0,size,size);p.globalAlpha=1;p.globalCompositeOperation="destination-in";p.drawImage(this.mask,0,0);p.globalCompositeOperation="source-over"}
+}
+
+/* Deferred local pixel tools; kept out of this cache-correction build.
+export type PixelToolMode="mixer"|"blur"|"sharpen"|"dodge"|"burn";
+export class PixelToolRenderer{
+ private previous:StrokePoint|null=null;private carry=0;private carried:[number,number,number]|null=null;
+ constructor(private readonly ctx:CanvasRenderingContext2D,private readonly settings:BrushSettings,private readonly mode:PixelToolMode,private readonly color:[number,number,number]){}
+ begin(point:StrokePoint):void{this.previous={...point};this.apply(point)}
+ add(point:StrokePoint):void{if(!this.previous){this.begin(point);return}const a=this.previous,d=Math.hypot(point.x-a.x,point.y-a.y);if(d<.01)return;const step=Math.max(1,this.settings.size*.12);let at=step-this.carry;while(at<=d){const t=at/d;this.apply({x:a.x+(point.x-a.x)*t,y:a.y+(point.y-a.y)*t,pressure:a.pressure+(point.pressure-a.pressure)*t});at+=step}this.carry=Math.max(0,d-(at-step));this.previous={...point}}
+ end(point?:StrokePoint):void{if(point)this.add(point);this.previous=null}
+ private apply(point:StrokePoint):void{const radius=Math.max(2,Math.ceil(this.settings.size*pressureValue(point.pressure,this.settings.pressureCurve)/2)),x=Math.max(0,Math.floor(point.x-radius)),y=Math.max(0,Math.floor(point.y-radius)),w=Math.min(this.ctx.canvas.width-x,radius*2+1),h=Math.min(this.ctx.canvas.height-y,radius*2+1);if(w<1||h<1)return;const image=this.ctx.getImageData(x,y,w,h),source=new Uint8ClampedArray(image.data),data=image.data,strength=(this.settings.blendStrength/100)*.32;
+  if(this.mode==="mixer"&&!this.carried)this.carried=[this.color[0],this.color[1],this.color[2]];
+  for(let py=0;py<h;py++)for(let px=0;px<w;px++){const dx=x+px-point.x,dy=y+py-point.y,fall=Math.max(0,1-Math.hypot(dx,dy)/radius);if(!fall)continue;const i=(py*w+px)*4,a=strength*fall*fall;if(this.mode==="blur"||this.mode==="sharpen"){let rr=0,gg=0,bb=0,count=0;for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){const sx=Math.min(w-1,Math.max(0,px+ox)),sy=Math.min(h-1,Math.max(0,py+oy)),si=(sy*w+sx)*4;rr+=source[si]!;gg+=source[si+1]!;bb+=source[si+2]!;count++}rr/=count;gg/=count;bb/=count;const factor=this.mode==="blur"?a:-a*.75;data[i]=Math.min(255,Math.max(0,data[i]!+(rr-data[i]!)*factor));data[i+1]=Math.min(255,Math.max(0,data[i+1]!+(gg-data[i+1]!)*factor));data[i+2]=Math.min(255,Math.max(0,data[i+2]!+(bb-data[i+2]!)*factor))}else if(this.mode==="mixer"){const c=this.carried!;const pickup=a*.45;c[0]+= (data[i]!-c[0])*pickup;c[1]+=(data[i+1]!-c[1])*pickup;c[2]+=(data[i+2]!-c[2])*pickup;data[i]+= (c[0]-data[i]!)*a;data[i+1]+=(c[1]-data[i+1]!)*a;data[i+2]+=(c[2]-data[i+2]!)*a;data[i+3]=Math.max(data[i+3]!,Math.round(255*a))}else{const sign=this.mode==="dodge"?1:-1;data[i]=Math.min(255,Math.max(0,data[i]!+sign*255*a*.28));data[i+1]=Math.min(255,Math.max(0,data[i+1]!+sign*255*a*.28));data[i+2]=Math.min(255,Math.max(0,data[i+2]!+sign*255*a*.28))}}
+  this.ctx.putImageData(image,x,y)}
+}
+*/
