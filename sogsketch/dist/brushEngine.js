@@ -128,7 +128,7 @@ const pressureValue = (raw, curve) => {
     const exponent = Math.pow(2, (50 - Math.min(100, Math.max(0, curve))) / 50);
     return Math.pow(p, exponent);
 };
-/** A stroke-local, distance driven dab renderer. It never depends on event rate. */
+/** Stroke-local renderer. Ordinary brushes use continuous geometry; only explicit effect tips use dabs. */
 export class StrokeRenderer {
     ctx;
     options;
@@ -136,17 +136,16 @@ export class StrokeRenderer {
     filtered = null;
     carry = 0;
     dabIndex = 0;
+    hasMoved = false;
     random;
     constructor(ctx, options) {
         this.ctx = ctx;
         this.options = options;
         this.random = randomFactory(options.seed ?? ((Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0));
     }
-    get usesStampPath() { const s = this.options.settings; return effectTips.has(s.tip) || s.tip === "bristle" || s.texture !== "none" || s.hardness < 45; }
-    begin(point) { this.previous = { ...point }; this.filtered = { ...point }; if (this.usesStampPath)
-        this.paint(point, 0, true);
-    else
-        this.drawStart(point); }
+    get usesStampPath() { return effectTips.has(this.options.settings.tip); }
+    begin(point) { this.previous = { ...point }; this.filtered = { ...point }; this.hasMoved = false; if (this.usesStampPath)
+        this.paint(point, 0, true); }
     add(point) {
         if (!this.previous || !this.filtered) {
             this.begin(point);
@@ -163,15 +162,33 @@ export class StrokeRenderer {
             this.emitSegment(this.filtered, target);
         else
             this.drawContinuous(this.filtered, target);
+        this.hasMoved = true;
         this.previous = { ...point };
         this.filtered = target;
     }
-    drawStart(point) { const s = this.options.settings, p = pressureValue(point.pressure, s.pressureCurve), radius = Math.max(.25, s.size * p / 2), alpha = (s.opacity / 100) * (s.flow / 100); this.ctx.save(); this.options.clip?.(this.ctx); this.ctx.globalCompositeOperation = this.options.erase ? "destination-out" : "source-over"; this.ctx.globalAlpha = alpha; this.ctx.fillStyle = this.options.color; this.ctx.beginPath(); if (s.tip === "flat" || s.tip === "chisel") {
-        const angle = (s.angle + s.rotation) * Math.PI / 180;
-        this.ctx.ellipse(point.x, point.y, radius, Math.max(.5, radius * (s.tip === "chisel" ? .24 : .32)), angle, 0, Math.PI * 2);
+    drawStart(point) {
+        const s = this.options.settings, p = pressureValue(point.pressure, s.pressureCurve), radius = Math.max(.25, s.size * p / 2), alpha = (s.opacity / 100) * (s.flow / 100), softness = 1 - s.hardness / 100;
+        this.ctx.save();
+        this.options.clip?.(this.ctx);
+        this.ctx.globalCompositeOperation = this.options.erase ? "destination-out" : "source-over";
+        this.ctx.fillStyle = this.options.color;
+        if (softness > .08 && !this.options.erase && s.tip !== "flat" && s.tip !== "chisel") {
+            this.ctx.globalAlpha = alpha * (.42 + .4 * (1 - softness));
+            this.ctx.shadowColor = this.options.color;
+            this.ctx.shadowBlur = radius * softness * .9;
+        }
+        else
+            this.ctx.globalAlpha = alpha;
+        this.ctx.beginPath();
+        if (s.tip === "flat" || s.tip === "chisel") {
+            const angle = (s.angle + s.rotation) * Math.PI / 180;
+            this.ctx.ellipse(point.x, point.y, radius, Math.max(.5, radius * (s.tip === "chisel" ? .24 : .32)), angle, 0, Math.PI * 2);
+        }
+        else
+            this.ctx.arc(point.x, point.y, radius * Math.max(.45, 1 - softness * .32), 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.restore();
     }
-    else
-        this.ctx.arc(point.x, point.y, radius, 0, Math.PI * 2); this.ctx.fill(); this.ctx.restore(); }
     drawContinuous(a, b) {
         const s = this.options.settings, pa = pressureValue(a.pressure, s.pressureCurve), pb = pressureValue(b.pressure, s.pressureCurve), ra = Math.max(.25, s.size * pa / 2), rb = Math.max(.25, s.size * pb / 2), alpha = (s.opacity / 100) * (s.flow / 100), angle = (s.angle + s.rotation) * Math.PI / 180;
         const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy);
@@ -188,26 +205,45 @@ export class StrokeRenderer {
         this.ctx.save();
         this.options.clip?.(this.ctx);
         this.ctx.globalCompositeOperation = this.options.erase ? "destination-out" : "source-over";
-        this.ctx.globalAlpha = alpha;
         this.ctx.fillStyle = this.options.color;
-        this.ctx.beginPath();
-        this.ctx.moveTo(a.x + nx * wa, a.y + ny * wa);
-        this.ctx.lineTo(b.x + nx * wb, b.y + ny * wb);
-        this.ctx.lineTo(b.x - nx * wb, b.y - ny * wb);
-        this.ctx.lineTo(a.x - nx * wa, a.y - ny * wa);
-        this.ctx.closePath();
-        this.ctx.fill();
-        this.ctx.beginPath();
-        if (s.tip === "flat" || s.tip === "chisel")
-            this.ctx.ellipse(b.x, b.y, rb, Math.max(.4, rb * (s.tip === "chisel" ? .24 : .32)), angle, 0, Math.PI * 2);
+        const fillBand = (scale) => { this.ctx.beginPath(); this.ctx.moveTo(a.x + nx * wa * scale, a.y + ny * wa * scale); this.ctx.lineTo(b.x + nx * wb * scale, b.y + ny * wb * scale); this.ctx.lineTo(b.x - nx * wb * scale, b.y - ny * wb * scale); this.ctx.lineTo(a.x - nx * wa * scale, a.y - ny * wa * scale); this.ctx.closePath(); if (s.tip === "flat" || s.tip === "chisel")
+            this.ctx.ellipse(b.x, b.y, rb * scale, Math.max(.4, rb * (s.tip === "chisel" ? .24 : .32) * scale), angle, 0, Math.PI * 2, true);
         else
-            this.ctx.arc(b.x, b.y, rb, 0, Math.PI * 2);
-        this.ctx.fill();
+            this.ctx.arc(b.x, b.y, rb * scale, 0, Math.PI * 2, true); this.ctx.fill(); };
+        const softness = 1 - s.hardness / 100;
+        if (softness > .08 && !this.options.erase && s.tip !== "flat" && s.tip !== "chisel") {
+            this.ctx.globalAlpha = alpha * (.42 + .4 * (1 - softness));
+            this.ctx.shadowColor = this.options.color;
+            this.ctx.shadowBlur = Math.max(ra, rb) * softness * .9;
+            fillBand(Math.max(.45, 1 - softness * .32));
+            this.ctx.shadowBlur = 0;
+        }
+        else {
+            this.ctx.globalAlpha = alpha;
+            fillBand(1);
+        }
+        if ((s.tip === "bristle" || s.texture !== "none") && !this.options.erase) {
+            const textureStrength = { none: .16, paper: .10, grain: .16, chalk: .24, charcoal: .3, canvas: .13, wet: .08 }, strength = s.tip === "bristle" ? Math.max(.2, textureStrength[s.texture]) : textureStrength[s.texture], strands = s.tip === "bristle" ? 7 : s.texture === "charcoal" || s.texture === "chalk" ? 5 : 3;
+            this.ctx.shadowBlur = 0;
+            this.ctx.strokeStyle = this.options.color;
+            this.ctx.lineCap = "round";
+            this.ctx.globalAlpha = alpha * strength;
+            for (let index = 0; index < strands; index++) {
+                const offset = (index - (strands - 1) / 2) / Math.max(1, strands - 1) * 1.35, offsetA = ra * offset, offsetB = rb * offset;
+                this.ctx.lineWidth = Math.max(.35, (ra + rb) / (strands * (s.tip === "bristle" ? 2.2 : 3.2)));
+                this.ctx.beginPath();
+                this.ctx.moveTo(a.x + nx * offsetA, a.y + ny * offsetA);
+                this.ctx.lineTo(b.x + nx * offsetB, b.y + ny * offsetB);
+                this.ctx.stroke();
+            }
+        }
         this.ctx.restore();
     }
     end(point) {
         if (point)
             this.add(point);
+        if (!this.usesStampPath && !this.hasMoved && this.filtered)
+            this.drawStart(this.filtered);
         this.previous = null;
         this.filtered = null;
     }
@@ -240,7 +276,7 @@ export class StrokeRenderer {
         const sizeJitter = isEffect ? s.randomSize / 100 : Math.min(.08, s.randomSize / 500);
         const diameter = Math.max(.5, s.size * pressure * (1 + (this.random() * 2 - 1) * sizeJitter));
         const stamp = getBrushStamp(s, this.options.color, diameter);
-        const directionAngle = s.tip === "bristle" ? direction - Math.PI / 2 : (s.tip === "grass" || s.tip === "leaf") ? direction : 0;
+        const directionAngle = (s.tip === "grass" || s.tip === "leaf") ? direction : 0;
         const randomAngle = isEffect ? (this.random() * 2 - 1) * s.randomRotation * Math.PI / 180 : 0;
         const angle = (s.angle + s.rotation) * Math.PI / 180 + directionAngle + randomAngle;
         const opacityJitter = isEffect ? s.randomOpacity / 100 : Math.min(.08, s.randomOpacity / 500);
