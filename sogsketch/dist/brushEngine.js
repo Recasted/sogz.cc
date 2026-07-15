@@ -3,16 +3,43 @@ const p = (category, id, name, changes) => ({ id, name, category, ...base, ...ch
 export const defaultBrushes = [
     p("Core Brushes", "hard-round", "Hard Round", { size: 24, hardness: 100, spacing: 8, smoothing: 28 }),
     p("Core Brushes", "soft-round", "Soft Round", { size: 72, opacity: 55, flow: 35, hardness: 0, spacing: 3, smoothing: 32 }),
-    p("Core Brushes", "pencil", "Pencil", { size: 3, opacity: 82, flow: 100, hardness: 100, spacing: 6, smoothing: 22, texture: "paper" }),
-    p("Core Brushes", "pressure-ink", "Pressure Ink", { size: 14, hardness: 100, spacing: 5, smoothing: 48, stabilizer: 7, pressureCurve: 58 }),
-    p("Core Brushes", "flat-paint", "Flat Paint Brush", { size: 54, opacity: 92, flow: 82, hardness: 100, spacing: 5, smoothing: 32, tip: "flat", angle: 25 }),
+    p("Core Brushes", "airbrush", "Airbrush", { size: 96, opacity: 34, flow: 18, hardness: 0, spacing: 2, smoothing: 30 }),
+    p("Core Brushes", "opaque-pressure", "Opaque Pressure", { size: 32, hardness: 100, spacing: 4, smoothing: 38, pressureCurve: 64 }),
+    p("Core Brushes", "tapered-round", "Tapered Round", { size: 18, hardness: 100, spacing: 4, smoothing: 58, stabilizer: 8, pressureCurve: 76 }),
+    p("Core Brushes", "soft-glaze", "Soft Glaze", { size: 110, opacity: 22, flow: 12, hardness: 12, spacing: 2, smoothing: 42 }),
+    p("Ink", "pressure-ink", "Pressure Ink", { size: 14, hardness: 100, spacing: 4, smoothing: 52, stabilizer: 7, pressureCurve: 62 }),
+    p("Ink", "comic-pen", "Comic Pen", { size: 10, hardness: 100, spacing: 3, smoothing: 64, stabilizer: 10, pressureCurve: 72 }),
+    p("Ink", "technical-pen", "Technical Pen", { size: 4, hardness: 100, spacing: 3, smoothing: 46, stabilizer: 8, pressureCurve: 20 }),
+    p("Ink", "dry-ink", "Dry Ink", { size: 17, opacity: 94, flow: 88, hardness: 100, spacing: 7, smoothing: 44, tip: "bristle", texture: "paper", pressureCurve: 66 }),
+    p("Ink", "sumi-ink", "Sumi Ink", { size: 38, opacity: 90, flow: 72, hardness: 78, spacing: 5, smoothing: 48, tip: "bristle", texture: "wet", pressureCurve: 70 }),
+    p("Ink", "calligraphy-45", "Calligraphy 45°", { size: 30, hardness: 100, spacing: 3, smoothing: 58, stabilizer: 9, tip: "flat", angle: 45, pressureCurve: 40 }),
+    p("Pencils", "pencil", "HB Pencil", { size: 3, opacity: 82, flow: 100, hardness: 100, spacing: 5, smoothing: 22, texture: "paper" }),
+    p("Pencils", "2b-pencil", "2B Pencil", { size: 6, opacity: 78, flow: 78, hardness: 92, spacing: 6, smoothing: 25, texture: "grain", pressureCurve: 62 }),
+    p("Pencils", "6b-pencil", "6B Pencil", { size: 11, opacity: 72, flow: 68, hardness: 82, spacing: 7, smoothing: 24, texture: "charcoal", pressureCurve: 68 }),
+    p("Pencils", "mechanical-pencil", "Mechanical Pencil", { size: 2, opacity: 92, hardness: 100, spacing: 4, smoothing: 38, stabilizer: 5, texture: "paper", pressureCurve: 25 }),
+    p("Pencils", "colored-pencil", "Colored Pencil", { size: 7, opacity: 68, flow: 72, hardness: 88, spacing: 7, smoothing: 28, texture: "paper", pressureCurve: 58 }),
+    p("Paint", "flat-paint", "Flat Paint", { size: 54, opacity: 100, flow: 100, hardness: 100, spacing: 3, smoothing: 46, tip: "paint", pressureCurve: 46 }),
+    p("Paint", "wet-paint", "Wet Paint", { size: 62, opacity: 76, flow: 58, hardness: 72, spacing: 4, smoothing: 50, tip: "bristle", texture: "wet", pressureCurve: 58 }),
+    p("Paint", "gouache", "Gouache", { size: 48, opacity: 94, flow: 86, hardness: 92, spacing: 4, smoothing: 42, tip: "paint", texture: "paper", pressureCurve: 52 }),
+    p("Paint", "oil-bristle", "Oil Bristle", { size: 46, opacity: 88, flow: 62, hardness: 84, spacing: 5, smoothing: 38, tip: "bristle", texture: "canvas", pressureCurve: 58 }),
+    p("Paint", "acrylic", "Acrylic", { size: 42, opacity: 98, flow: 92, hardness: 96, spacing: 3, smoothing: 40, tip: "paint", texture: "canvas", pressureCurve: 48 }),
+    p("Paint", "watercolor-wash", "Watercolor Wash", { size: 115, opacity: 24, flow: 18, hardness: 8, spacing: 2, smoothing: 46, texture: "wet", pressureCurve: 44 }),
+    p("Paint", "palette-knife", "Palette Knife", { size: 58, opacity: 100, flow: 92, hardness: 100, spacing: 4, smoothing: 30, tip: "flat", texture: "canvas", angle: 18, pressureCurve: 30 }),
+    p("Markers", "alcohol-marker", "Alcohol Marker", { size: 34, opacity: 38, flow: 34, hardness: 88, spacing: 3, smoothing: 48, tip: "paint", pressureCurve: 34 }),
+    p("Markers", "chisel-marker", "Chisel Marker", { size: 42, opacity: 62, flow: 52, hardness: 100, spacing: 3, smoothing: 54, tip: "chisel", angle: 45, pressureCurve: 25 }),
+    p("Markers", "brush-marker", "Brush Marker", { size: 20, opacity: 82, flow: 76, hardness: 100, spacing: 3, smoothing: 62, stabilizer: 8, pressureCurve: 74 }),
+    p("Markers", "highlighter", "Highlighter", { size: 48, opacity: 25, flow: 30, hardness: 100, spacing: 3, smoothing: 44, tip: "chisel", angle: 0, pressureCurve: 18 }),
+    p("Texture", "chalk", "Chalk", { size: 28, opacity: 72, flow: 68, hardness: 88, spacing: 8, smoothing: 22, tip: "bristle", texture: "chalk", randomSize: 8, randomOpacity: 10 }),
+    p("Texture", "charcoal", "Charcoal", { size: 34, opacity: 68, flow: 64, hardness: 76, spacing: 8, smoothing: 20, tip: "bristle", texture: "charcoal", randomSize: 10, randomOpacity: 14 }),
+    p("Texture", "pastel", "Soft Pastel", { size: 45, opacity: 62, flow: 55, hardness: 55, spacing: 7, smoothing: 25, tip: "bristle", texture: "grain", randomSize: 6, randomOpacity: 10 }),
+    p("Texture", "grain-shader", "Grain Shader", { size: 90, opacity: 20, flow: 16, hardness: 18, spacing: 5, smoothing: 32, texture: "grain", randomOpacity: 12 }),
     p("Specialty Brushes", "sponge", "Sponge", { size: 70, opacity: 58, flow: 70, hardness: 70, spacing: 38, smoothing: 12, tip: "scatter", texture: "grain", randomSize: 22, randomOpacity: 15, randomRotation: 45 }),
     p("Specialty Brushes", "grass", "Grass", { size: 48, opacity: 88, flow: 90, hardness: 100, spacing: 32, smoothing: 18, tip: "grass", randomSize: 18, randomOpacity: 8, randomRotation: 8 }),
     p("Specialty Brushes", "leaves", "Leaves", { size: 34, opacity: 90, flow: 90, hardness: 100, spacing: 48, smoothing: 16, tip: "leaf", randomSize: 24, randomOpacity: 10, randomRotation: 38 }),
     p("Specialty Brushes", "clouds", "Clouds", { size: 120, opacity: 24, flow: 35, hardness: 0, spacing: 24, smoothing: 30, tip: "cloud", randomSize: 20, randomOpacity: 12, randomRotation: 25 }),
     p("Specialty Brushes", "scatter", "Scatter", { size: 32, opacity: 72, flow: 78, hardness: 100, spacing: 48, smoothing: 8, tip: "scatter", randomSize: 35, randomOpacity: 20, randomRotation: 90 })
 ];
-export const brushCategories = ["Core Brushes", "Specialty Brushes", "Custom"];
+export const brushCategories = ["Core Brushes", "Ink", "Pencils", "Paint", "Markers", "Texture", "Specialty Brushes", "Custom"];
 const stampCache = new Map();
 const hash = (text) => { let value = 2166136261; for (let i = 0; i < text.length; i++)
     value = Math.imul(value ^ text.charCodeAt(i), 16777619); return value >>> 0; };
@@ -30,6 +57,9 @@ export function getBrushStamp(settings, color, size) {
         ctx.roundRect(cx - r, cy - r * .32, px, px * .64, Math.max(1, r * .08));
     else if (settings.tip === "chisel") {
         ctx.ellipse(cx, cy, r, r * .24, 0, 0, Math.PI * 2);
+    }
+    else if (settings.tip === "paint") {
+        ctx.roundRect(cx - r, cy - r * .37, px, px * .74, Math.max(2, r * .35));
     }
     else if (settings.tip === "leaf") {
         ctx.moveTo(cx - r, cy);
@@ -112,7 +142,7 @@ export class StrokeRenderer {
         this.options = options;
         this.random = randomFactory(options.seed ?? ((Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0));
     }
-    get usesStampPath() { return effectTips.has(this.options.settings.tip) || this.options.settings.hardness < 45; }
+    get usesStampPath() { const s = this.options.settings; return effectTips.has(s.tip) || s.tip === "bristle" || s.texture !== "none" || s.hardness < 45; }
     begin(point) { this.previous = { ...point }; this.filtered = { ...point }; if (this.usesStampPath)
         this.paint(point, 0, true);
     else
@@ -136,9 +166,9 @@ export class StrokeRenderer {
         this.previous = { ...point };
         this.filtered = target;
     }
-    drawStart(point) { const s = this.options.settings, p = pressureValue(point.pressure, s.pressureCurve), radius = Math.max(.25, s.size * p / 2), alpha = (s.opacity / 100) * (s.flow / 100); this.ctx.save(); this.options.clip?.(this.ctx); this.ctx.globalCompositeOperation = this.options.erase ? "destination-out" : "source-over"; this.ctx.globalAlpha = alpha; this.ctx.fillStyle = this.options.color; this.ctx.beginPath(); if (s.tip === "flat") {
-        const angle = (s.angle + s.rotation) * Math.PI / 180, w = radius, h = Math.max(.5, radius * .24), c = Math.cos(angle), n = Math.sin(angle);
-        this.ctx.ellipse(point.x, point.y, w, h, angle, 0, Math.PI * 2);
+    drawStart(point) { const s = this.options.settings, p = pressureValue(point.pressure, s.pressureCurve), radius = Math.max(.25, s.size * p / 2), alpha = (s.opacity / 100) * (s.flow / 100); this.ctx.save(); this.options.clip?.(this.ctx); this.ctx.globalCompositeOperation = this.options.erase ? "destination-out" : "source-over"; this.ctx.globalAlpha = alpha; this.ctx.fillStyle = this.options.color; this.ctx.beginPath(); if (s.tip === "flat" || s.tip === "chisel") {
+        const angle = (s.angle + s.rotation) * Math.PI / 180;
+        this.ctx.ellipse(point.x, point.y, radius, Math.max(.5, radius * (s.tip === "chisel" ? .24 : .32)), angle, 0, Math.PI * 2);
     }
     else
         this.ctx.arc(point.x, point.y, radius, 0, Math.PI * 2); this.ctx.fill(); this.ctx.restore(); }
@@ -149,8 +179,8 @@ export class StrokeRenderer {
             return;
         const nx = -dy / d, ny = dx / d;
         let wa = ra, wb = rb;
-        if (s.tip === "flat") {
-            const nibX = Math.cos(angle), nibY = Math.sin(angle), sideX = -nibY, sideY = nibX, minor = .28;
+        if (s.tip === "flat" || s.tip === "chisel") {
+            const nibX = Math.cos(angle), nibY = Math.sin(angle), sideX = -nibY, sideY = nibX, minor = s.tip === "chisel" ? .24 : .32;
             const projection = Math.sqrt((nx * nibX + ny * nibY) ** 2 + minor ** 2 * (nx * sideX + ny * sideY) ** 2);
             wa = Math.max(.4, ra * projection);
             wb = Math.max(.4, rb * projection);
@@ -168,8 +198,8 @@ export class StrokeRenderer {
         this.ctx.closePath();
         this.ctx.fill();
         this.ctx.beginPath();
-        if (s.tip === "flat")
-            this.ctx.ellipse(b.x, b.y, rb, Math.max(.4, rb * .32), angle, 0, Math.PI * 2);
+        if (s.tip === "flat" || s.tip === "chisel")
+            this.ctx.ellipse(b.x, b.y, rb, Math.max(.4, rb * (s.tip === "chisel" ? .24 : .32)), angle, 0, Math.PI * 2);
         else
             this.ctx.arc(b.x, b.y, rb, 0, Math.PI * 2);
         this.ctx.fill();
@@ -210,7 +240,7 @@ export class StrokeRenderer {
         const sizeJitter = isEffect ? s.randomSize / 100 : Math.min(.08, s.randomSize / 500);
         const diameter = Math.max(.5, s.size * pressure * (1 + (this.random() * 2 - 1) * sizeJitter));
         const stamp = getBrushStamp(s, this.options.color, diameter);
-        const directionAngle = (s.tip === "grass" || s.tip === "leaf") ? direction : 0;
+        const directionAngle = s.tip === "bristle" ? direction - Math.PI / 2 : (s.tip === "grass" || s.tip === "leaf") ? direction : 0;
         const randomAngle = isEffect ? (this.random() * 2 - 1) * s.randomRotation * Math.PI / 180 : 0;
         const angle = (s.angle + s.rotation) * Math.PI / 180 + directionAngle + randomAngle;
         const opacityJitter = isEffect ? s.randomOpacity / 100 : Math.min(.08, s.randomOpacity / 500);

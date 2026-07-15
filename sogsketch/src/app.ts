@@ -57,7 +57,24 @@ function commitShape(point:Point):void{const x=startPoint.x,y=startPoint.y,w=poi
 function drawPathPreview(point?:Point):void{overlayCtx.clearRect(0,0,state.width,state.height);if(!pathPoints.length)return;overlayCtx.save();overlayCtx.strokeStyle=state.foreground;overlayCtx.lineWidth=Math.max(1,state.brush.size/state.view.zoom);overlayCtx.beginPath();overlayCtx.moveTo(pathPoints[0]!.x,pathPoints[0]!.y);for(const p of pathPoints.slice(1))overlayCtx.lineTo(p.x,p.y);if(point)overlayCtx.lineTo(point.x,point.y);if(state.tool==="polygon"&&pathPoints.length>2)overlayCtx.lineTo(pathPoints[0]!.x,pathPoints[0]!.y);overlayCtx.stroke();overlayCtx.restore()}
 function finishPath():void{if(pathPoints.length<2)return;checkpoint(state.tool==="polygon"?"Polygon":"Polyline");withLayerContext(ctx=>{ctx.beginPath();ctx.moveTo(pathPoints[0]!.x,pathPoints[0]!.y);for(const point of pathPoints.slice(1))ctx.lineTo(point.x,point.y);if(state.tool==="polygon")ctx.closePath();ctx.stroke()});pathPoints=[];drawSelection()}
 
-function floodFill(point:Point):void{const layer=selectedLayer();if(!layer||layer.locked)return;checkpoint("Fill");const ctx=layer.canvas.getContext("2d",{willReadFrequently:true})!,image=ctx.getImageData(0,0,state.width,state.height),data=image.data,x=Math.floor(point.x),y=Math.floor(point.y),index=(y*state.width+x)*4,target=[data[index]!,data[index+1]!,data[index+2]!,data[index+3]!],fill=[...hexToRgb(state.foreground),Math.round(255*state.brush.opacity/100)];if(target.every((value,i)=>value===fill[i]))return;const stack:[[number,number]]|Array<[number,number]>=[[x,y]],seen=new Uint8Array(state.width*state.height);while(stack.length){const current=stack.pop();if(!current)break;const [cx,cy]=current;if(cx<0||cy<0||cx>=state.width||cy>=state.height)continue;const key=cy*state.width+cx;if(seen[key])continue;seen[key]=1;const at=key*4;if(Math.abs(data[at]!-target[0]!)+Math.abs(data[at+1]!-target[1]!)+Math.abs(data[at+2]!-target[2]!)+Math.abs(data[at+3]!-target[3]!)>40)continue;data[at]=fill[0]!;data[at+1]=fill[1]!;data[at+2]=fill[2]!;data[at+3]=fill[3]!;stack.push([cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1])}ctx.putImageData(image,0,0);composite()}
+function floodFill(point:Point):void{
+ const layer=selectedLayer();if(!layer||layer.locked)return;
+ const local=layerPoint(point,layer),x=Math.floor(local.x),y=Math.floor(local.y),width=layer.canvas.width,height=layer.canvas.height;
+ if(x<0||y<0||x>=width||y>=height||!inSelection(local))return;
+ const ctx=layer.canvas.getContext("2d",{willReadFrequently:true})!,image=ctx.getImageData(0,0,width,height),data=image.data,start=(y*width+x)*4;
+ const target=[data[start]!,data[start+1]!,data[start+2]!,data[start+3]!],rgb=hexToRgb(state.foreground),sourceAlpha=state.brush.opacity/100;
+ const colourDistance=(at:number):number=>{
+  const alphaDelta=Math.abs(data[at+3]!-target[3]!);
+  if(target[3]!<16&&data[at+3]!<16)return alphaDelta;
+  return Math.abs(data[at]!-target[0]!)+Math.abs(data[at+1]!-target[1]!)+Math.abs(data[at+2]!-target[2]!)+alphaDelta*1.5;
+ };
+ if(colourDistance(start)===0&&target[0]===rgb[0]&&target[1]===rgb[1]&&target[2]===rgb[2]&&target[3]===Math.round(sourceAlpha*255))return;
+ checkpoint("Fill");
+ const seen=new Uint8Array(width*height),stack:number[]=[y*width+x],matched:number[]=[];
+ while(stack.length){const key=stack.pop()!;if(seen[key])continue;seen[key]=1;const cx=key%width,cy=Math.floor(key/width),at=key*4;if(colourDistance(at)>72||!inSelection({x:cx+.5,y:cy+.5,pressure:1}))continue;matched.push(key);if(cx>0)stack.push(key-1);if(cx+1<width)stack.push(key+1);if(cy>0)stack.push(key-width);if(cy+1<height)stack.push(key+width)}
+ for(const key of matched){const at=key*4,destinationAlpha=data[at+3]!/255,outAlpha=sourceAlpha+destinationAlpha*(1-sourceAlpha);if(outAlpha<=0)continue;data[at]=Math.round((rgb[0]*sourceAlpha+data[at]!*destinationAlpha*(1-sourceAlpha))/outAlpha);data[at+1]=Math.round((rgb[1]*sourceAlpha+data[at+1]!*destinationAlpha*(1-sourceAlpha))/outAlpha);data[at+2]=Math.round((rgb[2]*sourceAlpha+data[at+2]!*destinationAlpha*(1-sourceAlpha))/outAlpha);data[at+3]=Math.round(outAlpha*255)}
+ ctx.putImageData(image,0,0);composite();setStatus(`Filled ${matched.length.toLocaleString()} pixels`)
+}
 function pickColor(point:Point):void{const pixel=paintCtx.getImageData(Math.floor(point.x),Math.floor(point.y),1,1).data;setForeground(rgbToHex(pixel[0]!,pixel[1]!,pixel[2]!))}
 function clearSelectionOrLayer():void{const layer=selectedLayer();if(!layer||layer.locked)return;checkpoint("Clear");const ctx=layer.canvas.getContext("2d")!;if(state.selection)ctx.clearRect(state.selection.x,state.selection.y,state.selection.width,state.selection.height);else ctx.clearRect(0,0,state.width,state.height);composite()}
 

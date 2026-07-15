@@ -2,8 +2,8 @@ export type ToolName = "brush"|"pencil"|"eraser"|"smudge"|"line"|"rectangle"|"el
 
 export interface Point { x:number; y:number; pressure:number }
 export interface Selection { x:number; y:number; width:number; height:number; ellipse:boolean }
-export type BrushCategory="Core Brushes"|"Specialty Brushes"|"Custom";
-export type BrushTip="round"|"flat"|"chisel"|"bristle"|"scatter"|"leaf"|"grass"|"cloud";
+export type BrushCategory="Core Brushes"|"Ink"|"Pencils"|"Paint"|"Markers"|"Texture"|"Specialty Brushes"|"Custom";
+export type BrushTip="round"|"paint"|"flat"|"chisel"|"bristle"|"scatter"|"leaf"|"grass"|"cloud";
 export type BrushTexture="none"|"paper"|"grain"|"chalk"|"charcoal"|"canvas"|"wet";
 export interface BrushSettings { size:number; opacity:number; flow:number; hardness:number; spacing:number; smoothing:number; stabilizer:number; pressureCurve:number; rotation:number; angle:number; randomSize:number; randomOpacity:number; randomRotation:number; blendStrength:number; tip:BrushTip; texture:BrushTexture; eraserMode:boolean; symmetry:boolean }
 export interface PaintLayer { id:number; name:string; canvas:HTMLCanvasElement; visible:boolean; locked:boolean; opacity:number; blendMode:GlobalCompositeOperation; alphaInherit:boolean; groupId:number|null; x:number; y:number; scaleX:number; scaleY:number }
