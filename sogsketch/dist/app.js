@@ -1,14 +1,16 @@
 import { HistoryManager } from "./history.js";
 import { canvasCopy, clamp, downloadBlob, hexToRgb, hslToRgb, qs, rgbToHex, rgbToHsl } from "./utils.js";
+import { getBrushStamp } from "./brushEngine.js";
+import { BrushLibrary } from "./brushLibrary.js";
 const paint = qs("#paintCanvas"), overlay = qs("#overlayCanvas"), stage = qs("#canvasStage"), viewport = qs("#viewport");
 const paintCtx = paint.getContext("2d", { willReadFrequently: true }), overlayCtx = overlay.getContext("2d");
 const fileInput = qs("#fileInput"), layerList = qs("#layerList"), historyList = qs("#historyList"), navigator = qs("#navigator"), navCtx = navigator.getContext("2d");
 const fgInput = qs("#fgColor"), bgInput = qs("#bgColor"), hexInput = qs("#hexInput"), rInput = qs("#rInput"), gInput = qs("#gInput"), bInput = qs("#bInput"), hInput = qs("#hInput"), sInput = qs("#sInput"), lInput = qs("#lInput");
-const toolLabels = { brush: "Freehand brush", pencil: "Pencil", eraser: "Eraser", line: "Line", rectangle: "Rectangle", ellipse: "Ellipse", polygon: "Polygon", polyline: "Polyline", path: "Bezier path", fill: "Fill bucket", gradient: "Gradient", picker: "Color picker", move: "Move layer", transform: "Transform layer", crop: "Crop canvas", selectRect: "Rectangle selection", selectEllipse: "Ellipse selection", text: "Text", pan: "Pan canvas", zoom: "Zoom" };
-const defaultPresets = [{ id: "ink", name: "Ink", size: 12, opacity: 100, flow: 100, hardness: 100, spacing: 8, smoothing: 45 }, { id: "paint", name: "Paint", size: 38, opacity: 92, flow: 70, hardness: 78, spacing: 12, smoothing: 55 }, { id: "air", name: "Airbrush", size: 95, opacity: 40, flow: 28, hardness: 10, spacing: 7, smoothing: 30 }, { id: "pencil", name: "Pencil", size: 4, opacity: 100, flow: 100, hardness: 100, spacing: 5, smoothing: 18 }, { id: "marker", name: "Marker", size: 28, opacity: 72, flow: 85, hardness: 88, spacing: 10, smoothing: 40 }, { id: "soft", name: "Soft", size: 140, opacity: 25, flow: 20, hardness: 0, spacing: 7, smoothing: 25 }];
-const state = { width: 1600, height: 1000, resolution: 72, name: "Untitled", background: "#FFFFFF", layers: [], selectedLayerId: null, nextLayerId: 1, tool: "brush", brush: { size: 24, opacity: 100, flow: 100, hardness: 85, spacing: 12, smoothing: 35, stabilizer: 4, eraserMode: false, symmetry: false }, foreground: "#000000", backgroundColor: "#FFFFFF", recentColors: ["#000000", "#FFFFFF"], selection: null, guides: [], view: { zoom: .65, panX: 0, panY: 0, rotation: 0, flipX: 1, flipY: 1, grid: false, rulers: false, snap: true }, autosave: true };
-let drawing = false, workspacePanning = false, startPoint = { x: 0, y: 0, pressure: 1 }, lastPoint = { x: 0, y: 0, pressure: 1 }, panStart = { x: 0, y: 0, panX: 0, panY: 0 }, moveStart = { x: 0, y: 0, layerX: 0, layerY: 0 }, pathPoints = [], strokeBefore = null, textPoint = null, historyBusy = false, autosaveTimer = 0;
+const toolLabels = { brush: "Freehand brush", pencil: "Pencil", eraser: "Eraser", smudge: "Blend / Smudge", line: "Line", rectangle: "Rectangle", ellipse: "Ellipse", polygon: "Polygon", polyline: "Polyline", path: "Bezier path", fill: "Fill bucket", gradient: "Gradient", picker: "Color picker", move: "Move layer", transform: "Transform layer", crop: "Crop canvas", selectRect: "Rectangle selection", selectEllipse: "Ellipse selection", text: "Text", pan: "Pan canvas", zoom: "Zoom" };
+const state = { width: 1600, height: 1000, resolution: 72, name: "Untitled", background: "#FFFFFF", layers: [], selectedLayerId: null, nextLayerId: 1, tool: "brush", brush: { size: 24, opacity: 100, flow: 100, hardness: 85, spacing: 12, smoothing: 35, stabilizer: 4, rotation: 0, angle: 0, randomSize: 0, randomOpacity: 0, randomRotation: 0, blendStrength: 55, tip: "round", texture: "none", eraserMode: false, symmetry: false }, foreground: "#000000", backgroundColor: "#FFFFFF", recentColors: ["#000000", "#FFFFFF"], selection: null, guides: [], view: { zoom: .65, panX: 0, panY: 0, rotation: 0, flipX: 1, flipY: 1, grid: false, rulers: false, snap: true }, autosave: true };
+let drawing = false, workspacePanning = false, startPoint = { x: 0, y: 0, pressure: 1 }, lastPoint = { x: 0, y: 0, pressure: 1 }, panStart = { x: 0, y: 0, panX: 0, panY: 0 }, moveStart = { x: 0, y: 0, layerX: 0, layerY: 0 }, pathPoints = [], strokeBefore = null, textPoint = null, historyBusy = false, autosaveTimer = 0, activeBrushId = localStorage.getItem("sogsketch-active-brush") ?? "hard-round", smudgeBuffer = null;
 const history = new HistoryManager(24, renderHistory);
+let brushLibrary;
 function makeLayer(name, background = false) { const canvas = document.createElement("canvas"); canvas.width = state.width; canvas.height = state.height; return { id: state.nextLayerId++, name, canvas, visible: true, locked: false, opacity: 100, blendMode: "source-over", alphaInherit: false, groupId: null, x: 0, y: 0, scaleX: 1, scaleY: 1 }; }
 function selectedLayer() { return state.layers.find(layer => layer.id === state.selectedLayerId) ?? null; }
 function setCanvasSize(width, height) { state.width = clamp(Math.round(width), 64, 8192); state.height = clamp(Math.round(height), 64, 8192); for (const canvas of [paint, overlay]) {
@@ -108,27 +110,59 @@ function clipToSelection(ctx) { const s = state.selection; if (!s)
     ctx.ellipse(s.x + s.width / 2, s.y + s.height / 2, Math.abs(s.width / 2), Math.abs(s.height / 2), 0, 0, Math.PI * 2);
 else
     ctx.rect(s.x, s.y, s.width, s.height); ctx.clip(); }
-function brushStamp(ctx, point, size, color, erase) { if (!inSelection(point))
-    return; const radius = Math.max(.5, size * point.pressure / 2), hardness = state.tool === "pencil" ? 100 : state.brush.hardness; ctx.save(); ctx.globalAlpha = (state.brush.opacity / 100) * (state.brush.flow / 100); ctx.globalCompositeOperation = erase ? "destination-out" : "source-over"; if (hardness >= 98) {
-    ctx.fillStyle = color;
-}
-else {
-    const gradient = ctx.createRadialGradient(point.x, point.y, radius * hardness / 100, point.x, point.y, radius);
-    gradient.addColorStop(0, color);
-    gradient.addColorStop(1, "transparent");
-    ctx.fillStyle = gradient;
-} ctx.beginPath(); ctx.arc(point.x, point.y, radius, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
-function strokeLine(ctx, a, b, size, color, erase) { ctx.save(); clipToSelection(ctx); ctx.globalAlpha = (state.brush.opacity / 100) * (state.brush.flow / 100); ctx.globalCompositeOperation = erase ? "destination-out" : "source-over"; ctx.strokeStyle = color; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.lineWidth = Math.max(.5, size * ((a.pressure + b.pressure) / 2)); const hardness = state.tool === "pencil" ? 100 : state.brush.hardness; if (hardness < 95 && !erase) {
-    ctx.shadowColor = color;
-    ctx.shadowBlur = (1 - hardness / 100) * size * .45;
-} ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); ctx.restore(); }
-function drawBrushSegment(from, to) { const layer = selectedLayer(); if (!layer || layer.locked)
-    return; const ctx = layer.canvas.getContext("2d"), a = layerPoint(from, layer), b = layerPoint(to, layer), size = state.tool === "pencil" ? Math.min(state.brush.size, 8) : state.brush.size, erase = state.tool === "eraser" || state.brush.eraserMode; if (Math.hypot(b.x - a.x, b.y - a.y) < .5) {
-    brushStamp(ctx, a, size, state.foreground, erase);
-    if (state.brush.symmetry)
-        brushStamp(ctx, { ...a, x: state.width - a.x }, size, state.foreground, erase);
+function brushStamp(ctx, point, size, color, erase, rotation = 0) { if (!inSelection(point))
+    return; const pressure = Math.max(.08, point.pressure), randomSize = 1 + (Math.random() * 2 - 1) * state.brush.randomSize / 100, actualSize = Math.max(.5, size * pressure * randomSize), stamp = getBrushStamp(state.brush, color, actualSize), randomOpacity = 1 - Math.random() * state.brush.randomOpacity / 100, angle = (state.brush.angle + state.brush.rotation + rotation + (Math.random() * 2 - 1) * state.brush.randomRotation) * Math.PI / 180; ctx.save(); clipToSelection(ctx); ctx.globalAlpha = (state.brush.opacity / 100) * (state.brush.flow / 100) * randomOpacity; ctx.globalCompositeOperation = erase ? "destination-out" : "source-over"; ctx.translate(point.x, point.y); ctx.rotate(angle); ctx.drawImage(stamp, -stamp.width / 2, -stamp.height / 2); ctx.restore(); }
+function strokeLine(ctx, a, b, size, color, erase) { const distance = Math.hypot(b.x - a.x, b.y - a.y), direction = Math.atan2(b.y - a.y, b.x - a.x), pressure = Math.max(.08, (a.pressure + b.pressure) / 2), randomSize = 1 + (Math.random() * 2 - 1) * state.brush.randomSize / 100, width = Math.max(.5, size * pressure * randomSize), stampTip = ["scatter", "leaf", "grass", "cloud"].includes(state.brush.tip); if (stampTip) {
+    const step = Math.max(2, width * state.brush.spacing / 100), steps = Math.max(1, Math.ceil(distance / step)), degrees = direction * 180 / Math.PI;
+    for (let index = 1; index <= steps; index++) {
+        const t = index / steps;
+        brushStamp(ctx, { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, pressure: a.pressure + (b.pressure - a.pressure) * t }, size, color, erase, degrees);
+    }
     return;
-} strokeLine(ctx, a, b, size, state.foreground, erase); if (state.brush.symmetry)
+} if (distance < .01)
+    return; ctx.save(); clipToSelection(ctx); ctx.globalCompositeOperation = erase ? "destination-out" : "source-over"; ctx.strokeStyle = color; ctx.lineJoin = "round"; ctx.lineCap = "butt"; const opacity = (state.brush.opacity / 100) * (state.brush.flow / 100) * (1 - Math.random() * state.brush.randomOpacity / 100), softness = 1 - state.brush.hardness / 100, brushAngle = (state.brush.angle + state.brush.rotation) * Math.PI / 180; ctx.globalAlpha = opacity; if (state.brush.tip === "chisel")
+    ctx.lineWidth = Math.max(.5, width * (.22 + .78 * Math.abs(Math.sin(direction - brushAngle))));
+else if (state.brush.tip === "flat")
+    ctx.lineWidth = width * .72;
+else
+    ctx.lineWidth = width; if (softness > .05 && !erase) {
+    ctx.shadowColor = color;
+    ctx.shadowBlur = width * softness * .65;
+    if (state.brush.hardness < 20) {
+        ctx.globalAlpha = opacity * .42;
+        ctx.lineWidth = width * (.55 + state.brush.hardness / 100);
+    }
+} const overlap = Math.min(distance * .25, width * .12), extendX = Math.cos(direction) * overlap, extendY = Math.sin(direction) * overlap; ctx.beginPath(); ctx.moveTo(a.x - extendX, a.y - extendY); ctx.lineTo(b.x + extendX, b.y + extendY); ctx.stroke(); const textured = state.brush.tip === "bristle" || ["grain", "chalk", "charcoal"].includes(state.brush.texture); if (textured && !erase) {
+    const strands = state.brush.tip === "bristle" ? 7 : state.brush.texture === "charcoal" || state.brush.texture === "chalk" ? 5 : 3, normalX = -Math.sin(direction), normalY = Math.cos(direction);
+    ctx.shadowBlur = 0;
+    ctx.lineCap = "butt";
+    for (let strand = 0; strand < strands; strand++) {
+        const spread = (strand - (strands - 1) / 2) / (Math.max(1, strands - 1)) * width * .72, jitter = (Math.random() - .5) * width * .12;
+        ctx.globalAlpha = opacity * (.16 + Math.random() * .16);
+        ctx.lineWidth = Math.max(.45, width / (strands * (state.brush.texture === "charcoal" ? 1.35 : 1.8)));
+        ctx.beginPath();
+        ctx.moveTo(a.x - extendX + normalX * (spread + jitter), a.y - extendY + normalY * (spread + jitter));
+        ctx.lineTo(b.x + extendX + normalX * (spread - jitter), b.y + extendY + normalY * (spread - jitter));
+        ctx.stroke();
+    }
+} ctx.restore(); }
+function smudgeSegment(from, to) { const layer = selectedLayer(); if (!layer || layer.locked)
+    return; const ctx = layer.canvas.getContext("2d", { willReadFrequently: true }), a = layerPoint(from, layer), b = layerPoint(to, layer), distance = Math.hypot(b.x - a.x, b.y - a.y), size = Math.max(2, state.brush.size * ((a.pressure + b.pressure) / 2)), step = Math.max(1, size * .12), steps = Math.max(1, Math.ceil(distance / step)), patch = Math.max(4, Math.ceil(size)); if (!smudgeBuffer || smudgeBuffer.width !== patch || smudgeBuffer.height !== patch) {
+    smudgeBuffer = document.createElement("canvas");
+    smudgeBuffer.width = smudgeBuffer.height = patch;
+} const bufferCtx = smudgeBuffer.getContext("2d"); ctx.save(); clipToSelection(ctx); for (let index = 1; index <= steps; index++) {
+    const t = index / steps, sourceT = Math.max(0, t - 1 / steps), sx = a.x + (b.x - a.x) * sourceT - patch / 2, sy = a.y + (b.y - a.y) * sourceT - patch / 2, dx = a.x + (b.x - a.x) * t - patch / 2, dy = a.y + (b.y - a.y) * t - patch / 2;
+    bufferCtx.clearRect(0, 0, patch, patch);
+    bufferCtx.drawImage(layer.canvas, sx, sy, patch, patch, 0, 0, patch, patch);
+    ctx.globalAlpha = (state.brush.opacity / 100) * (state.brush.blendStrength / 100) * (.35 + .65 * (a.pressure + (b.pressure - a.pressure) * t));
+    ctx.globalCompositeOperation = "source-over";
+    ctx.drawImage(smudgeBuffer, dx, dy, patch, patch);
+} ctx.restore(); }
+function drawBrushSegment(from, to) { const layer = selectedLayer(); if (!layer || layer.locked)
+    return; if (state.tool === "smudge") {
+    smudgeSegment(from, to);
+    return;
+} const ctx = layer.canvas.getContext("2d"), a = layerPoint(from, layer), b = layerPoint(to, layer), size = state.brush.size, erase = state.tool === "eraser" || state.brush.eraserMode; strokeLine(ctx, a, b, size, state.foreground, erase); if (state.brush.symmetry)
     strokeLine(ctx, { ...a, x: state.width - a.x }, { ...b, x: state.width - b.x }, size, state.foreground, erase); }
 function withLayerContext(draw) { const layer = selectedLayer(); if (!layer || layer.locked)
     return; const ctx = layer.canvas.getContext("2d"); ctx.save(); ctx.globalAlpha = state.brush.opacity / 100; ctx.strokeStyle = state.foreground; ctx.fillStyle = state.foreground; ctx.lineWidth = state.brush.size; ctx.lineCap = "round"; ctx.lineJoin = "round"; draw(ctx); ctx.restore(); composite(); }
@@ -225,11 +259,12 @@ function pointerDown(event) { event.preventDefault(); event.stopPropagation(); c
     pathPoints.push(point);
     drawPathPreview();
     return;
-} const layer = selectedLayer(); if (["brush", "pencil", "eraser", "line", "rectangle", "ellipse", "path", "gradient"].includes(state.tool) && (!layer || layer.locked))
-    return; drawing = true; if (["brush", "pencil", "eraser"].includes(state.tool)) {
+} const layer = selectedLayer(); if (["brush", "pencil", "eraser", "smudge", "line", "rectangle", "ellipse", "path", "gradient"].includes(state.tool) && (!layer || layer.locked))
+    return; drawing = true; if (["brush", "pencil", "eraser", "smudge"].includes(state.tool)) {
     checkpoint(toolLabels[state.tool]);
     strokeBefore = canvasCopy(layer.canvas);
-    drawBrushSegment(point, point);
+    if (state.tool !== "smudge")
+        drawBrushSegment(point, point);
     composite();
 }
 else if (state.tool === "move" || state.tool === "transform") {
@@ -260,7 +295,7 @@ function pointerMove(event) { const point = pointFromEvent(event); qs("#pointerS
     layer.scaleY = event.shiftKey ? layer.scaleX : clamp(1 + (event.clientY - moveStart.y) / 300, .05, 8);
     composite();
     return;
-} if (["brush", "pencil", "eraser"].includes(state.tool)) {
+} if (["brush", "pencil", "eraser", "smudge"].includes(state.tool)) {
     const smooth = Math.max(state.brush.smoothing / 100, state.brush.stabilizer / 30 * .88), filtered = { x: lastPoint.x * smooth + point.x * (1 - smooth), y: lastPoint.y * smooth + point.y * (1 - smooth), pressure: point.pressure };
     drawBrushSegment(lastPoint, filtered);
     lastPoint = filtered;
@@ -330,17 +365,28 @@ function setZoom(value) { state.view.zoom = clamp(value, .1, 8); syncView(); }
 function fitCanvas() { const rect = viewport.getBoundingClientRect(); setZoom(Math.min((rect.width - 70) / state.width, (rect.height - 70) / state.height)); state.view.panX = state.view.panY = 0; syncView(); }
 function setStatus(text) { qs("#statusText").textContent = text; }
 function updateTitle() { qs("#docTitle").textContent = `${state.name}.sogsketch`; document.title = `${state.name} — SogSketch`; }
-function syncBrushInputs() { for (const key of ["size", "opacity", "flow", "hardness", "spacing", "smoothing", "stabilizer"]) {
+function syncBrushInputs() { for (const key of ["size", "opacity", "flow", "hardness", "spacing", "smoothing", "stabilizer", "rotation", "angle", "blendStrength"]) {
     const input = qs(`#${key}Input`);
     input.value = String(state.brush[key]);
-    qs(`#${key}Value`).value = key === "size" ? `${state.brush[key]} px` : key === "stabilizer" ? String(state.brush[key]) : `${state.brush[key]}%`;
-} qs("#eraserModeButton").classList.toggle("active", state.brush.eraserMode); qs("#symmetryButton").classList.toggle("active", state.brush.symmetry); drawBrushPreview(); }
-function drawBrushPreview() { const canvas = qs("#brushPreview"), ctx = canvas.getContext("2d"); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.strokeStyle = "#555"; ctx.beginPath(); ctx.moveTo(10, canvas.height / 2); ctx.lineTo(canvas.width - 10, canvas.height / 2); ctx.stroke(); const size = Math.min(42, state.brush.size); brushStamp(ctx, { x: canvas.width / 2, y: canvas.height / 2, pressure: 1 }, size, state.foreground, state.brush.eraserMode); }
-function renderBrushPresets() { const container = qs("#brushPresets"), custom = JSON.parse(localStorage.getItem("sogsketch-brushes") ?? "[]"), presets = [...defaultPresets, ...custom]; container.replaceChildren(...presets.map(preset => { const button = document.createElement("button"); button.className = "preset"; button.title = preset.name; const dot = document.createElement("i"); const size = clamp(preset.size / 3, 4, 34); dot.style.width = dot.style.height = `${size}px`; button.append(dot); button.addEventListener("click", () => applyBrushPreset(preset)); return button; })); }
-function applyBrushPreset(preset) { Object.assign(state.brush, { size: preset.size, opacity: preset.opacity, flow: preset.flow, hardness: preset.hardness, spacing: preset.spacing, smoothing: preset.smoothing }); syncBrushInputs(); const recent = qs("#recentBrushes"), chip = document.createElement("button"); chip.textContent = preset.name; chip.addEventListener("click", () => applyBrushPreset(preset)); recent.prepend(chip); while (recent.children.length > 5)
-    recent.lastElementChild?.remove(); }
-function saveBrushPreset() { const name = prompt("Preset name", "Custom brush"); if (!name)
-    return; const custom = JSON.parse(localStorage.getItem("sogsketch-brushes") ?? "[]"); custom.push({ id: crypto.randomUUID(), name, size: state.brush.size, opacity: state.brush.opacity, flow: state.brush.flow, hardness: state.brush.hardness, spacing: state.brush.spacing, smoothing: state.brush.smoothing }); localStorage.setItem("sogsketch-brushes", JSON.stringify(custom.slice(-20))); renderBrushPresets(); }
+    qs(`#${key}Value`).value = key === "size" ? `${state.brush[key]} px` : key === "stabilizer" ? String(state.brush[key]) : key === "rotation" || key === "angle" ? `${state.brush[key]}°` : `${state.brush[key]}%`;
+} qs("#eraserModeButton").classList.toggle("active", state.brush.eraserMode); qs("#symmetryButton").classList.toggle("active", state.brush.symmetry); drawBrushPreview(); brushLibrary?.syncSettings(); }
+function drawBrushPreview() { const canvas = qs("#brushPreview"), ctx = canvas.getContext("2d"); ctx.clearRect(0, 0, canvas.width, canvas.height); const size = Math.min(32, Math.max(3, state.brush.size * .38)), effect = ["scatter", "leaf", "grass", "cloud"].includes(state.brush.tip); ctx.strokeStyle = state.foreground; ctx.globalAlpha = Math.max(.28, state.brush.opacity / 100); if (effect) {
+    const stamp = getBrushStamp(state.brush, state.foreground, size);
+    for (let x = 12; x < canvas.width - 8; x += Math.max(8, size * state.brush.spacing / 75)) {
+        const y = canvas.height / 2 + Math.sin(x / 25) * 8;
+        ctx.drawImage(stamp, x - stamp.width / 2, y - stamp.height / 2);
+    }
+    return;
+} ctx.lineCap = state.brush.tip === "flat" || state.brush.tip === "chisel" ? "square" : "round"; ctx.lineJoin = "round"; ctx.lineWidth = state.brush.tip === "chisel" ? size * .35 : state.brush.tip === "flat" ? size * .72 : size; if (state.brush.hardness < 35) {
+    ctx.shadowColor = state.foreground;
+    ctx.shadowBlur = size * (1 - state.brush.hardness / 100) * .55;
+    ctx.globalAlpha *= .55;
+} ctx.beginPath(); ctx.moveTo(10, canvas.height * .66); ctx.bezierCurveTo(canvas.width * .28, canvas.height * .12, canvas.width * .62, canvas.height * .9, canvas.width - 10, canvas.height * .35); ctx.stroke(); }
+function renderBrushPresets() { if (!brushLibrary)
+    return; const container = qs("#brushPresets"), presets = brushLibrary.all.slice(0, 8); container.replaceChildren(...presets.map(preset => { const button = document.createElement("button"); button.className = "preset"; button.title = preset.name; button.setAttribute("aria-label", preset.name); const dot = document.createElement("i"); const size = clamp(preset.size / 3, 4, 34); dot.style.width = dot.style.height = `${size}px`; button.append(dot); button.addEventListener("click", () => brushLibrary.selectById(preset.id)); return button; })); }
+function applyBrushPreset(preset) { activeBrushId = preset.id; localStorage.setItem("sogsketch-active-brush", activeBrushId); const recent = qs("#recentBrushes"), chip = document.createElement("button"); chip.textContent = preset.name; chip.addEventListener("click", () => brushLibrary.selectById(preset.id)); recent.prepend(chip); while (recent.children.length > 5)
+    recent.lastElementChild?.remove(); renderBrushPresets(); }
+function saveBrushPreset() { brushLibrary.saveCurrent(); }
 function setForeground(color, remember = true) { if (!/^#[0-9a-f]{6}$/i.test(color))
     return; state.foreground = color.toUpperCase(); if (remember) {
     state.recentColors = [state.foreground, ...state.recentColors.filter(item => item !== state.foreground)].slice(0, 16);
@@ -361,7 +407,7 @@ finally {
     URL.revokeObjectURL(url);
 } }
 async function openProject(file) { const project = JSON.parse(await file.text()); if (project.format !== "sogsketch")
-    throw new Error("Not a SogSketch project"); await restoreSnapshot({ ...project.state, label: "Open project" }); state.brush = { ...project.brush }; state.guides = project.guides; history.reset(); syncBrushInputs(); fitCanvas(); setStatus("Project opened"); }
+    throw new Error("Not a SogSketch project"); await restoreSnapshot({ ...project.state, label: "Open project" }); state.brush = { ...state.brush, ...project.brush }; state.guides = project.guides; history.reset(); syncBrushInputs(); fitCanvas(); setStatus("Project opened"); }
 function saveProject() { const project = { format: "sogsketch", version: 1, savedAt: new Date().toISOString(), state: (() => { const { label, ...rest } = snapshot("Save project"); return rest; })(), brush: { ...state.brush }, guides: [...state.guides] }; downloadBlob(new Blob([JSON.stringify(project)], { type: "application/json" }), `${safeName()}.sogsketch`); }
 function safeName() { return state.name.trim().replace(/[^a-z0-9_-]+/gi, "-") || "sogsketch"; }
 function exportImage(type) { const output = document.createElement("canvas"); output.width = state.width; output.height = state.height; const ctx = output.getContext("2d"); if (type !== "image/png" && state.background === "transparent") {
@@ -455,11 +501,11 @@ function keyHandler(event) { const target = event.target; if (["INPUT", "TEXTARE
     clearSelectionOrLayer();
     return;
 } if (event.key === "[") {
-    state.brush.size = clamp(state.brush.size - 2, 1, 300);
+    state.brush.size = clamp(state.brush.size - 2, 1, 500);
     syncBrushInputs();
     return;
 } if (event.key === "]") {
-    state.brush.size = clamp(state.brush.size + 2, 1, 300);
+    state.brush.size = clamp(state.brush.size + 2, 1, 500);
     syncBrushInputs();
     return;
 } if (event.key === "Tab") {
@@ -471,7 +517,7 @@ function keyHandler(event) { const target = event.target; if (["INPUT", "TEXTARE
     pathPoints = [];
     drawSelection();
     return;
-} const map = { b: "brush", p: "pencil", e: "eraser", l: "line", r: "rectangle", o: "ellipse", f: "fill", g: "gradient", i: "picker", m: "move", c: "crop", s: "selectRect", t: "text", h: "pan", z: "zoom" }; if (map[key])
+} const map = { b: "brush", p: "pencil", e: "eraser", u: "smudge", l: "line", r: "rectangle", o: "ellipse", f: "fill", g: "gradient", i: "picker", m: "move", c: "crop", s: "selectRect", t: "text", h: "pan", z: "zoom" }; if (map[key])
     setTool(map[key]); if (key === "x") {
     [state.foreground, state.backgroundColor] = [state.backgroundColor, state.foreground];
     syncColors();
@@ -481,7 +527,12 @@ function keyHandler(event) { const target = event.target; if (["INPUT", "TEXTARE
     syncColors();
 } if (key === "2")
     fitCanvas(); }
-async function init() { document.body.classList.add("needs-document"); setCanvasSize(Number(qs("#newWidth").value), Number(qs("#newHeight").value)); state.layers = []; state.selectedLayerId = null; bindUi(); document.addEventListener("keydown", keyHandler); syncView(); syncColors(); syncBrushInputs(); renderBrushPresets(); renderLayers(); updateTitle(); composite(); setTimeout(fitCanvas, 50); const workspace = JSON.parse(localStorage.getItem("sogsketch-workspace") ?? "null"); if (workspace?.dock === false)
+function bindBrushEngineUi() { for (const key of ["rotation", "angle", "blendStrength"]) {
+    qs(`#${key}Input`).addEventListener("input", event => { state.brush[key] = Number(event.target.value); syncBrushInputs(); });
+} document.querySelectorAll("[data-tool]").forEach(button => button.addEventListener("click", () => { qs("#blendStrengthOption").hidden = button.dataset.tool !== "smudge"; if (button.dataset.tool === "smudge")
+    qs("#canvasHud").textContent = "Drag across paint to blend colours"; })); document.addEventListener("keydown", event => { if (event.key.toLowerCase() === "u" && !(["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)))
+    qs("#blendStrengthOption").hidden = false; }); brushLibrary = new BrushLibrary(() => state.brush, settings => { state.brush = { ...settings }; syncBrushInputs(); }, applyBrushPreset); brushLibrary.selectById(activeBrushId); }
+async function init() { document.body.classList.add("needs-document"); setCanvasSize(Number(qs("#newWidth").value), Number(qs("#newHeight").value)); state.layers = []; state.selectedLayerId = null; bindUi(); bindBrushEngineUi(); document.addEventListener("keydown", keyHandler); syncView(); syncColors(); syncBrushInputs(); renderBrushPresets(); renderLayers(); updateTitle(); composite(); setTimeout(fitCanvas, 50); const workspace = JSON.parse(localStorage.getItem("sogsketch-workspace") ?? "null"); if (workspace?.dock === false)
     qs("#dock").classList.add("mobile-hidden"); if (workspace?.tools === false)
     qs("#toolbar").classList.add("mobile-hidden"); if (matchMedia("(max-width:900px)").matches)
     qs("#dock").classList.add("mobile-hidden"); setStatus("Choose a canvas"); setTimeout(() => qs("#newDialog").showModal(), 0); }
