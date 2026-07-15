@@ -434,7 +434,7 @@ else {
     }
     ctx.putImageData(image, 0, 0);
 } composite(); }
-function setTool(tool) { state.tool = tool; pathPoints = []; document.querySelectorAll("[data-tool]").forEach(button => button.classList.toggle("active", button.dataset.tool === tool)); qs("#toolName").textContent = toolLabels[tool]; qs("#canvasHud").textContent = tool === "polygon" || tool === "polyline" ? "Click points · double-click or Enter to finish" : tool === "transform" ? "Drag horizontally/vertically to scale" : tool === "crop" ? "Drag the crop rectangle" : "Click and drag on the canvas"; overlay.style.cursor = tool === "pan" ? "grab" : tool === "text" ? "text" : tool === "picker" ? "copy" : tool === "zoom" ? "zoom-in" : "crosshair"; }
+function setTool(tool) { state.tool = tool; pathPoints = []; document.querySelectorAll("[data-tool]").forEach(button => button.classList.toggle("active", button.dataset.tool === tool)); qs("#toolName").textContent = toolLabels[tool]; qs("#canvasHud").textContent = tool === "polygon" || tool === "polyline" ? "Click points · double-click or Enter to finish" : tool === "transform" ? "Drag horizontally/vertically to scale" : tool === "crop" ? "Drag the crop rectangle" : "Click and drag on the canvas"; overlay.style.cursor = tool === "pan" ? "grab" : tool === "text" ? "text" : tool === "picker" ? "copy" : tool === "zoom" ? "zoom-in" : ""; }
 function setZoom(value) { state.view.zoom = clamp(value, .1, 8); syncView(); }
 function fitCanvas() { const rect = viewport.getBoundingClientRect(); setZoom(Math.min((rect.width - 70) / state.width, (rect.height - 70) / state.height)); state.view.panX = state.view.panY = 0; syncView(); }
 function setStatus(text) { qs("#statusText").textContent = text; }
