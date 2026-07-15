@@ -7,7 +7,7 @@
   <meta name="description" content="SogSketch — a free browser-based drawing and painting studio." />
   <title>SogSketch</title>
   <link rel="icon" href="../assets/favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
 </head>
 <body>
   <div class="app" id="app">
@@ -26,7 +26,7 @@
       </nav>
       <a class="support-link" href="https://ko-fi.com/sogz0/goal" target="_blank" rel="noopener noreferrer">support us</a>
       <button class="mobile-toggle" id="toolsToggle" title="Toggle tools">Tools</button>
-      <button class="mobile-toggle" id="dockToggle" title="Toggle panels">Panels</button>
+      <button class="mobile-toggle dock-open" id="dockToggle" title="Open edit panels">=</button>
       <span class="doc-title" id="docTitle">Untitled.sogsketch</span>
     </header>
 
@@ -79,6 +79,7 @@
       </section>
 
       <aside class="dock" id="dock">
+        <button class="dock-close" id="dockClose" type="button" title="Close edit panels">x</button>
         <details open class="panel color-panel"><summary>Advanced Color Selector</summary><div class="panel-body">
           <div class="color-row"><input id="fgColor" type="color" value="#ffffff" title="Foreground color"><input id="bgColor" type="color" value="#000000" title="Background color"><button id="swapColors" title="Swap foreground/background (X)">⇄</button><button id="resetColors" title="Reset colors (D)">B/W</button></div>
           <label>HEX <input id="hexInput" value="#FFFFFF" maxlength="7"></label>
@@ -115,6 +116,6 @@
   </aside>
 
   <input id="fileInput" type="file" accept="image/*,.sogsketch,application/json" multiple hidden>
-  <script type="module" src="dist/app.js?v=3"></script>
+  <script type="module" src="dist/app.js?v=4"></script>
 </body>
 </html>
