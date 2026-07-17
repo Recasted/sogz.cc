@@ -499,7 +499,22 @@ function setTool(tool) { state.tool = tool; pathPoints = []; document.querySelec
 function setZoom(value) { state.view.zoom = clamp(value, .1, 8); syncView(); }
 function fitCanvas() { const rect = viewport.getBoundingClientRect(); setZoom(Math.min((rect.width - 70) / state.width, (rect.height - 70) / state.height)); state.view.panX = state.view.panY = 0; syncView(); }
 function setStatus(text) { qs("#statusText").textContent = text; }
-function updateTitle() { qs("#docTitle").textContent = `${state.name}.sogsketch`; document.title = `${state.name} — SogSketch`; }
+function updateTitle() { qs("#docName").textContent = state.name; document.title = `${state.name} — SogSketch`; }
+function bindProjectTitle() { const name = qs("#docName"); let original = state.name, editing = false; const finish = (cancel = false) => { if (!editing)
+    return; editing = false; name.contentEditable = "false"; name.classList.remove("editing"); const entered = name.textContent?.trim().replace(/\.sogsketch$/i, "") ?? ""; state.name = cancel ? original : entered || original; updateTitle(); if (!cancel) {
+    scheduleAutosave();
+    setStatus(`Project renamed to ${state.name}`);
+} }; const start = () => { if (editing || document.body.classList.contains("needs-document"))
+    return; editing = true; original = state.name; name.contentEditable = "true"; name.classList.add("editing"); name.focus(); const range = document.createRange(), selection = getSelection(); range.selectNodeContents(name); selection?.removeAllRanges(); selection?.addRange(range); }; name.addEventListener("click", start); name.addEventListener("keydown", event => { event.stopPropagation(); if (event.key === "Enter") {
+    event.preventDefault();
+    finish();
+}
+else if (event.key === "Escape") {
+    event.preventDefault();
+    finish(true);
+    name.blur();
+} }); name.addEventListener("blur", () => finish()); name.addEventListener("focus", () => { if (!editing)
+    start(); }); }
 function syncBrushInputs() { for (const key of ["size", "opacity", "flow", "hardness", "spacing", "smoothing", "stabilizer", "pressureCurve", "rotation", "angle", "blendStrength"]) {
     const input = qs(`#${key}Input`);
     input.value = String(key === "size" ? brushSizeToSlider(state.brush.size) : state.brush[key]);
@@ -687,6 +702,7 @@ async function init() { document.body.classList.add("needs-document"); setCanvas
     qs("#toolbar").classList.add("mobile-hidden"); if (matchMedia("(max-width:900px)").matches)
     qs("#dock").classList.add("mobile-hidden"); setStatus("Choose a canvas"); setTimeout(() => qs("#newDialog").showModal(), 0); }
 bindExactRangeEditing();
+bindProjectTitle();
 restoreWorkspacePreferences();
 void init().catch(error => { console.error(error); showMessage("SogSketch error", `<p>${String(error)}</p>`); });
 //# sourceMappingURL=app.js.map
