@@ -243,7 +243,7 @@ function renderContinuousStroke() { const layer = selectedLayer(); if (!layer ||
 } ctx.restore(); }
 function withLayerContext(draw) { const layer = selectedLayer(); if (!layer || layer.locked)
     return; const ctx = layer.canvas.getContext("2d"); ctx.save(); ctx.globalAlpha = state.brush.opacity / 100; ctx.strokeStyle = state.foreground; ctx.fillStyle = state.foreground; ctx.lineWidth = state.brush.size; ctx.lineCap = "round"; ctx.lineJoin = "round"; draw(ctx); ctx.restore(); composite(); }
-function previewShape(point) { overlayCtx.clearRect(0, 0, state.width, state.height); overlayCtx.save(); overlayCtx.strokeStyle = state.foreground; overlayCtx.lineWidth = state.brush.size / state.view.zoom; overlayCtx.globalAlpha = state.brush.opacity / 100; overlayCtx.setLineDash(state.tool.startsWith("select") || state.tool === "crop" ? [8, 6] : []); const x = startPoint.x, y = startPoint.y, w = point.x - x, h = point.y - y; overlayCtx.beginPath(); if (state.tool === "line")
+function previewShape(point) { overlayCtx.clearRect(0, 0, state.width, state.height); overlayCtx.save(); overlayCtx.strokeStyle = state.foreground; overlayCtx.lineWidth = state.brush.size; overlayCtx.lineCap = "round"; overlayCtx.lineJoin = "round"; overlayCtx.globalAlpha = state.brush.opacity / 100; overlayCtx.setLineDash(state.tool.startsWith("select") || state.tool === "crop" ? [8, 6] : []); const x = startPoint.x, y = startPoint.y, w = point.x - x, h = point.y - y; overlayCtx.beginPath(); if (state.tool === "line")
     overlayCtx.moveTo(x, y), overlayCtx.lineTo(point.x, point.y);
 else if (state.tool === "rectangle" || state.tool === "crop" || state.tool === "selectRect")
     overlayCtx.rect(x, y, w, h);
@@ -278,7 +278,7 @@ else if (state.tool === "ellipse")
 else if (state.tool === "path")
     ctx.moveTo(x, y), ctx.bezierCurveTo(x, point.y, point.x, y, point.x, point.y); ctx.stroke(); }); }
 function drawPathPreview(point) { overlayCtx.clearRect(0, 0, state.width, state.height); if (!pathPoints.length)
-    return; overlayCtx.save(); overlayCtx.strokeStyle = state.foreground; overlayCtx.lineWidth = Math.max(1, state.brush.size / state.view.zoom); overlayCtx.beginPath(); overlayCtx.moveTo(pathPoints[0].x, pathPoints[0].y); for (const p of pathPoints.slice(1))
+    return; overlayCtx.save(); overlayCtx.strokeStyle = state.foreground; overlayCtx.lineWidth = state.brush.size; overlayCtx.lineCap = "round"; overlayCtx.lineJoin = "round"; overlayCtx.beginPath(); overlayCtx.moveTo(pathPoints[0].x, pathPoints[0].y); for (const p of pathPoints.slice(1))
     overlayCtx.lineTo(p.x, p.y); if (point)
     overlayCtx.lineTo(point.x, point.y); if (state.tool === "polygon" && pathPoints.length > 2)
     overlayCtx.lineTo(pathPoints[0].x, pathPoints[0].y); overlayCtx.stroke(); overlayCtx.restore(); }
