@@ -50,3 +50,6 @@ body.needs-document #newDialog::backdrop{background:rgba(0,0,0,.88)}
 @media(max-width:520px){.brush-library{left:40px;right:4px;width:auto;max-height:50vh}.brush-library-tools{grid-template-columns:1fr 115px}.brush-library-grid{grid-template-columns:repeat(2,minmax(105px,1fr))}.brush-settings-grid{grid-template-columns:1fr}.brush-library-actions{grid-template-columns:repeat(3,1fr)}.brush-library-actions button:nth-child(n){grid-column:auto}}
 [hidden]{display:none!important}
 button:disabled{opacity:.38;cursor:not-allowed;pointer-events:none}
+.options-bar #sizeInput{width:300px}
+input[type="range"]{cursor:ew-resize}
+@media(max-width:520px){.options-bar #sizeInput{width:180px}}

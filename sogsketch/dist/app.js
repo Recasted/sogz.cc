@@ -9,7 +9,7 @@ const referenceOverlay = qs("#referenceOverlay"), referenceList = qs("#reference
 const fgInput = qs("#fgColor"), bgInput = qs("#bgColor"), hexInput = qs("#hexInput"), rInput = qs("#rInput"), gInput = qs("#gInput"), bInput = qs("#bInput"), hInput = qs("#hInput"), sInput = qs("#sInput"), lInput = qs("#lInput");
 const toolLabels = { brush: "Freehand brush", pencil: "Pencil", eraser: "Eraser", smudge: "Blend / Smudge", line: "Line", rectangle: "Rectangle", ellipse: "Ellipse", polygon: "Polygon", polyline: "Polyline", path: "Bezier path", fill: "Fill bucket", gradient: "Gradient", picker: "Color picker", move: "Move layer", transform: "Transform layer", crop: "Crop canvas", selectRect: "Rectangle selection", selectEllipse: "Ellipse selection", text: "Text", pan: "Pan canvas", zoom: "Zoom" };
 const state = { width: 1600, height: 1000, resolution: 72, name: "Untitled", background: "#FFFFFF", layers: [], selectedLayerId: null, nextLayerId: 1, tool: "brush", brush: { size: 24, opacity: 100, flow: 100, hardness: 85, spacing: 12, smoothing: 35, stabilizer: 4, pressureCurve: 50, rotation: 0, angle: 0, randomSize: 0, randomOpacity: 0, randomRotation: 0, blendStrength: 55, tip: "round", texture: "none", eraserMode: false, symmetry: false }, foreground: "#000000", backgroundColor: "#FFFFFF", recentColors: ["#000000", "#FFFFFF"], selection: null, guides: [], view: { zoom: .65, panX: 0, panY: 0, rotation: 0, flipX: 1, flipY: 1, grid: false, rulers: false, snap: true }, autosave: true };
-let drawing = false, workspacePanning = false, startPoint = { x: 0, y: 0, pressure: 1 }, lastPoint = { x: 0, y: 0, pressure: 1 }, panStart = { x: 0, y: 0, panX: 0, panY: 0 }, moveStart = { x: 0, y: 0, layerX: 0, layerY: 0 }, pathPoints = [], strokePoints = [], strokeBefore = null, textPoint = null, historyBusy = false, autosaveTimer = 0, activeBrushId = localStorage.getItem("sogsketch-active-brush") ?? "hard-round", smudgeBuffer = null, strokeRenderer = null, mirrorStrokeRenderer = null, smudgeRenderer = null;
+let drawing = false, canvasPanning = false, workspacePanning = false, startPoint = { x: 0, y: 0, pressure: 1 }, lastPoint = { x: 0, y: 0, pressure: 1 }, panStart = { x: 0, y: 0, panX: 0, panY: 0 }, moveStart = { x: 0, y: 0, layerX: 0, layerY: 0 }, pathPoints = [], strokePoints = [], strokeBefore = null, textPoint = null, historyBusy = false, autosaveTimer = 0, activeBrushId = localStorage.getItem("sogsketch-active-brush") ?? "hard-round", smudgeBuffer = null, strokeRenderer = null, mirrorStrokeRenderer = null, smudgeRenderer = null;
 let references = [], selectedReferenceId = null, nextReferenceId = 1, referenceEditing = false, referenceDrag = null;
 const history = new HistoryManager(renderHistory);
 let brushLibrary;
@@ -95,6 +95,14 @@ async function addReferenceFiles(files) { for (const file of files) {
 function deleteSelectedReference() { const index = references.findIndex(item => item.id === selectedReferenceId); if (index < 0)
     return; references.splice(index, 1); selectedReferenceId = references.at(-1)?.id ?? null; if (!references.length)
     setReferenceEditing(false); renderReferences(); setStatus("Reference removed"); }
+function bindExactRangeEditing() { document.addEventListener("contextmenu", event => { const target = event.target, input = target.closest('input[type="range"]'); if (!input)
+    return; event.preventDefault(); const min = Number(input.min || 0), max = Number(input.max || 100), step = Number(input.step || 1), label = input.closest("label")?.childNodes[0]?.textContent?.trim() || input.dataset.brushSetting || input.id || "Slider", typed = prompt(`${label}: enter an exact value (${min}–${max})`, input.value); if (typed === null)
+    return; const parsed = Number(typed); if (!Number.isFinite(parsed)) {
+    setStatus("Enter a valid number");
+    return;
+} const value = clamp(Math.round((parsed - min) / step) * step + min, min, max); if (input.id === "layerOpacity")
+    checkpoint("Layer opacity"); input.value = String(value); input.dispatchEvent(new Event("input", { bubbles: true })); input.dispatchEvent(new Event("change", { bubbles: true })); setStatus(`${label} set to ${value}`); }); window.addEventListener("keydown", event => { const target = event.target, mod = event.ctrlKey || event.metaKey, key = event.key.toLowerCase(); if (target.type !== "range" || !mod || (key !== "z" && key !== "y"))
+    return; event.preventDefault(); event.stopImmediatePropagation(); void (key === "y" || event.shiftKey ? redo() : undo()); }, { capture: true }); }
 function layerSnapshot(layer) { return { id: layer.id, name: layer.name, image: layer.canvas.toDataURL("image/png"), visible: layer.visible, locked: layer.locked, opacity: layer.opacity, blendMode: layer.blendMode, alphaInherit: layer.alphaInherit, groupId: layer.groupId, x: layer.x, y: layer.y, scaleX: layer.scaleX, scaleY: layer.scaleY }; }
 function snapshot(label) { return { label, width: state.width, height: state.height, resolution: state.resolution, name: state.name, background: state.background, layers: state.layers.map(layerSnapshot), selectedLayerId: state.selectedLayerId, nextLayerId: state.nextLayerId, foreground: state.foreground, backgroundColor: state.backgroundColor, selection: state.selection ? { ...state.selection } : null }; }
 function checkpoint(label) { if (historyBusy)
@@ -328,7 +336,8 @@ function clearSelectionOrLayer() { const layer = selectedLayer(); if (!layer || 
 else
     ctx.clearRect(0, 0, state.width, state.height); composite(); }
 function pointerDown(event) { event.preventDefault(); event.stopPropagation(); const point = pointFromEvent(event); startPoint = lastPoint = point; overlay.setPointerCapture(event.pointerId); if (state.tool === "pan" || event.button === 1 || event.altKey) {
-    drawing = true;
+    drawing = false;
+    canvasPanning = true;
     panStart = { x: event.clientX, y: event.clientY, panX: state.view.panX, panY: state.view.panY };
     viewport.classList.add("panning");
     return;
@@ -379,13 +388,14 @@ else if (["line", "rectangle", "ellipse", "path", "gradient"].includes(state.too
 function pointerMove(event) { const point = pointFromEvent(event); qs("#pointerStatus").textContent = `${Math.round(point.x)}, ${Math.round(point.y)}`; if ((state.tool === "polygon" || state.tool === "polyline") && pathPoints.length) {
     drawPathPreview(point);
     return;
-} if (!drawing)
-    return; event.preventDefault(); if (state.tool === "pan" || event.buttons === 4 || event.altKey) {
+} if (canvasPanning) {
+    event.preventDefault();
     state.view.panX = panStart.panX + event.clientX - panStart.x;
     state.view.panY = panStart.panY + event.clientY - panStart.y;
     syncView();
     return;
-} const layer = selectedLayer(); if (state.tool === "move" && layer) {
+} if (!drawing)
+    return; event.preventDefault(); const layer = selectedLayer(); if (state.tool === "move" && layer) {
     layer.x = moveStart.layerX + (event.clientX - moveStart.x) / state.view.zoom;
     layer.y = moveStart.layerY + (event.clientY - moveStart.y) / state.view.zoom;
     composite();
@@ -408,7 +418,13 @@ function pointerMove(event) { const point = pointFromEvent(event); qs("#pointerS
     composite();
     return;
 } previewShape(point); }
-function pointerUp(event) { if (!drawing)
+function pointerUp(event) { if (canvasPanning) {
+    canvasPanning = false;
+    viewport.classList.remove("panning");
+    if (overlay.hasPointerCapture(event.pointerId))
+        overlay.releasePointerCapture(event.pointerId);
+    return;
+} if (!drawing)
     return; const point = pointFromEvent(event), layer = selectedLayer(), local = layer ? layerPoint(point, layer) : point; drawing = false; viewport.classList.remove("panning"); if (overlay.hasPointerCapture(event.pointerId))
     overlay.releasePointerCapture(event.pointerId); if (["brush", "pencil", "eraser", "smudge"].includes(state.tool)) {
     strokeRenderer?.end(local);
@@ -663,6 +679,7 @@ async function init() { document.body.classList.add("needs-document"); setCanvas
     qs("#dock").classList.add("mobile-hidden"); if (workspace?.tools === false)
     qs("#toolbar").classList.add("mobile-hidden"); if (matchMedia("(max-width:900px)").matches)
     qs("#dock").classList.add("mobile-hidden"); setStatus("Choose a canvas"); setTimeout(() => qs("#newDialog").showModal(), 0); }
+bindExactRangeEditing();
 restoreWorkspacePreferences();
 void init().catch(error => { console.error(error); showMessage("SogSketch error", `<p>${String(error)}</p>`); });
 //# sourceMappingURL=app.js.map
