@@ -50,6 +50,5 @@ body.needs-document #newDialog::backdrop{background:rgba(0,0,0,.88)}
 @media(max-width:520px){.brush-library{left:40px;right:4px;width:auto;max-height:50vh}.brush-library-tools{grid-template-columns:1fr 115px}.brush-library-grid{grid-template-columns:repeat(2,minmax(105px,1fr))}.brush-settings-grid{grid-template-columns:1fr}.brush-library-actions{grid-template-columns:repeat(3,1fr)}.brush-library-actions button:nth-child(n){grid-column:auto}}
 [hidden]{display:none!important}
 button:disabled{opacity:.38;cursor:not-allowed;pointer-events:none}
-.options-bar #sizeInput{width:300px}
 input[type="range"]{cursor:ew-resize}
-@media(max-width:520px){.options-bar #sizeInput{width:180px}}
+.range-editor{position:fixed;z-index:80;display:grid;grid-template-columns:1fr auto;gap:5px;width:165px;padding:6px;border:1px solid #111;border-radius:3px;background:#303030;box-shadow:0 7px 22px #000;color:#ddd}.range-editor[hidden]{display:none}.range-editor span{grid-column:1/-1;color:#aaa;font-size:10px}.range-editor input{min-width:0;width:100%;padding:5px 6px;border:1px solid #151515;background:#1d1d1d;color:#fff}.range-editor button{padding:4px 9px;border:1px solid #181818;background:#4b4b4b}.range-editor:before{content:"";position:absolute;top:-5px;left:14px;width:8px;height:8px;transform:rotate(45deg);border-left:1px solid #111;border-top:1px solid #111;background:#303030}

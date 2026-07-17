@@ -7,7 +7,7 @@
   <meta name="description" content="SogSketch — a free browser-based drawing and painting studio." />
   <title>SogSketch</title>
   <link rel="icon" href="../assets/favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=10" />
 </head>
 <body>
   <div class="app" id="app">
@@ -34,7 +34,7 @@
 
     <section class="options-bar" aria-label="Tool options">
       <span class="tool-name" id="toolName">Freehand brush</span>
-      <label>Size <input id="sizeInput" type="range" min="1" max="300" step="1" value="24"><output id="sizeValue">24 px</output></label>
+      <label>Size <input id="sizeInput" data-log-size data-exact-min="1" data-exact-max="300" data-exact-step="1" type="range" min="0" max="1000" step="1" value="512"><output id="sizeValue">24 px</output></label>
       <label>Opacity <input id="opacityInput" type="range" min="1" max="100" value="100"><output id="opacityValue">100%</output></label>
       <label>Flow <input id="flowInput" type="range" min="1" max="100" value="100"><output id="flowValue">100%</output></label>
       <label>Hardness <input id="hardnessInput" type="range" min="0" max="100" value="85"><output id="hardnessValue">85%</output></label>
@@ -149,6 +149,6 @@
   <input id="fileInput" type="file" accept="image/*,.sogsketch,application/json" multiple hidden>
   <input id="referenceFileInput" type="file" accept="image/*" multiple hidden>
   <input id="brushPresetFileInput" type="file" accept="application/json,.json" hidden>
-  <script type="module" src="dist/app.js?v=15"></script>
+  <script type="module" src="dist/app.js?v=16"></script>
 </body>
 </html>
