@@ -7,7 +7,7 @@
   <meta name="description" content="SogSketch — a free browser-based drawing and painting studio." />
   <title>SogSketch</title>
   <link rel="icon" href="../assets/favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
   <div class="app" id="app">
@@ -107,8 +107,8 @@
           <div class="reference-actions"><button id="addReferenceImage">Add image</button><button id="editReferences" aria-pressed="false">Move / resize</button></div>
           <div class="reference-list" id="referenceList"><p class="reference-empty">Add images to use as tracing references.</p></div>
           <div class="reference-controls" id="referenceControls" hidden>
-            <label>Opacity <input id="referenceOpacity" type="range" min="5" max="100" value="40"><output id="referenceOpacityValue">40%</output></label>
-            <label>Scale <input id="referenceScale" type="range" min="10" max="300" value="100"><output id="referenceScaleValue">100%</output></label>
+            <label>Opacity <input id="referenceOpacity" type="range" min="0" max="100" value="40"><output id="referenceOpacityValue">40%</output></label>
+            <label>Size <input id="referenceScale" type="range" min="10" max="500" value="100"><output id="referenceScaleValue">100%</output></label>
             <div class="reference-actions"><button id="traceReference">Trace at 35%</button><button id="toggleReferenceVisibility">Hide</button><button id="deleteReference">Delete</button></div>
           </div>
           <small class="reference-note">References are saved with the project but never included in exported artwork.</small>
@@ -149,6 +149,6 @@
   <input id="fileInput" type="file" accept="image/*,.sogsketch,application/json" multiple hidden>
   <input id="referenceFileInput" type="file" accept="image/*" multiple hidden>
   <input id="brushPresetFileInput" type="file" accept="application/json,.json" hidden>
-  <script type="module" src="dist/app.js?v=13"></script>
+  <script type="module" src="dist/app.js?v=14"></script>
 </body>
 </html>
