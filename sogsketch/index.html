@@ -79,6 +79,7 @@
         <div class="canvas-viewport" id="viewport">
           <div class="canvas-stage" id="canvasStage">
             <canvas id="paintCanvas" width="1600" height="1000" aria-label="SogSketch canvas"></canvas>
+            <div class="reference-overlay" id="referenceOverlay" aria-label="Reference images"></div>
             <canvas id="overlayCanvas" width="1600" height="1000" aria-label="Drawing preview"></canvas>
           </div>
         </div>
@@ -100,6 +101,17 @@
           <div class="layer-list" id="layerList"></div>
           <div class="layer-actions"><button data-command="addLayer" title="Add layer">＋</button><button data-command="duplicateLayer" title="Duplicate layer">⧉</button><button data-command="groupLayer" title="Group layer">▱</button><button data-command="mergeDown" title="Merge down">⇩</button><button data-command="deleteLayer" title="Delete layer">🗑</button></div>
           <label class="alpha-toggle"><input id="alphaInherit" type="checkbox"> Alpha inherit / clipping</label>
+        </div></details>
+
+        <details open class="panel reference-panel"><summary>References</summary><div class="panel-body">
+          <div class="reference-actions"><button id="addReferenceImage">Add image</button><button id="editReferences" aria-pressed="false">Move / resize</button></div>
+          <div class="reference-list" id="referenceList"><p class="reference-empty">Add images to use as tracing references.</p></div>
+          <div class="reference-controls" id="referenceControls" hidden>
+            <label>Opacity <input id="referenceOpacity" type="range" min="5" max="100" value="40"><output id="referenceOpacityValue">40%</output></label>
+            <label>Scale <input id="referenceScale" type="range" min="10" max="300" value="100"><output id="referenceScaleValue">100%</output></label>
+            <div class="reference-actions"><button id="traceReference">Trace at 35%</button><button id="toggleReferenceVisibility">Hide</button><button id="deleteReference">Delete</button></div>
+          </div>
+          <small class="reference-note">References are saved with the project but never included in exported artwork.</small>
         </div></details>
 
         <details open class="panel"><summary>Brush Presets</summary><div class="panel-body"><div class="brush-preview"><canvas id="brushPreview" width="240" height="54"></canvas></div><div class="preset-grid" id="brushPresets"></div><button id="openBrushLibrary" class="primary-panel-button" aria-expanded="false">Open Brush Library</button><button id="saveBrushPreset">Save current preset</button><div class="recent-brushes" id="recentBrushes"></div></div></details>
@@ -135,7 +147,8 @@
   </aside>
 
   <input id="fileInput" type="file" accept="image/*,.sogsketch,application/json" multiple hidden>
+  <input id="referenceFileInput" type="file" accept="image/*" multiple hidden>
   <input id="brushPresetFileInput" type="file" accept="application/json,.json" hidden>
-  <script type="module" src="dist/app.js?v=12"></script>
+  <script type="module" src="dist/app.js?v=13"></script>
 </body>
 </html>
