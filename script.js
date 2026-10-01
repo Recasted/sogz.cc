@@ -15,13 +15,13 @@ let audioQueue = [...(config.defaultAudioTracks || [])];
 let audioQueueIndex = 0;
 let audioLabel = "default";
 let audioStarted = false;
-
+ 
 document.title = "sogz' — archive";
 const rememberedBackground = localStorage.getItem(backgroundKey);
 setBackground(rememberedBackground || config.backgroundImage);
 document.querySelector("#backgroundImage").style.setProperty("--scene-position", config.backgroundPosition || "center");
 config.cards.forEach((card, index) => createCard(card, index));
-
+ 
 function createCard(card, index) {
   const saved = savedLayout[index];
   const state = saved || { x: card.x, y: card.y, rotation: card.rotation };
@@ -45,26 +45,25 @@ function createCard(card, index) {
   </div>${cardLinks}`;
   const photo = element.querySelector(".card-photo");
   const image = photo.querySelector("img");
-  const matchPhotoToImage = () => {
-    if (image.naturalWidth && image.naturalHeight) {
-      photo.style.setProperty("--photo-ratio", `${image.naturalWidth} / ${image.naturalHeight}`);
-    }
-  };
-  if (image.complete) matchPhotoToImage();
-  else image.addEventListener("load", matchPhotoToImage, { once: true });
+  // Every card uses the same fixed photo frame (set in style.css), so no per-image sizing here.
   field.appendChild(element);
   const title = element.querySelector(".card-title");
   const titleTrack = element.querySelector(".card-title-track");
   const updateTitlePan = () => {
-    const overflow = Math.max(0, Math.ceil(titleTrack.getBoundingClientRect().width - title.clientWidth));
-    title.style.setProperty("--title-overflow", `${overflow + 24}px`);
-    title.classList.toggle("is-overflowing", overflow > 1);
+    // Shrink long titles until they fit inside the card instead of running off the edge.
+    title.style.fontSize = "";
+    let size = parseFloat(getComputedStyle(title).fontSize);
+    while (title.scrollWidth > title.clientWidth + 1 && size > 8) {
+      size -= 0.5;
+      title.style.fontSize = `${size}px`;
+    }
+    title.classList.remove("is-overflowing");
   };
   new ResizeObserver(updateTitlePan).observe(title);
   requestAnimationFrame(updateTitlePan);
   makeInteractive(element, state, card, index);
 }
-
+ 
 function makeInteractive(element, state, card, index) {
   let pointerId, startX, startY, originX, originY, moved;
   element.addEventListener("pointerdown", (event) => {
@@ -99,7 +98,7 @@ function makeInteractive(element, state, card, index) {
     if ((event.key === "Enter" || event.key === " ") && openIndex === null) { event.preventDefault(); openCard(index, card); }
   });
 }
-
+ 
 function openCard(index, card) {
   if (openIndex !== null) return;
   openIndex = index;
@@ -110,7 +109,7 @@ function openCard(index, card) {
   playCardMusic(card);
   showToast(`${card.title.toLowerCase()} is playing · click outside to close`);
 }
-
+ 
 function closeCard() {
   if (openIndex === null) return;
   const element = document.querySelector(`.profile-card[data-index="${openIndex}"]`);
@@ -119,7 +118,7 @@ function closeCard() {
   scene.classList.remove("card-open");
   openIndex = null;
 }
-
+ 
 async function playCardMusic(card) {
   stopSynth();
   if (card.audioTracks?.length) {
@@ -133,7 +132,7 @@ async function playCardMusic(card) {
   }
   updateSoundLabel();
 }
-
+ 
 function setAudioQueue(tracks, label, shouldPlay) {
   const nextQueue = (tracks || []).filter((track) => track?.src);
   if (!nextQueue.length) return;
@@ -144,7 +143,7 @@ function setAudioQueue(tracks, label, shouldPlay) {
   loadAudioTrack(shouldPlay);
   updateSoundLabel();
 }
-
+ 
 function loadAudioTrack(shouldPlay) {
   const track = audioQueue[audioQueueIndex];
   if (!track) return;
@@ -160,7 +159,7 @@ function loadAudioTrack(shouldPlay) {
     });
   }
 }
-
+ 
 function playSynthTheme(name) {
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   if (!AudioCtx) return;
@@ -189,13 +188,13 @@ function playSynthTheme(name) {
   };
   tick(); synth.timer = setInterval(tick, 520);
 }
-
+ 
 function stopSynth() {
   clearInterval(synth.timer); synth.timer = null;
   synth.nodes.forEach((node) => { try { node.stop(); } catch {} }); synth.nodes = [];
   if (synth.context) { synth.context.close(); synth.context = null; }
 }
-
+ 
 function toggleMusic() {
   if (audio.src) {
     if (audio.paused) {
@@ -211,24 +210,24 @@ function toggleMusic() {
   }
   updateSoundLabel();
 }
-
+ 
 function updateSoundLabel() {
   let label = "music: tap to start";
   if (audioStarted && audio.paused) label = "music: paused";
   else if (!audio.paused) label = `music: ${audioLabel}`;
   document.querySelector("#soundButton").textContent = label;
 }
-
+ 
 function startDefaultAudioOnFirstInteraction() {
   if (!audio.src || !audio.paused || muted) return;
   audio.play().catch(() => updateSoundLabel());
 }
-
+ 
 function renderCard(element, state) {
   element.style.setProperty("--x", `${state.x}%`); element.style.setProperty("--y", `${state.y}%`);
   element.style.setProperty("--rotation", `${state.rotation}deg`);
 }
-
+ 
 function currentLayout() {
   return [...document.querySelectorAll(".profile-card")].map((element) => ({
     x: parseFloat(element.style.getPropertyValue("--x")), y: parseFloat(element.style.getPropertyValue("--y")),
@@ -245,12 +244,12 @@ function resetLayout() {
   });
   showToast("layout reset");
 }
-
+ 
 function setBackground(value) {
   const image = value.startsWith("data:") ? value : value;
   document.querySelector("#backgroundImage").style.setProperty("--scene-image", `url("${image}")`);
 }
-
+ 
 function applyBackground(file) {
   if (!file || !file.type.startsWith("image/")) return;
   const reader = new FileReader();
@@ -270,7 +269,7 @@ function applyBackground(file) {
   };
   reader.readAsDataURL(file);
 }
-
+ 
 function showToast(message) {
   const toast = document.querySelector("#toast"); toast.textContent = message; toast.classList.add("show");
   clearTimeout(window.archiveToast); window.archiveToast = setTimeout(() => toast.classList.remove("show"), 2200);
@@ -280,7 +279,7 @@ function nextCardLayer() {
   topLayer = topLayer >= 60 ? 21 : topLayer + 1;
   return String(topLayer);
 }
-
+ 
 document.addEventListener("pointermove", (event) => {
   const cursor = document.querySelector("#plusCursor"); cursor.style.left = `${event.clientX}px`; cursor.style.top = `${event.clientY}px`;
 });
@@ -307,3 +306,4 @@ audio.addEventListener("ended", () => {
 audio.addEventListener("error", () => showToast("this song could not be loaded"));
 document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeCard(); });
 setAudioQueue(config.defaultAudioTracks, "default", true);
+ 
