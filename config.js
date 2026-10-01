@@ -1,4 +1,3 @@
-
 // PERSONALIZE THE SITE HERE.
 // Put your own images in the assets folder, then update the paths below.
 window.ARCHIVE_CONFIG = {
@@ -21,7 +20,7 @@ window.ARCHIVE_CONFIG = {
       links: []
     },
     {
-      title: "GAMING", subtitle: "profiles 002", image: "assets/card-02.png", x: 36, y: 53, rotation: 3, theme: "glass", audio: "",
+      title: "GAMING", subtitle: "profiles 002", image: "assets/card-02.jpg", x: 36, y: 53, rotation: 3, theme: "glass", audio: "",
       audioTracks: [
         { title: "MARY JANE", src: "assets/audio/02-1-mary-jane.mp3" },
         { title: "a song about america", src: "assets/audio/02-2-a-song-about-america.mp3" }
