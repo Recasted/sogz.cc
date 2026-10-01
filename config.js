@@ -1,3 +1,4 @@
+
 // PERSONALIZE THE SITE HERE.
 // Put your own images in the assets folder, then update the paths below.
 window.ARCHIVE_CONFIG = {
@@ -6,22 +7,18 @@ window.ARCHIVE_CONFIG = {
   defaultAudioTracks: [
     { title: "Einfach Sein", src: "assets/audio/default.mp3" }
   ],
-
+ 
   cards: [
     {
-      title: "NSFW",
-      subtitle: "profiles 001",
+      title: "UNDER CONSTRUCTION",
+      subtitle: "coming soon 001",
       image: "assets/card-01.jpg",
       x: 15, y: 56, rotation: -6, theme: "pulse", audio: "",
       audioTracks: [
         { title: "baby me", src: "assets/audio/01-1-baby-me.mp3" },
         { title: "cold outside", src: "assets/audio/01-2-cold-outside.mp3" }
       ],
-      links: [
-        { label: "manyvids", url: "https://www.manyvids.com/Activity/transpr1ncess/1009387475/club" },
-        { label: "pornhub", url: "https://www.pornhub.com/model/transpr1ncess?utm_source=ig&utm_medium=social" },
-        { label: "telegram", url: "https://t.me/estrogenslut" }
-      ]
+      links: []
     },
     {
       title: "GAMING", subtitle: "profiles 002", image: "assets/card-02.png", x: 36, y: 53, rotation: 3, theme: "glass", audio: "",
@@ -59,7 +56,6 @@ window.ARCHIVE_CONFIG = {
         { label: "instagram alt", url: "https://www.instagram.com/24.9.15.12.5/" },
         { label: "twitch", url: "https://www.twitch.tv/p62_" },
         { label: "youtube", url: "https://www.youtube.com/@ForageCR" },
-        { label: "doxbin", url: "https://doxbin.com/user/k1ck" },
         { label: "telegram", url: "https://t.me/cartelleader" }
       ]
     }
