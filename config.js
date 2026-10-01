@@ -32,7 +32,7 @@ window.ARCHIVE_CONFIG = {
       ]
     },
     {
-      title: "CREATIVE / TOOLS", subtitle: "draw - edit - explore 003", image: "assets/card-03.png", x: 57, y: 55, rotation: -2, theme: "void", audio: "",
+      title: "CREATIVE / TOOLS", subtitle: "draw - edit - explore 003", image: "assets/card-03.jpg", x: 57, y: 55, rotation: -2, theme: "void", audio: "",
       audioTracks: [
         { title: "RUN", src: "assets/audio/03-1-run.mp3" },
         { title: "reminding", src: "assets/audio/03-2-reminding.mp3" }
