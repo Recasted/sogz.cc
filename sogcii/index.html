@@ -295,6 +295,131 @@
     const video = document.createElement("video");
     video.playsInline = true; video.loop = true; video.preload = "auto";
     let image = null, kind = null, camStream = null, objectUrl = null;
+    let media = video; // the playing source: the <video> element or a GIF player with the same controls
+
+    // ---------- GIF support: decode every frame so a GIF plays (and exports) like a video ----------
+    const lzw = (minSize, data, npix) => {
+      const out = new Uint8Array(npix), clear = 1 << minSize, eoi = clear + 1;
+      const prefix = new Int16Array(4096), suffix = new Uint8Array(4096), stack = new Uint8Array(4097);
+      for (let i = 0; i < clear; i++) { prefix[i] = -1; suffix[i] = i; }
+      let size = minSize + 1, mask = (1 << size) - 1, next = eoi + 1, old = -1, first = 0;
+      let bits = 0, datum = 0, pos = 0, op = 0;
+      while (op < npix) {
+        while (bits < size) { if (pos >= data.length) return out; datum |= data[pos++] << bits; bits += 8; }
+        let code = datum & mask; datum >>= size; bits -= size;
+        if (code === clear) { size = minSize + 1; mask = (1 << size) - 1; next = eoi + 1; old = -1; continue; }
+        if (code === eoi) break;
+        if (old === -1) { out[op++] = suffix[code]; old = code; first = code; continue; }
+        const inCode = code; let sp = 0;
+        if (code >= next) { stack[sp++] = first; code = old; }
+        while (code > eoi) { stack[sp++] = suffix[code]; code = prefix[code]; }
+        first = suffix[code]; stack[sp++] = first;
+        if (next < 4096) { prefix[next] = old; suffix[next] = first; next++; if ((next & mask) === 0 && next < 4096) { size++; mask = (1 << size) - 1; } }
+        old = inCode;
+        while (sp > 0 && op < npix) out[op++] = stack[--sp];
+      }
+      return out;
+    };
+    const decodeGif = async (buf) => {
+      const d = new Uint8Array(buf);
+      if (String.fromCharCode(d[0], d[1], d[2]) !== "GIF") throw new Error("not a gif");
+      let p = 6;
+      const W = d[p] | d[p + 1] << 8, H = d[p + 2] | d[p + 3] << 8, pf = d[p + 4]; p += 7;
+      let gct = null;
+      if (pf & 0x80) { const n = 1 << ((pf & 7) + 1); gct = d.subarray(p, p + n * 3); p += n * 3; }
+      const skipSubs = () => { while (p < d.length && d[p]) p += d[p] + 1; p++; };
+      const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+      const cx = cv.getContext("2d", { willReadFrequently: true });
+      const patch = document.createElement("canvas"), px = patch.getContext("2d");
+      const frames = [], delays = [];
+      let gce = { delay: 0, disposal: 0, trans: -1 };
+      while (p < d.length) {
+        const b = d[p++];
+        if (b === 0x3B) break;
+        if (b === 0x21) {
+          const label = d[p++];
+          if (label === 0xF9) { const f = d[p + 1]; gce = { disposal: (f >> 2) & 7, delay: (d[p + 2] | d[p + 3] << 8) * 10, trans: (f & 1) ? d[p + 4] : -1 }; p += d[p] + 1; skipSubs(); }
+          else skipSubs();
+          continue;
+        }
+        if (b !== 0x2C) break;
+        const x = d[p] | d[p + 1] << 8, y = d[p + 2] | d[p + 3] << 8, w = d[p + 4] | d[p + 5] << 8, h = d[p + 6] | d[p + 7] << 8, f = d[p + 8]; p += 9;
+        let pal = gct;
+        if (f & 0x80) { const n = 1 << ((f & 7) + 1); pal = d.subarray(p, p + n * 3); p += n * 3; }
+        const interlaced = !!(f & 0x40), minSize = d[p++];
+        let len = 0; const start = p;
+        while (p < d.length && d[p]) { len += d[p]; p += d[p] + 1; }
+        p++;
+        const data = new Uint8Array(len);
+        for (let q = start, o = 0; q < d.length && d[q]; q += d[q] + 1) { data.set(d.subarray(q + 1, q + 1 + d[q]), o); o += d[q]; }
+        if (!w || !h || !pal) { gce = { delay: 0, disposal: 0, trans: -1 }; continue; }
+        const idx = lzw(minSize, data, w * h);
+        const img = new ImageData(w, h);
+        const rowOf = [];
+        if (interlaced) for (const [s0, st] of [[0, 8], [4, 8], [2, 4], [1, 2]]) for (let r = s0; r < h; r += st) rowOf.push(r);
+        for (let r = 0; r < h; r++) {
+          const yy = interlaced ? rowOf[r] : r;
+          for (let c = 0; c < w; c++) {
+            const k = idx[r * w + c]; if (k === gce.trans) continue;
+            const o = (yy * w + c) * 4;
+            img.data[o] = pal[k * 3]; img.data[o + 1] = pal[k * 3 + 1]; img.data[o + 2] = pal[k * 3 + 2]; img.data[o + 3] = 255;
+          }
+        }
+        const saved = gce.disposal === 3 ? cx.getImageData(0, 0, W, H) : null;
+        patch.width = w; patch.height = h; px.putImageData(img, 0, 0);
+        cx.drawImage(patch, x, y);
+        frames.push(await createImageBitmap(cv));
+        delays.push(gce.delay < 20 ? 100 : gce.delay);
+        if (gce.disposal === 2) cx.clearRect(x, y, w, h);
+        else if (saved) cx.putImageData(saved, 0, 0);
+        gce = { delay: 0, disposal: 0, trans: -1 };
+      }
+      if (!frames.length) throw new Error("no frames");
+      return { W, H, frames, delays };
+    };
+    class GifPlayer extends EventTarget {
+      constructor({ W, H, frames, delays }) {
+        super();
+        this.videoWidth = W; this.videoHeight = H; this.frames = frames; this.readyState = 4;
+        this.starts = []; let t = 0; for (const dl of delays) { this.starts.push(t / 1000); t += dl; }
+        this.duration = t / 1000; this.paused = true; this.loop = true; this.index = 0; this.t = 0; this.t0 = 0;
+      }
+      get source() { return this.frames[this.index]; }
+      get currentTime() { return this.paused ? this.t : Math.min(this.duration, (performance.now() - this.t0) / 1000); }
+      set currentTime(v) {
+        this.t = Math.max(0, Math.min(this.duration, v)); this.t0 = performance.now() - this.t * 1000;
+        this.setIndex(this.t); this.dispatchEvent(new Event("seeked")); this.dispatchEvent(new Event("timeupdate"));
+      }
+      setIndex(t) {
+        let lo = 0, hi = this.starts.length - 1;
+        while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (this.starts[mid] <= t) lo = mid; else hi = mid - 1; }
+        if (lo !== this.index) { this.index = lo; this.dispatchEvent(new Event("frame")); }
+      }
+      play() {
+        if (!this.paused) return Promise.resolve();
+        if (this.t >= this.duration) this.t = 0;
+        this.paused = false; this.t0 = performance.now() - this.t * 1000;
+        this.dispatchEvent(new Event("play")); this.dispatchEvent(new Event("frame"));
+        const tick = () => {
+          if (this.paused) return;
+          let t = (performance.now() - this.t0) / 1000;
+          if (t >= this.duration) {
+            if (this.loop) { this.t0 += this.duration * 1000 * Math.floor(t / this.duration); t = (performance.now() - this.t0) / 1000; }
+            else {
+              this.t = this.duration; this.paused = true; this.setIndex(this.duration);
+              this.dispatchEvent(new Event("timeupdate")); this.dispatchEvent(new Event("pause")); this.dispatchEvent(new Event("ended"));
+              return;
+            }
+          }
+          this.setIndex(t); this.dispatchEvent(new Event("timeupdate"));
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        return Promise.resolve();
+      }
+      pause() { if (this.paused) return; this.t = this.currentTime; this.paused = true; this.dispatchEvent(new Event("pause")); }
+      close() { this.paused = true; this.frames.forEach((f) => f.close && f.close()); }
+    }
     let audio = null; // { ctx, src, gain, dest }
 
     const toast = (msg, ms = 2200) => { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), ms); };
@@ -302,17 +427,20 @@
     const stopCamera = () => { if (camStream) { camStream.getTracks().forEach((t) => t.stop()); camStream = null; } };
     const resetSource = () => {
       stopCamera(); video.pause(); video.removeAttribute("src"); video.srcObject = null; video.load();
+      if (media !== video) { media.close(); media = video; }
       if (objectUrl) URL.revokeObjectURL(objectUrl); objectUrl = null; image = null;
     };
     const ready = (name) => {
       $("drop").hidden = true; out.hidden = false;
       $("srcName").textContent = name;
       $("transport").hidden = kind !== "video";
+      $("mute").hidden = media !== video;
       $("exportVideo").disabled = kind === "image";
       $("exportVideo").textContent = kind === "camera" ? "Start recording" : "Export video";
       $("savePng").disabled = $("copyText").disabled = false;
       $("info").textContent = kind === "image" ? "Images export as PNG or text. Load a video to export a video."
         : kind === "camera" ? "Recording captures your camera as ASCII with sound until you press stop."
+        : media !== video ? "Exporting plays the GIF once in real time and saves it as a video. GIFs have no sound."
         : "Exporting plays the video once in real time and records it with sound. Keep this tab open until it's done.";
       layoutDirty = true; requestRender(); startLoop();
     };
@@ -320,7 +448,23 @@
       if (!file) return;
       resetSource();
       objectUrl = URL.createObjectURL(file);
-      if (file.type.startsWith("image/")) {
+      if (file.type === "image/gif" || /\.gif$/i.test(file.name)) {
+        $("srcName").textContent = "Loading GIF…";
+        file.arrayBuffer().then(decodeGif).then((g) => {
+          const gp = new GifPlayer(g);
+          gp.loop = $("loop").classList.contains("on");
+          wire(gp);
+          gp.addEventListener("frame", () => render());
+          media = gp; kind = "video"; ready(file.name);
+          gp.play();
+        }).catch(() => {
+          // fall back to showing the GIF as a still image
+          const img = new Image();
+          img.onload = () => { image = img; kind = "image"; ready(file.name); };
+          img.onerror = () => toast("Couldn't open that GIF");
+          img.src = objectUrl;
+        });
+      } else if (file.type.startsWith("image/")) {
         const img = new Image();
         img.onload = () => { image = img; kind = "image"; ready(file.name); };
         img.onerror = () => toast("Couldn't open that image");
@@ -352,7 +496,7 @@
     // ---------- layout ----------
     let L = null, layoutDirty = true;
     const even = (n) => Math.max(2, Math.round(n / 2) * 2);
-    const srcDims = () => kind === "image" ? [image.naturalWidth, image.naturalHeight] : [video.videoWidth || 16, video.videoHeight || 9];
+    const srcDims = () => kind === "image" ? [image.naturalWidth, image.naturalHeight] : [media.videoWidth || 16, media.videoHeight || 9];
     const computeLayout = () => {
       const s = read();
       const [sw, sh] = srcDims();
@@ -431,11 +575,11 @@
 
     const render = () => {
       if (!kind) return;
-      if (kind !== "image" && video.readyState < 2) return;
+      if (kind !== "image" && media.readyState < 2) return;
       if (layoutDirty || !L) computeLayout();
       const s = read();
       const { W, H, cols, rows, cellH, cx, cy, cw, ch } = L;
-      const src = kind === "image" ? image : video;
+      const src = kind === "image" ? image : media === video ? video : media.source;
 
       sctx.imageSmoothingEnabled = true; sctx.imageSmoothingQuality = "high";
       sctx.drawImage(src, cx, cy, cw, ch, 0, 0, cols, rows);
@@ -557,6 +701,7 @@
     let loopGen = 0;
     const startLoop = () => {
       const gen = ++loopGen;
+      if (media !== video) { updateTime(); return; } // GIF frames trigger their own renders
       if ("requestVideoFrameCallback" in HTMLVideoElement.prototype && kind !== "image") {
         const onFrame = () => { if (gen !== loopGen) return; render(); video.requestVideoFrameCallback(onFrame); };
         video.requestVideoFrameCallback(onFrame);
@@ -580,25 +725,28 @@
 
     // ---------- transport ----------
     const fmt = (t) => { t = Math.max(0, t || 0); return `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`; };
-    const updatePlay = () => { $("play").textContent = video.paused ? "▶" : "❚❚"; };
+    const updatePlay = () => { $("play").textContent = media.paused ? "▶" : "❚❚"; };
     const updateTime = () => {
       if (kind === "video") {
-        const d = video.duration || 0;
+        const d = media.duration || 0;
         $("seek").max = d || 1;
-        if (!seeking) $("seek").value = video.currentTime;
-        $("time").textContent = `${fmt(video.currentTime)} / ${fmt(d)}`;
+        if (!seeking) $("seek").value = media.currentTime;
+        $("time").textContent = `${fmt(media.currentTime)} / ${fmt(d)}`;
       }
     };
     let seeking = false;
-    video.addEventListener("timeupdate", updateTime);
-    video.addEventListener("play", updatePlay); video.addEventListener("pause", updatePlay);
-    video.addEventListener("seeked", requestRender);
-    $("seek").addEventListener("input", () => { seeking = true; video.currentTime = +$("seek").value; });
+    const wire = (m) => {
+      m.addEventListener("timeupdate", updateTime);
+      m.addEventListener("play", updatePlay); m.addEventListener("pause", updatePlay);
+      m.addEventListener("seeked", requestRender);
+    };
+    wire(video);
+    $("seek").addEventListener("input", () => { seeking = true; media.currentTime = +$("seek").value; });
     $("seek").addEventListener("change", () => { seeking = false; });
-    const togglePlay = () => { if (kind !== "video" || recorder) return; ensureAudio(); video.paused ? video.play() : video.pause(); };
+    const togglePlay = () => { if (kind !== "video" || recorder) return; ensureAudio(); media.paused ? media.play() : media.pause(); };
     $("play").addEventListener("click", togglePlay);
     out.addEventListener("click", togglePlay);
-    $("loop").addEventListener("click", (e) => { e.currentTarget.classList.toggle("on"); video.loop = e.currentTarget.classList.contains("on"); });
+    $("loop").addEventListener("click", (e) => { e.currentTarget.classList.toggle("on"); media.loop = e.currentTarget.classList.contains("on"); });
     $("mute").addEventListener("click", (e) => {
       const b = e.currentTarget; b.classList.toggle("on");
       const silent = b.classList.contains("on");
@@ -609,7 +757,7 @@
 
     // ---------- audio (needed so exports keep the sound) ----------
     const ensureAudio = () => {
-      if (audio || kind !== "video") { if (audio) audio.ctx.resume(); return; }
+      if (audio || kind !== "video" || media !== video) { if (audio) audio.ctx.resume(); return; }
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const src = ctx.createMediaElementSource(video);
@@ -640,7 +788,7 @@
       recorder = null; canvasTrack = null;
     };
     const startExport = async () => {
-      if (!window.MediaRecorder) return toast("Your browser can't record video. Try Chrome or Edge.", 3500);
+      if (!window.MediaRecorder) return toast("Your browser can't record media. Try Chrome or Edge.", 3500);
       if (recorder) { // camera: second click stops
         if (kind === "camera") recorder.stop();
         return;
@@ -651,7 +799,7 @@
       const vStream = out.captureStream(0);
       canvasTrack = vStream.getVideoTracks()[0];
       const tracks = [canvasTrack];
-      if (kind === "video" && audio) tracks.push(...audio.dest.stream.getAudioTracks());
+      if (kind === "video" && media === video && audio) tracks.push(...audio.dest.stream.getAudioTracks());
       if (kind === "camera" && camStream) tracks.push(...camStream.getAudioTracks());
       const stream = new MediaStream(tracks);
       const pxls = L.W * L.H;
@@ -661,7 +809,7 @@
       recorder.onstop = () => {
         const type = recorder.mimeType || mime || "video/webm";
         const ext = type.includes("mp4") ? "mp4" : "webm";
-        if (kind === "video") { video.loop = $("loop").classList.contains("on"); }
+        if (kind === "video") { media.loop = $("loop").classList.contains("on"); }
         if (!cancelled && chunks.length) {
           download(new Blob(chunks, { type: type.split(";")[0] }), `${baseName()}.${ext}`);
           toast(ext === "mp4" ? "Saved MP4" : "Saved WEBM (your browser can't make MP4 — use Chrome or Edge for MP4)", 4500);
@@ -682,24 +830,24 @@
       }
       // video: play once from the start in real time
       $("progLabel").textContent = "Rendering video…";
-      video.pause(); video.loop = false;
-      await new Promise((res) => { video.addEventListener("seeked", res, { once: true }); video.currentTime = 0; });
+      media.pause(); media.loop = false;
+      await new Promise((res) => { media.addEventListener("seeked", res, { once: true }); media.currentTime = 0; });
       render();
       recorder.start(500);
-      const onEnd = () => { video.removeEventListener("ended", onEnd); if (recorder && recorder.state !== "inactive") { render(); setTimeout(() => recorder && recorder.stop(), 150); } };
-      video.addEventListener("ended", onEnd);
+      const onEnd = () => { media.removeEventListener("ended", onEnd); if (recorder && recorder.state !== "inactive") { render(); setTimeout(() => recorder && recorder.stop(), 150); } };
+      media.addEventListener("ended", onEnd);
       const prog = () => {
         if (!recorder) return;
-        const d = video.duration || 1;
-        $("progFill").style.width = `${Math.min(100, video.currentTime / d * 100)}%`;
-        $("progTime").textContent = `${fmt(video.currentTime)} / ${fmt(d)}`;
+        const d = media.duration || 1;
+        $("progFill").style.width = `${Math.min(100, media.currentTime / d * 100)}%`;
+        $("progTime").textContent = `${fmt(media.currentTime)} / ${fmt(d)}`;
         requestAnimationFrame(prog);
       };
       prog();
-      try { await video.play(); } catch { toast("Couldn't start playback"); recorder.stop(); }
+      try { await media.play(); } catch { toast("Couldn't start playback"); recorder.stop(); }
     };
     $("exportVideo").addEventListener("click", startExport);
-    $("cancel").addEventListener("click", () => { if (!recorder) return; cancelled = true; video.pause(); recorder.stop(); });
+    $("cancel").addEventListener("click", () => { if (!recorder) return; cancelled = true; media.pause(); recorder.stop(); });
 
     $("savePng").addEventListener("click", () => { render(); out.toBlob((b) => download(b, baseName() + ".png"), "image/png"); });
     $("copyText").addEventListener("click", async () => {
