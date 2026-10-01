@@ -149,6 +149,18 @@
         <label><input type="checkbox" id="invert" /> Invert</label>
       </div>
 
+      <h2>Spreadsheet</h2>
+      <div class="checks" style="margin-top:0">
+        <label><input type="checkbox" id="sheet" /> Spreadsheet grid (A B C / 1 2 3)</label>
+      </div>
+      <label class="row">Cell fill
+        <select id="fill">
+          <option value="none">None</option>
+          <option value="gray">Black &amp; white</option>
+          <option value="color">Original colors</option>
+        </select>
+      </label>
+
       <h2>Color</h2>
       <label class="row">Mode
         <select id="colorMode">
@@ -219,17 +231,20 @@
       paper:     { label:"Paper",     charset:"detailed", colorMode:"mono",     fg:"#141210", fg2:"#141210", bg:"#f1ece1", glow:0,    invert:true,  bold:false },
       vapor:     { label:"Vapor",     charset:"standard", colorMode:"gradient", fg:"#ff4fd8", fg2:"#38e8ff", bg:"#0b0018", glow:0.4,  invert:false, bold:true },
       lyrics:    { label:"Lyrics",    charset:"text",     colorMode:"mono",     fg:"#ffffff", fg2:"#ffffff", bg:"#000000", glow:0.2,  invert:false, bold:true, custom:"SOGZ" },
+      excel:     { label:"Excel B&W", charset:"standard", colorMode:"mono",     fg:"#111111", fg2:"#111111", bg:"#ffffff", glow:0,    invert:false,  bold:false, sheet:true, fill:"gray",  cols:56 },
+      excelColor:{ label:"Excel color",charset:"standard", colorMode:"mono",    fg:"#111111", fg2:"#111111", bg:"#ffffff", glow:0,    invert:false, bold:false, sheet:true, fill:"color", cols:56 },
       blueprint: { label:"Blueprint", charset:"standard", colorMode:"mono",     fg:"#dbe8ff", fg2:"#dbe8ff", bg:"#0b2a6b", glow:0.1,  invert:false, bold:false }
     };
 
     const ctl = {};
-    for (const id of ["charset","custom","cols","bold","invert","colorMode","fg","fg2","bg","brightness","contrast","glow","size"]) ctl[id] = $(id);
+    for (const id of ["charset","custom","cols","bold","invert","colorMode","fg","fg2","bg","brightness","contrast","glow","size","sheet","fill"]) ctl[id] = $(id);
 
     // ---------- settings ----------
     const read = () => ({
       charset: ctl.charset.value, custom: ctl.custom.value, cols: +ctl.cols.value, bold: ctl.bold.checked, invert: ctl.invert.checked,
       colorMode: ctl.colorMode.value, fg: ctl.fg.value, fg2: ctl.fg2.value, bg: ctl.bg.value,
-      brightness: +ctl.brightness.value, contrast: +ctl.contrast.value, glow: +ctl.glow.value, size: ctl.size.value
+      brightness: +ctl.brightness.value, contrast: +ctl.contrast.value, glow: +ctl.glow.value, size: ctl.size.value,
+      sheet: ctl.sheet.checked, fill: ctl.fill.value
     });
     const apply = (s) => {
       for (const [k, v] of Object.entries(s)) {
@@ -244,6 +259,7 @@
       $("customLabel").textContent = cs === "text" ? "Your text" : "Dark → light";
       $("fg2Row").hidden = ctl.colorMode.value !== "gradient";
       $("fgRow").hidden = ctl.colorMode.value === "original";
+      $("fill").closest("label").style.opacity = ctl.sheet.checked ? 1 : .45;
       $("colsOut").textContent = ctl.cols.value;
       for (const id of ["brightness","contrast","glow"]) ctl[id].nextElementSibling.textContent = (+ctl[id].value).toFixed(2);
     };
@@ -258,10 +274,17 @@
       sw.style.background = p.bg;
       sw.style.color = p.colorMode === "original" ? "#e0a050" : p.fg;
       if (p.colorMode === "gradient") { sw.style.backgroundImage = `linear-gradient(135deg, ${p.bg} 40%, ${p.fg2})`; }
-      sw.textContent = p.charset === "binary" ? "01" : p.charset === "blocks" ? "▓▒" : p.charset === "text" ? "Aa" : "#@";
+      if (p.sheet) {
+        sw.style.background = "#fff"; sw.style.color = "#217346";
+        sw.style.backgroundImage = p.fill === "color"
+          ? "linear-gradient(90deg,#e74c3c 33%,#f1c40f 33% 66%,#3498db 66%)"
+          : "linear-gradient(90deg,#222 33%,#888 33% 66%,#ddd 66%)";
+        sw.style.boxShadow = "inset 0 0 0 1px #217346";
+      }
+      sw.textContent = p.sheet ? "" : p.charset === "binary" ? "01" : p.charset === "blocks" ? "▓▒" : p.charset === "text" ? "Aa" : "#@";
       b.append(sw, document.createTextNode(p.label));
       b.addEventListener("click", () => {
-        apply({ ...p, custom: p.custom ?? ctl.custom.value });
+        apply({ sheet: false, fill: "none", ...p, custom: p.custom ?? ctl.custom.value });
         [...presetBox.children].forEach((x) => x.classList.toggle("on", x === b));
         changed();
       });
@@ -341,18 +364,23 @@
         const k = long / Math.max(sw, sh);
         W = even(sw * k); H = even(sh * k);
       }
-      // crop the source to fill the output (like "cover")
-      let cx = 0, cy = 0, cw = sw, ch = sh;
-      if (sw / sh > W / H) { cw = sh * W / H; cx = (sw - cw) / 2; } else { ch = sw * H / W; cy = (sh - ch) / 2; }
       const cols = s.cols;
-      const cellW = W / cols;
-      const rows = Math.max(1, Math.round(H / (cellW / 0.6)));
-      const cellH = H / rows;
+      // spreadsheet headers take a strip on the top and left
+      let ox = 0, oy = 0;
+      if (s.sheet) { ox = Math.round(Math.max(30, Math.min(W, H) * 0.055)); }
+      const cellW = (W - ox) / cols;
+      if (s.sheet) oy = Math.round(Math.max(18, Math.min(cellW / 0.6, H * 0.04)));
+      const rows = Math.max(1, Math.round((H - oy) / (cellW / 0.6)));
+      const cellH = (H - oy) / rows;
       const fontPx = cellH;
       const font = `${s.bold ? "700 " : ""}${fontPx}px ${FONT_STACK}`;
       lctx.font = font;
       const glyphW = lctx.measureText("M").width || cellW;
-      L = { W, H, cx, cy, cw, ch, cols, rows, cellW, cellH, font, scaleX: cellW / glyphW, glyphW };
+      // the source is cropped to the cell area's shape
+      const aw = W - ox, ah = H - oy;
+      let cx = 0, cy = 0, cw = sw, ch = sh;
+      if (sw / sh > aw / ah) { cw = sh * aw / ah; cx = (sw - cw) / 2; } else { ch = sw * ah / aw; cy = (sh - ch) / 2; }
+      L = { W, H, cx, cy, cw, ch, cols, rows, cellW, cellH, font, scaleX: cellW / glyphW, glyphW, ox, oy, sheet: s.sheet };
       if (out.width !== W || out.height !== H) { out.width = W; out.height = H; }
       if (layer.width !== W || layer.height !== H) { layer.width = W; layer.height = H; }
       sample.width = cols; sample.height = rows; colorCv.width = cols; colorCv.height = rows;
@@ -362,6 +390,45 @@
     // ---------- render ----------
     let lastRows = [];
     const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+    // Excel-style column letters (A..Z, AA..) and row numbers with gridlines
+    const colName = (n) => { let s = ""; n++; while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; };
+    const drawSheet = (s) => {
+      const { W, H, cols, rows, cellW, cellH, ox, oy } = L;
+      const light = hex(s.bg).reduce((a, v) => a + v, 0) / 765 > 0.5;
+      const grid = light ? "#d4d4d4" : "#3a3a3a", head = light ? "#f3f3f3" : "#1c1c1c";
+      const headLine = light ? "#bdbdbd" : "#4a4a4a", headText = light ? "#444444" : "#b9b9b9", green = "#217346";
+      const gw = Math.max(1, Math.round(Math.min(cellW, cellH) / 22));
+      octx.save();
+      // gridlines
+      octx.fillStyle = grid;
+      for (let x = 0; x <= cols; x++) octx.fillRect(Math.round(ox + x * cellW), oy, gw, H - oy);
+      for (let y = 0; y <= rows; y++) octx.fillRect(ox, Math.round(oy + y * cellH), W - ox, gw);
+      // header strips
+      octx.fillStyle = head; octx.fillRect(0, 0, W, oy); octx.fillRect(0, 0, ox, H);
+      octx.fillStyle = headLine;
+      for (let x = 0; x <= cols; x++) octx.fillRect(Math.round(ox + x * cellW), 0, gw, oy);
+      for (let y = 0; y <= rows; y++) octx.fillRect(0, Math.round(oy + y * cellH), ox, gw);
+      octx.fillRect(0, oy - gw, W, gw); octx.fillRect(ox - gw, 0, gw, H);
+      // corner triangle
+      octx.fillStyle = headLine;
+      octx.beginPath(); octx.moveTo(ox - gw * 3, oy * 0.3); octx.lineTo(ox - gw * 3, oy - gw * 3); octx.lineTo(ox - oy * 0.7, oy - gw * 3); octx.closePath(); octx.fill();
+      // labels: skip some when cells get too small to read
+      octx.fillStyle = headText; octx.textAlign = "center"; octx.textBaseline = "middle";
+      const colFont = Math.min(oy * 0.6, cellW * 0.62, 26);
+      octx.font = `${colFont}px Arial, Helvetica, sans-serif`;
+      const colStep = Math.max(1, Math.ceil((octx.measureText(colName(cols - 1)).width + colFont * 0.6) / cellW));
+      for (let x = 0; x < cols; x += colStep) octx.fillText(colName(x), ox + (x + 0.5) * cellW, oy / 2 + 1);
+      const rowFont = Math.min(cellH * 0.62, ox * 0.36, 26);
+      octx.font = `${rowFont}px Arial, Helvetica, sans-serif`;
+      const rowStep = Math.max(1, Math.ceil((rowFont * 1.15) / cellH));
+      for (let y = 0; y < rows; y += rowStep) octx.fillText(String(y + 1), ox / 2, oy + (y + 0.5) * cellH + 1);
+      // the selected cell, like Excel's A1 cursor
+      octx.strokeStyle = green; octx.lineWidth = Math.max(2, gw * 2);
+      octx.strokeRect(ox + 1, oy + 1, cellW - 1, cellH - 1);
+      octx.fillStyle = green; octx.fillRect(ox, oy - gw * 2, cellW, gw * 2); octx.fillRect(ox - gw * 2, oy, gw * 2, cellH);
+      octx.restore();
+    };
+
     const render = () => {
       if (!kind) return;
       if (kind !== "image" && video.readyState < 2) return;
@@ -379,7 +446,9 @@
       const setArr = set ? [...set] : null;
       const textArr = isText ? [...(s.custom.replace(/\s+/g, "") || "SOGZ")] : null;
       const n = setArr ? setArr.length - 1 : 0;
-      const needColor = s.colorMode === "original" || isText;
+      const fillMode = s.sheet ? s.fill : "none";
+      const needColor = s.colorMode === "original" || isText || fillMode !== "none";
+      const fimg = fillMode !== "none" ? cctx.createImageData(cols, rows) : null;
       const cimg = needColor ? cctx.createImageData(cols, rows) : null;
       const fgc = hex(s.fg);
       const asciiOnly = setArr ? setArr.every((c) => c.charCodeAt(0) < 128) : true;
@@ -394,12 +463,25 @@
           const l0 = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
           let l = (l0 - 0.5) * s.contrast + 0.5 + s.brightness;
           l = l < 0 ? 0 : l > 1 ? 1 : l;
+          const la = l;
           if (s.invert) l = 1 - l;
           let chr;
           if (isText) { chr = l < 0.1 ? " " : textArr[t++ % textArr.length]; }
           else chr = setArr[Math.round(l * n)];
           line += chr;
-          if (needColor) {
+          if (fimg) {
+            // cell background like Excel cell shading; text flips to stay readable
+            let fr, fg, fb;
+            if (fillMode === "color") {
+              const k = l0 > 0.02 ? Math.min(3, Math.max((l0 - 0.5) * s.contrast + 0.5 + s.brightness, 0.05) / l0) : 1;
+              fr = Math.min(255, r * k); fg = Math.min(255, g * k); fb = Math.min(255, b * k);
+            } else { const v = Math.round(la * 255); fr = fg = fb = v; }
+            fimg.data[i] = fr; fimg.data[i + 1] = fg; fimg.data[i + 2] = fb; fimg.data[i + 3] = 255;
+            const fl = (0.2126 * fr + 0.7152 * fg + 0.0722 * fb) / 255;
+            // text is a softer shade of its own cell, so the picture reads first
+            const sh = fl > 0.5 ? 0.45 : 1.9, add = fl > 0.5 ? 0 : 60;
+            cimg.data[i] = Math.min(255, fr * sh + add); cimg.data[i + 1] = Math.min(255, fg * sh + add); cimg.data[i + 2] = Math.min(255, fb * sh + add); cimg.data[i + 3] = 255;
+          } else if (needColor) {
             let cr, cg, cb;
             if (s.colorMode === "original") {
               const k = l0 > 0.02 ? Math.min(3, Math.max(l, 0.15) / l0) : 1;
@@ -417,7 +499,7 @@
       lctx.globalCompositeOperation = "source-over";
       lctx.clearRect(0, 0, W, H);
       lctx.font = L.font; lctx.textBaseline = "top"; lctx.fillStyle = "#fff";
-      lctx.setTransform(L.scaleX, 0, 0, 1, 0, 0);
+      lctx.setTransform(L.scaleX, 0, 0, 1, L.ox, L.oy);
       const yOff = cellH * 0.06;
       if (asciiOnly && !isText) {
         for (let y = 0; y < rows; y++) lctx.fillText(lastRows[y], 0, y * cellH + yOff);
@@ -431,10 +513,10 @@
 
       // 2) tint the glyphs
       lctx.globalCompositeOperation = "source-in";
-      if (needColor && (s.colorMode === "original" || s.colorMode === "mono")) {
+      if (needColor && (fimg || s.colorMode === "original" || s.colorMode === "mono")) {
         cctx.putImageData(cimg, 0, 0);
         lctx.imageSmoothingEnabled = false;
-        lctx.drawImage(colorCv, 0, 0, W, H);
+        lctx.drawImage(colorCv, L.ox, L.oy, cols * L.cellW, rows * cellH);
       } else if (s.colorMode === "gradient") {
         const gr = lctx.createLinearGradient(0, 0, W * 0.6, H);
         gr.addColorStop(0, s.fg); gr.addColorStop(1, s.fg2);
@@ -442,7 +524,7 @@
         if (isText) { // fade lyrics by brightness
           cctx.putImageData(cimg, 0, 0);
           lctx.globalCompositeOperation = "destination-in";
-          lctx.imageSmoothingEnabled = false; lctx.drawImage(colorCv, 0, 0, W, H);
+          lctx.imageSmoothingEnabled = false; lctx.drawImage(colorCv, L.ox, L.oy, cols * L.cellW, rows * cellH);
         }
       } else { lctx.fillStyle = s.fg; lctx.fillRect(0, 0, W, H); }
       lctx.globalCompositeOperation = "source-over";
@@ -450,6 +532,12 @@
       // 3) compose onto the background, with optional glow
       octx.globalCompositeOperation = "source-over"; octx.globalAlpha = 1; octx.filter = "none";
       octx.fillStyle = s.bg; octx.fillRect(0, 0, W, H);
+      if (fimg) {
+        cctx.putImageData(fimg, 0, 0);
+        octx.imageSmoothingEnabled = false;
+        octx.drawImage(colorCv, L.ox, L.oy, cols * L.cellW, rows * cellH);
+        octx.imageSmoothingEnabled = true;
+      }
       if (s.glow > 0) {
         const bgL = hex(s.bg).reduce((a, v) => a + v, 0) / 765;
         octx.filter = `blur(${Math.max(2, cellH * 0.7)}px)`;
@@ -459,6 +547,7 @@
         octx.filter = "none"; octx.globalAlpha = 1; octx.globalCompositeOperation = "source-over";
       }
       octx.drawImage(layer, 0, 0);
+      if (L.sheet) drawSheet(s);
       if (recorder && canvasTrack && canvasTrack.requestFrame) canvasTrack.requestFrame();
     };
 
