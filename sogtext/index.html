@@ -10,6 +10,7 @@
   <style>
     :root { --bg:#0b0b0b; --panel:#141414; --panel2:#1b1b1b; --line:#2a2a2a; --text:#ece7dd; --muted:#8d8880; --red:#c0141f; --red2:#e0303b; --mono:"Cascadia Mono","Consolas","DejaVu Sans Mono","Menlo","Courier New",monospace; }
     * { box-sizing:border-box; }
+    [hidden] { display:none !important; }
     html, body { margin:0; min-height:100%; background:var(--bg); color:var(--text); font:13px/1.4 Arial,Helvetica,sans-serif; }
     button, input, select, textarea { color:inherit; font:inherit; }
     a { color:inherit; }
@@ -47,6 +48,10 @@
     .fs { display:flex; align-items:center; gap:8px; margin:10px 0 0; color:var(--muted); font-size:11px; }
     .fs input { width:160px; accent-color:var(--red); }
     .gallery-head { display:flex; align-items:baseline; justify-content:space-between; margin:28px 0 10px; }
+    .gallery-head { gap:12px; flex-wrap:wrap; align-items:center; }
+    #search { width:220px; height:30px; padding:4px 9px; border:1px solid var(--line); border-radius:3px; outline:0; background:var(--panel); color:var(--text); }
+    #search:focus { border-color:#555; }
+    .card pre.loading { color:var(--muted); font-family:Arial, sans-serif; font-size:11px; }
     .gallery-head h2 { margin:0; color:var(--muted); font-size:10px; font-weight:400; letter-spacing:.2em; text-transform:uppercase; }
     .gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:10px; }
     .card { min-width:0; padding:10px 12px 12px; border:1px solid var(--line); border-radius:4px; background:var(--panel); cursor:pointer; text-align:left; }
@@ -128,7 +133,7 @@
     <section class="stage">
       <div class="output-wrap" id="outWrap"><pre id="output"></pre></div>
       <div class="fs">Preview size <input id="size" type="range" min="6" max="28" value="14" /></div>
-      <div class="gallery-head"><h2>All fonts — click one to use it</h2></div>
+      <div class="gallery-head"><h2 id="galleryTitle">All fonts — click one to use it</h2><input id="search" type="search" placeholder="Search fonts…" autocomplete="off" /></div>
       <div class="gallery" id="gallery"></div>
     </section>
   </main>
@@ -147,13 +152,41 @@
     const bytes = Uint8Array.from(atob(FONT_DATA_B64), (c) => c.charCodeAt(0));
     const json = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
     const FONTS = JSON.parse(json);
-    const names = Object.keys(FONTS);
-    for (const name of names) figlet.parseFont(name, FONTS[name]);
+    const BUNDLED = Object.keys(FONTS);
+    for (const name of BUNDLED) figlet.parseFont(name, FONTS[name]);
+    // Every FIGlet font. The bundled ones load instantly; the rest come from the jsDelivr CDN when needed.
+    const ALL_FONTS = ["1Row", "3-D", "3D Diagonal", "3D-ASCII", "3x5", "4Max", "5 Line Oblique", "Acrobatic", "Alligator", "Alligator2", "Alpha", "Alphabet", "AMC 3 Line", "AMC 3 Liv1", "AMC AAA01", "AMC Neko", "AMC Razor", "AMC Razor2", "AMC Slash", "AMC Slider", "AMC Thin", "AMC Tubes", "AMC Untitled", "ANSI Compact", "ANSI Regular", "ANSI Shadow", "Arrows", "ASCII 12", "ASCII 9", "ASCII New Roman", "Avatar", "B1FF", "Babyface Lame", "Babyface Leet", "Banner", "Banner3", "Banner3-D", "Banner4", "Barbwire", "Basic", "Bear", "Bell", "Benjamin", "Big", "Big ASCII 12", "Big ASCII 9", "Big Chief", "Big Money-ne", "Big Money-nw", "Big Money-se", "Big Money-sw", "Big Mono 12", "Big Mono 9", "Bigfig", "Binary", "Block", "Blocks", "Bloody", "BlurVision ASCII", "Bolger", "Braced", "Bright", "Broadway", "Broadway KB", "Bubble", "Bulbhead", "Caligraphy", "Caligraphy2", "Calvin S", "Cards", "Catwalk", "Chiseled", "Chunky", "Circle", "Classy", "Coder Mini", "Coinstak", "Cola", "Colossal", "Computer", "Contessa", "Contrast", "Cosmike", "Cosmike2", "Crawford", "Crawford2", "Crazy", "Cricket", "Cursive", "Cyberlarge", "Cybermedium", "Cybersmall", "Cygnet", "DANC4", "Dancing Font", "Decimal", "Def Leppard", "Delta Corps Priest 1", "DiamFont", "Diamond", "Diet Cola", "Digital", "Doh", "Doom", "DOS Rebel", "Dot Matrix", "Double", "Double Shorts", "Dr Pepper", "DWhistled", "Efti Chess", "Efti Font", "Efti Italic", "Efti Piti", "Efti Robot", "Efti Wall", "Efti Water", "Electronic", "Elite", "Emboss", "Emboss 2", "Epic", "Fender", "Filter", "Fire Font-k", "Fire Font-s", "Flipped", "Flower Power", "Font Font", "Four Tops", "Fraktur", "Fun Face", "Fun Faces", "Future", "Future Smooth", "Future Thin", "Fuzzy", "Georgi16", "Georgia11", "Ghost", "Ghoulish", "Glenyn", "Goofy", "Gothic", "Graceful", "Gradient", "Graffiti", "Greek", "Heart Left", "Heart Right", "Henry 3D", "Hex", "Hieroglyphs", "Hollywood", "Horizontal Left", "Horizontal Right", "ICL-1900", "Impossible", "Invita", "Isometric1", "Isometric2", "Isometric3", "Isometric4", "Italic", "Ivrit", "Jacky", "Jazmine", "Jerusalem", "JS Block Letters", "JS Bracket Letters", "JS Capital Curves", "JS Cursive", "JS Stick Letters", "Katakana", "Kban", "Keyboard", "Knob", "Konto", "Konto Slant", "Larry 3D", "Larry 3D 2", "LCD", "Lean", "Letter", "Letters", "Lil Devil", "Line Blocks", "Linguaholic Mini Block", "Linguaholic Neon", "Linguaholic Rounded", "Linguaholic Shadow 3D", "Linux", "Lockergnome", "Madrid", "Marquee", "Maxfour", "Merlin1", "Merlin2", "Mike", "Mini", "miniwi", "Mirror", "Mnemonic", "Modular", "Mono 12", "Mono 9", "Morse", "Morse2", "Moscow", "Mshebrew210", "Muzzle", "Nancyj", "Nancyj-Fancy", "Nancyj-Improved", "Nancyj-Underlined", "Nipples", "NScript", "NT Greek", "NV Script", "O8", "Octal", "Ogre", "Old Banner", "OS2", "Pagga", "Patorjk's Cheese", "Patorjk-HeX", "Pawp", "Peaks", "Peaks Slant", "Pebbles", "Pepper", "Poison", "Puffy", "Puzzle", "Pyramid", "Rammstein", "Rebel", "Rectangles", "Red Phoenix", "Relief", "Relief2", "Reverse", "Roman", "Rot13", "Rotated", "Rounded", "Rowan Cap", "Rozzo", "RubiFont", "Runic", "Runyc", "S Blood", "Santa Clara", "Script", "Serifcap", "Shaded Blocky", "Shadow", "Shimrod", "Short", "SL Script", "Slant", "Slant Relief", "Slide", "Small", "Small ASCII 12", "Small ASCII 9", "Small Block", "Small Braille", "Small Caps", "Small Isometric1", "Small Keyboard", "Small Mono 12", "Small Mono 9", "Small Poison", "Small Script", "Small Shadow", "Small Slant", "Small Tengwar", "Soft", "Speed", "Spliff", "Stacey", "Stampate", "Stampatello", "Standard", "Star Strips", "Star Wars", "Stellar", "Stforek", "Stick Letters", "Stop", "Straight", "Stronger Than All", "Sub-Zero", "Swamp Land", "Swan", "Sweet", "Tanja", "Tengwar", "Term", "Terrace", "Test1", "The Edge", "Thick", "Thin", "THIS", "Thorned", "Three Point", "Ticks", "Ticks Slant", "Tiles", "Tinker-Toy", "Tmplr", "Tombstone", "Train", "Trek", "Tsalagi", "Tubular", "Twisted", "Two Point", "Univers", "Upside Down Text", "USA Flag", "Varsity", "Wavescape", "Wavy", "Weird", "Wet Letter", "Whimsy", "WideTerm", "Wow"];
+    const names = [...BUNDLED, ...ALL_FONTS.filter((n) => !BUNDLED.includes(n))];
+    const FIGLET_VERSION = "1.12.0";
+    const CDNS = [
+      (n) => `https://cdn.jsdelivr.net/npm/figlet@${FIGLET_VERSION}/fonts/${encodeURIComponent(n)}.flf`,
+      (n) => `https://unpkg.com/figlet@${FIGLET_VERSION}/fonts/${encodeURIComponent(n)}.flf`
+    ];
+    const loaded = new Set(BUNDLED), pending = new Map();
+    const loadFont = (name) => {
+      if (loaded.has(name)) return Promise.resolve(true);
+      if (pending.has(name)) return pending.get(name);
+      const job = (async () => {
+        for (const url of CDNS) {
+          try {
+            const res = await fetch(url(name));
+            if (!res.ok) continue;
+            figlet.parseFont(name, await res.text());
+            loaded.add(name); return true;
+          } catch {}
+        }
+        return false;
+      })();
+      pending.set(name, job);
+      job.then((ok) => { if (!ok) pending.delete(name); });
+      return job;
+    };
 
     const saved = (() => { try { return JSON.parse(localStorage.getItem("sogtext") || "{}"); } catch { return {}; } })();
     for (const name of names) els.font.add(new Option(name, name));
     els.font.value = names.includes(saved.font) ? saved.font : "ANSI Shadow";
     if (typeof saved.text === "string") els.text.value = saved.text;
+    $("galleryTitle").textContent = `All ${names.length} fonts — click one to use it`;
 
     const render = (text, font, opts = {}) => {
       const lines = text.split("\n");
@@ -192,8 +225,15 @@
       return out.join("\n");
     };
 
-    let current = "";
-    const update = () => {
+    let current = "", updateId = 0;
+    const update = async () => {
+      const id = ++updateId;
+      if (!loaded.has(els.font.value)) {
+        els.output.textContent = "Loading font…";
+        const ok = await loadFont(els.font.value);
+        if (id !== updateId) return;
+        if (!ok) { els.output.textContent = "Couldn't load this font. Check your connection or pick another one."; return; }
+      }
       const text = els.text.value || " ";
       let art = render(text, els.font.value, { layout: state.layout, width: +els.width.value || 120 });
       art = alignLines(art, state.align);
@@ -206,26 +246,50 @@
     };
 
     let galleryTimer;
+    const sampleText = () => (els.text.value.split("\n")[0] || "sogz").slice(0, 14) || "sogz";
+    const drawCard = async (card) => {
+      const name = card.dataset.font, pre = card.querySelector("pre");
+      if (!loaded.has(name)) {
+        pre.className = "loading"; pre.textContent = "Loading…";
+        const ok = await loadFont(name);
+        if (!ok) { pre.textContent = "Couldn't load"; return; }
+      }
+      pre.className = "";
+      try { pre.textContent = render(sampleText(), name, { width: 400 }); } catch { pre.textContent = "(this font can't draw that text)"; }
+      card.dataset.drawn = sampleText();
+    };
+    const visible = new Set();
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) { visible.add(e.target); if (e.target.dataset.drawn !== sampleText()) drawCard(e.target); }
+        else visible.delete(e.target);
+      }
+    }, { rootMargin: "600px 0px" });
     const buildGallery = () => {
-      const sample = (els.text.value.split("\n")[0] || "sogz").slice(0, 14) || "sogz";
       els.gallery.innerHTML = "";
       for (const name of names) {
         const card = document.createElement("button");
-        card.type = "button";
+        card.type = "button"; card.dataset.font = name;
         card.className = "card" + (name === els.font.value ? " on" : "");
         const label = document.createElement("span"); label.textContent = name;
-        const pre = document.createElement("pre"); pre.textContent = render(sample, name, { width: 400 });
+        const pre = document.createElement("pre"); pre.className = "loading"; pre.textContent = " ";
         card.append(label, pre);
         card.addEventListener("click", () => {
           els.font.value = name; update(); markGallery();
           window.scrollTo({ top: 0, behavior: "smooth" });
         });
         els.gallery.appendChild(card);
+        io.observe(card);
       }
     };
+    const refreshGallery = () => { for (const c of visible) drawCard(c); };
     const markGallery = () => {
-      [...els.gallery.children].forEach((c, i) => c.classList.toggle("on", names[i] === els.font.value));
+      for (const c of els.gallery.children) c.classList.toggle("on", c.dataset.font === els.font.value);
     };
+    $("search").addEventListener("input", (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      for (const c of els.gallery.children) c.hidden = q && !c.dataset.font.toLowerCase().includes(q);
+    });
 
     const toast = (msg) => {
       const t = $("toast"); t.textContent = msg; t.classList.add("show");
@@ -257,7 +321,7 @@
       c.toBlob((b) => download(b, fileBase() + ".png"), "image/png");
     };
 
-    els.text.addEventListener("input", () => { update(); clearTimeout(galleryTimer); galleryTimer = setTimeout(() => { buildGallery(); }, 250); });
+    els.text.addEventListener("input", () => { update(); clearTimeout(galleryTimer); galleryTimer = setTimeout(refreshGallery, 250); });
     for (const el of [els.font, els.width, els.border, els.fg, els.bg]) el.addEventListener("input", () => { update(); markGallery(); });
     for (const [id, key] of [["layout", "layout"], ["align", "align"]]) {
       $(id).addEventListener("click", (e) => {
