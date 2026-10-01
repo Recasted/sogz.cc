@@ -41,6 +41,8 @@ window.ARCHIVE_CONFIG = {
         { label: "SogSketch", url: "sogsketch/" },
         { label: "sogz editor", url: "sogzeditor/" },
         { label: "Sog95", url: "sog95/" },
+        { label: "Sogcii", url: "sogcii/" },
+        { label: "SogText", url: "sogtext/" },
         { label: "osint", url: "https://osintforge.dev" }
       ]
     },
