@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!-- OrbitSpace home page. The header, nav strip and footer are added by js/social.js. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/social.css">
+  <link rel="icon" href="images/avatars/orbit.svg" type="image/svg+xml">
+  <title>OrbitSpace | Home</title>
+</head>
+<body data-page="home">
+<div class="page">
+  <div class="content">
+    <div class="cols">
+
+      <div class="col-left">
+        <div class="box login-box">
+          <div class="box-head">Member Login</div>
+          <div class="box-body">
+            <form id="loginForm">
+              <label for="email">E-Mail:</label>
+              <input id="email" type="text">
+              <label for="pw">Password:</label>
+              <input id="pw" type="password">
+              <div class="row">
+                <label style="font-weight:normal;margin:0"><input type="checkbox" style="width:auto"> Remember Me</label>
+                <button class="btn" type="submit">LOGIN</button>
+              </div>
+              <div class="small" style="margin-top:4px"><a href="#help">Forgot your password?</a></div>
+            </form>
+            <div class="notice" id="loginNotice">OrbitSpace is not accepting new logins right now. Please try again later.</div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-head">OrbitSpace Stats</div>
+          <div class="box-body">
+            <table class="rows">
+              <tr><td class="label">Members</td><td><span id="memberCount">0</span> in your area</td></tr>
+              <tr><td class="label">Site visitors</td><td><span class="counter">0048213</span></td></tr>
+              <tr><td class="label">Online now</td><td>more than you'd think</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="box" id="help">
+          <div class="box-head">Help &amp; FAQ</div>
+          <div class="box-body">
+            <p><b>How do I change my layout?</b><br>Paste your code into the "About me" box! Ask a friend who knows HTML :)</p>
+            <p><b>What is a profile archive?</b><br>OrbitSpace saves old versions of your profile so you never lose them. You can hide versions you don't want people to see.</p>
+            <p><b>Who is Ori?</b><br>Ori made OrbitSpace and is everyone's first friend.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-right">
+        <div class="welcome">
+          <h2>OrbitSpace is a place for you and your friends.</h2>
+          Share photos, journals and interests with your friends. Find old classmates.
+          Make new friends. Leave comments. Never lose touch again.
+        </div>
+
+        <div class="box">
+          <div class="box-head">Cool New People <span class="more"><a href="browse.html">more</a></span></div>
+          <div class="box-body">
+            <div class="cool-new-people" id="coolNewPeople"></div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-head">Friend Activity <span class="more"><a href="feed.html">view all</a></span></div>
+          <div class="box-body">
+            <ul class="feed" id="homeFeed"></ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+  <!-- Load order matters: site list, then data, then the page builder. -->
+  <script>window.ROOT = "../";</script>
+  <script src="../shared/sites.js"></script>
+  <script src="data/members.js"></script>
+  <script src="data/activity.js"></script>
+  <script src="js/social.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+/*
+  sites.js — the ONE place where every angel.exe website is listed.
+
+  Each page loads this file first. If you rename or move a site's
+  folder, change "url" for that site here and every link updates.
+
+  Everything lives on sogz.cc, inside the angel-exe folder:
+    sogz.cc/angel-exe/             the hub (the GAMES card links here)
+    sogz.cc/angel-exe/orbitspace/  the social network
+  "url" is relative to the angel-exe folder, so the same links work
+  on your computer and on sogz.cc.
+
+  "storyDomain" is a made-up web address shown INSIDE the story (for
+  example on a profile's "OrbitSpace URL" line). It is never a real
+  address and nothing needs to be bought.
+
+  "status": "open"  = the site is built and linked
+            "soon"  = shown on the hub as "coming soon", not clickable
+*/
+window.SITES = {
+  hub: {
+    name: "angel.exe community",
+    storyDomain: "",
+    url: "index.html",
+    status: "open",
+    blurb: "The front door. Every site in the game is linked from here."
+  },
+  game: {
+    name: "angel.exe (official game page)",
+    storyDomain: "",                     // put the Steam page address in "url" when it exists
+    url: "",
+    status: "soon",
+    blurb: "The Steam page for the game. Coming when the game is announced."
+  },
+  social: {
+    name: "OrbitSpace",
+    storyDomain: "orbitspace.net",       // made-up, shown inside the story only
+    url: "orbitspace/index.html",
+    status: "open",
+    blurb: "you're never alone in orbit. Profiles, friends, comments and bulletins."
+  },
+  music: {
+    name: "music site",
+    storyDomain: "",
+    url: "",
+    status: "soon",
+    blurb: "Real artists, playlists and reviews. (Milestone 3)"
+  },
+  blogs: {
+    name: "personal homepages",
+    storyDomain: "",
+    url: "",
+    status: "soon",
+    blurb: "Diaries, guestbooks, poetry and fanfic. (Milestone 4)"
+  },
+  forum: {
+    name: "anonymous boards",
+    storyDomain: "",
+    url: "",
+    status: "soon",
+    blurb: "Pseudonymous threads, archives and locked posts. (Milestone 4)"
+  }
+  // The experimental mystery site (Milestone 5) is deliberately NOT listed
+  // here yet. Players should find it through clues, not the front page.
+};
+
+/*
+  Helper used by every page: turns a site key into a working link.
+  ROOT is set by each page (for example "../" for pages inside /social/).
+*/
+window.siteLink = function (key) {
+  var s = window.SITES[key];
+  if (!s || s.status !== "open" || !s.url) return null;
+  if (/^https?:\/\//.test(s.url)) return s.url;
+  return (window.ROOT || "") + s.url;
+};

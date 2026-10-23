@@ -9,15 +9,19 @@ window.ARCHIVE_CONFIG = {
  
   cards: [
     {
-      title: "UNDER CONSTRUCTION",
-      subtitle: "coming soon 001",
+      title: "GAMES",
+      subtitle: "angel.exe 001",
       image: "assets/card-01.jpg",
       x: 15, y: 56, rotation: -6, theme: "pulse", audio: "",
       audioTracks: [
         { title: "baby me", src: "assets/audio/01-1-baby-me.mp3" },
         { title: "cold outside", src: "assets/audio/01-2-cold-outside.mp3" }
       ],
-      links: []
+      // The one link on this card goes to the angel.exe community hub,
+      // which links every companion site. Change the url if the hub moves.
+      links: [
+        { label: "angel.exe", url: "angel-exe/" }
+      ]
     },
     {
       title: "GAMING", subtitle: "profiles 002", image: "assets/card-02.jpg", x: 36, y: 53, rotation: 3, theme: "glass", audio: "",
