@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="../shared/comments.css">
   <link rel="stylesheet" href="css/social.css">
   <link rel="icon" href="images/avatars/orbit.svg" type="image/svg+xml">
   <title>OrbitSpace | Home</title>
@@ -13,21 +14,10 @@
     <div class="cols">
 
       <div class="col-left">
-        <div class="box login-box">
-          <div class="box-head">Member Login</div>
-          <div class="box-body">
-            <form id="loginForm">
-              <label for="email">E-Mail:</label>
-              <input id="email" type="text">
-              <label for="pw">Password:</label>
-              <input id="pw" type="password">
-              <div class="row">
-                <label style="font-weight:normal;margin:0"><input type="checkbox" style="width:auto"> Remember Me</label>
-                <button class="btn" type="submit">LOGIN</button>
-              </div>
-              <div class="small" style="margin-top:4px"><a href="#help">Forgot your password?</a></div>
-            </form>
-            <div class="notice" id="loginNotice">OrbitSpace is not accepting new logins right now. Please try again later.</div>
+        <div class="box">
+          <div class="box-head">Who are you?</div>
+          <div class="box-body" id="guestBox">
+            <!-- filled in by js/social.js: pick a name and picture, no sign-up -->
           </div>
         </div>
 
@@ -48,6 +38,7 @@
             <p><b>How do I change my layout?</b><br>Paste your code into the "About me" box! Ask a friend who knows HTML :)</p>
             <p><b>What is a profile archive?</b><br>OrbitSpace saves old versions of your profile so you never lose them. You can hide versions you don't want people to see.</p>
             <p><b>Who is Ori?</b><br>Ori made OrbitSpace and is everyone's first friend.</p>
+            <p><b>Do I need an account?</b><br>Nope! Pick a name and a picture and you can comment anywhere. Comments show up for everyone after a moderator checks them.</p>
           </div>
         </div>
       </div>
@@ -72,6 +63,11 @@
             <ul class="feed" id="homeFeed"></ul>
           </div>
         </div>
+
+        <div class="box">
+          <div class="box-head">OrbitSpace Guestbook</div>
+          <div class="box-body"><div id="visitorComments"></div></div>
+        </div>
       </div>
 
     </div>
@@ -80,6 +76,10 @@
   <!-- Load order matters: site list, then data, then the page builder. -->
   <script>window.ROOT = "../";</script>
   <script src="../shared/sites.js"></script>
+  <script src="../shared/comments-config.js"></script>
+  <script src="../shared/approved-comments.js"></script>
+  <script src="../shared/filter.js"></script>
+  <script src="../shared/comments.js"></script>
   <script src="data/members.js"></script>
   <script src="data/activity.js"></script>
   <script src="js/social.js"></script>

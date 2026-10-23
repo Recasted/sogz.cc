@@ -23,16 +23,16 @@ body {
   padding: 10px;
   background: var(--bg);
   color: var(--text);
-  font: 11px/1.4 var(--font);
+  font: 13px/1.45 var(--font);
 }
 a { color: var(--link); text-decoration: none; }
 a:hover { color: var(--link-hover); text-decoration: underline; }
 .frame {
-  max-width: 900px;
+  max-width: 1080px;
   margin: 0 auto;
   background: var(--frame);
   border: 1px solid var(--border);
-  padding: 8px;
+  padding: 10px;
 }
 .banner {
   background: linear-gradient(var(--head-top), var(--head-bottom));
@@ -43,41 +43,41 @@ a:hover { color: var(--link-hover); text-decoration: underline; }
   justify-content: space-between;
 }
 .banner img { display: block; max-width: 100%; height: auto; }
-.banner .tag { color: #c8d3e6; font-size: 10px; text-align: right; }
+.banner .tag { color: #c8d3e6; font-size: 12px; text-align: right; }
 .toplinks { text-align: center; padding: 6px 0; font-weight: bold; }
 .toplinks a { margin: 0 6px; }
 .toplinks img { vertical-align: -3px; margin-right: 2px; }
 .crumbs { font-weight: bold; margin: 6px 0; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; }
-.crumbs .when { font-weight: normal; font-size: 10px; }
+.crumbs .when { font-weight: normal; font-size: 12px; }
 
 table.forum { width: 100%; border-collapse: collapse; border: 1px solid var(--border); margin-bottom: 10px; }
 table.forum th {
   background: linear-gradient(#8ea7c4, #5d7ca3);
   color: #fff;
-  font-size: 11px;
+  font-size: 13px;
   padding: 4px;
   border: 1px solid var(--border);
 }
-table.forum td { padding: 6px; border: 1px solid #fff; vertical-align: middle; }
-table.forum td.cat { background: var(--cat-bg); font-weight: bold; font-size: 12px; padding: 4px 6px; }
+table.forum td { padding: 8px; border: 1px solid #fff; vertical-align: middle; }
+table.forum td.cat { background: var(--cat-bg); font-weight: bold; font-size: 14px; padding: 4px 6px; }
 table.forum tr.r1 td { background: var(--row1); }
 table.forum tr.r1 td:nth-child(even) { background: var(--row2); }
-table.forum td.icon { width: 46px; text-align: center; }
-table.forum td.num { width: 60px; text-align: center; font-size: 10px; }
-table.forum td.last { width: 160px; text-align: center; font-size: 10px; }
-.forum-name { font-size: 12px; font-weight: bold; }
-.forum-desc { font-size: 10px; margin-top: 2px; }
-.forum-domain { font-size: 9px; color: #6b7b88; margin-top: 2px; }
+table.forum td.icon { width: 56px; text-align: center; }
+table.forum td.num { width: 70px; text-align: center; font-size: 12px; }
+table.forum td.last { width: 190px; text-align: center; font-size: 12px; }
+.forum-name { font-size: 15px; font-weight: bold; }
+.forum-desc { font-size: 12px; margin-top: 2px; }
+.forum-domain { font-size: 11px; color: #6b7b88; margin-top: 2px; }
 .soon .forum-name { color: #8794a0; }
 .soon .lock { color: #b33; font-size: 9px; font-weight: bold; margin-left: 4px; }
 
 .announce { background: #fffbe0; border: 1px solid #d9c56a; padding: 6px; margin-bottom: 10px; }
 .announce b { color: #a35a00; }
 
-.online td { font-size: 10px; }
-.legend { text-align: center; font-size: 10px; color: #555; margin: 8px 0; }
+.online td { font-size: 12px; }
+.legend { text-align: center; font-size: 12px; color: #555; margin: 8px 0; }
 .legend img { vertical-align: middle; margin: 0 2px 0 10px; }
-.footer { text-align: center; font-size: 9px; color: #555; margin-top: 10px; }
+.footer { text-align: center; font-size: 11px; color: #555; margin-top: 10px; }
 
 @media (max-width: 600px) {
   table.forum td.num, table.forum td.last, table.forum th.num, table.forum th.last { display: none; }
