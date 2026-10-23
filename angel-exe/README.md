@@ -7,8 +7,9 @@ sogz.cc inside the `angel-exe` folder, like your other tools:
 |---|---|---|
 | sogz.cc/angel-exe/ | the **hub**, a 2008 forum front page that links every site. The GAMES card on sogz.cc opens it. | `index.html`, `hub/` |
 | sogz.cc/angel-exe/orbitspace/ | **OrbitSpace**, the social network (Milestone 1) | `orbitspace/` |
+| sogz.cc/angel-exe/lowlight/ | **LowLight**, the music site with real artists (Milestone 3) | `lowlight/` |
 
-The music site, homepages and anonymous boards come in later milestones.
+The homepages and anonymous boards come in later milestones.
 They already appear on the hub as locked "coming soon" rows.
 
 Everything is plain HTML, CSS and JavaScript. There is nothing to install
@@ -36,6 +37,14 @@ angel-exe/
     logo.svg            the angel.exe wordmark
     folder*.svg         the little forum folder icons
   moderate.html         YOUR page for approving player comments (not linked anywhere)
+  lowlight/
+    index.html, artists.html, artist.html, playlists.html, blog.html
+    css/lowlight.css    LowLight colours, fonts and sizes
+    js/lowlight.js      builds the pages and runs the music player
+    data/music.js       ALL the music: artists, albums, songs, reviews, playlists, blog posts
+    audio/              music files you own (see audio/README.txt)
+    covers/             album cover pictures (see covers/README.txt)
+    images/logo.svg     the LowLight wordmark
   shared/
     sites.js            THE list of every site: name, address, coming soon or open
     comments.js         the player comment box used on every site
@@ -61,6 +70,61 @@ angel-exe/
     data/activity.js    the activity feed and bulletins
     images/             logo, icons, background patterns
 ```
+
+## The music site (LowLight)
+
+Everything on LowLight comes from `lowlight/data/music.js`. The top of
+that file explains every part.
+
+**Adding an artist:** copy the TEMPLATE block near the end of the
+`artists` list, paste it above the template, put a comma after the
+artist before it, and fill it in. Give each album a list of `tracks`.
+Only use real songs, and if you only know some of an album, set
+`tracksNote` to `"selected tracks"`.
+
+**A song without an album:** add it to `singles`, for example
+`{ artist: "snow-strippers", title: "Song name" }`. Snow Strippers' songs
+are all singles like this.
+
+**Playlists:** add a block to `playlists`. Each song is
+`{ artist: "artist-id", title: "Song title" }`, and the song must also be
+on one of that artist's albums or in `singles`. `by` can be a character
+(`theo`, `mara`, `june`) or `kestrel`, LowLight's made-up owner.
+
+**Reviews and blog posts:** add blocks to `reviews` and `posts`. They are
+dated in the story's world (before 2008-10-23).
+
+**Playing music:** every song plays as its YouTube video, in a small
+video window in the bottom right corner. It uses YouTube's own player,
+so nothing is copied. Next, previous, pause and volume all work, and
+when a video ends the next song starts.
+
+The videos are listed in the `videos` section of `lowlight/data/music.js`,
+grouped by artist. **To add a video:** open the song on YouTube, copy
+the address (`https://www.youtube.com/watch?v=...`) and add a line under
+that artist, for example `"Chasing Cars": "https://www.youtube.com/watch?v=GemKqzILV4w",`.
+The song title must be spelled exactly like it is on the album or in
+the playlist. Use official uploads (the artist's channel, their label,
+or "Artist - Topic") when you can, because fan uploads get deleted.
+
+If a video gets removed or its owner blocks embedding, the window says
+so, shows a "watch it on YouTube" link and skips to the next song after
+5 seconds. Then swap its link for another upload.
+
+Videos sometimes refuse to play when you open the page straight from
+your computer (YouTube wants a real website address). On sogz.cc they
+play normally.
+
+You can still play an audio file you're allowed to share: put it in
+`lowlight/audio/` and change the song from `"Song name"` to
+`{ title: "Song name", audio: "audio/file.mp3" }`.
+
+**Album covers:** each album gets a made-up cover automatically. To use
+a real one, see `lowlight/covers/README.txt`.
+
+OrbitSpace profiles link each favourite artist to their LowLight page.
+Artist pages show which characters are fans, using the `music` lists in
+`shared/story/characters.js`.
 
 ## The shared story files
 

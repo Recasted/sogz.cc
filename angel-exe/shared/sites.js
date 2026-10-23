@@ -7,6 +7,7 @@
   Everything lives on sogz.cc, inside the angel-exe folder:
     sogz.cc/angel-exe/             the hub (the GAMES card links here)
     sogz.cc/angel-exe/orbitspace/  the social network
+    sogz.cc/angel-exe/lowlight/    the music site
   "url" is relative to the angel-exe folder, so the same links work
   on your computer and on sogz.cc.
 
@@ -40,11 +41,11 @@ window.SITES = {
     blurb: "you're never alone in orbit. Profiles, friends, comments and bulletins."
   },
   music: {
-    name: "music site",
-    storyDomain: "",
-    url: "",
-    status: "soon",
-    blurb: "Real artists, playlists and reviews. (Milestone 3)"
+    name: "LowLight",
+    storyDomain: "lowlight.fm",          // made-up, shown inside the story only
+    url: "lowlight/index.html",
+    status: "open",
+    blurb: "music for the hours after midnight. Real artists, reviews and reader playlists."
   },
   blogs: {
     name: "personal homepages",

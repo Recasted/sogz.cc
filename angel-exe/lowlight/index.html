@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!-- LowLight: the music site. This page is built by js/lowlight.js from data/music.js. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LowLight | music for the hours after midnight</title>
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../shared/comments.css">
+  <link rel="stylesheet" href="css/lowlight.css">
+</head>
+<body data-page="home">
+<div class="page"></div>
+
+<!-- Load order matters: site list, story data, comments, music data, then the page builder. -->
+<script>window.ROOT = "../";</script>
+<script src="../shared/sites.js"></script>
+<script src="../shared/story/characters.js"></script>
+<script src="../shared/story/timeline.js"></script>
+<script src="../shared/comments-config.js"></script>
+<script src="../shared/approved-comments.js"></script>
+<script src="../shared/filter.js"></script>
+<script src="../shared/comments.js"></script>
+<script src="data/music.js"></script>
+<script src="js/lowlight.js"></script>
+</body>
+</html>

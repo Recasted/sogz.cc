@@ -359,7 +359,7 @@ PAGES.profile = function () {
     m.music.forEach(function (song) {
       // Artist names will link to the music site once it exists (Milestone 3).
       var name = musicHref
-        ? el("a", { href: musicHref, text: song.artist })
+        ? el("a", { href: musicHref.replace(/index\.html$/, "") + "artist.html?name=" + encodeURIComponent(song.artist), text: song.artist })
         : el("b", { title: "music site coming soon", text: song.artist });
       musicList.appendChild(el("li", {}, [name, song.note ? " - " + song.note : ""]));
     });
