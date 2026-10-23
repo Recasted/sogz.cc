@@ -154,7 +154,13 @@ BUILDERS.writing = function (hp, page, box) {
 BUILDERS.gallery = function (hp, page, box) {
   if (page.intro) box.appendChild(el("p", { class: "intro", text: page.intro }));
   var grid = el("div", { class: "gallery" });
+  var drawn = null;   // a page 12 the player drew on the hidden mirror site
+  try { drawn = JSON.parse(localStorage.getItem("angelexe.page12") || "null"); } catch (e) { drawn = null; }
   page.items.forEach(function (it) {
+    if (it.missing && it.drawnByPlayer && drawn && drawn.image) {
+      grid.appendChild(el("div", { class: "thumb drawn" }, [el("img", { src: drawn.image, alt: it.title }), el("b", { text: it.title }), el("span", { text: "drawn by " + drawn.by })]));
+      return;
+    }
     var pic = it.picture
       ? el("img", { src: "images/" + it.picture, alt: it.title })
       : el("div", { class: "nopic" + (it.missing ? " missing" : ""), text: it.missing ? "?" : "[ img ]" });
@@ -280,6 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.body.appendChild(el("div", { class: "host-page notfound" }, [
     el("h1", { text: "404 Not Found" }),
     el("p", { text: removed ? "The site " + HOST_DOMAIN + "/~" + removed.id + " was removed by its owner." : "There's no Starlit homepage at this address." }),
+    removed && removed.mirror ? el("p", { class: "small mirror-note" }, ["a cached copy may still exist on the ", el("a", { href: removed.mirror, text: "mirror service" }), "."]) : null,
     el("a", { href: "index.html", text: "Back to Starlit" })
   ]));
 });

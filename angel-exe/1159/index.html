@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!-- The hidden mystery site. Not linked from the hub on purpose. Built by js/mirror.js from data/mirror.js. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>~glasswings (mirror)</title>
+  <link rel="stylesheet" href="css/mirror.css">
+</head>
+<body>
+<div class="crt">
+  <div id="screen" aria-live="polite"></div>
+  <form id="prompt" autocomplete="off">
+    <label for="cmd">&gt;</label>
+    <input id="cmd" type="text" spellcheck="false" autocapitalize="off" aria-label="type a command">
+  </form>
+</div>
+
+<!-- page 12 of Glass Wings: the drawing window -->
+<div id="drawBox" class="drawbox" hidden>
+  <div class="drawbar">glass_wings/page12 <button id="closeBtn" type="button" title="close">×</button></div>
+  <canvas id="page12" width="360" height="480"></canvas>
+  <div class="tools">
+    <button id="penBtn" type="button">pen</button>
+    <button id="thickBtn" type="button">thick</button>
+    <button id="eraseBtn" type="button">eraser</button>
+    <button id="wipeBtn" type="button">start over</button>
+    <button id="saveBtn" type="button" class="save">save page 12</button>
+  </div>
+</div>
+
+<script src="data/mirror.js"></script>
+<script src="js/mirror.js"></script>
+</body>
+</html>

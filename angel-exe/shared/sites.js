@@ -63,8 +63,9 @@ window.SITES = {
     status: "open",
     blurb: "Anonymous boards for people who are awake when they shouldn't be."
   }
-  // The experimental mystery site (Milestone 5) is deliberately NOT listed
-  // here yet. Players should find it through clues, not the front page.
+  // The mystery site (angel-exe/1159/) is deliberately NOT listed here.
+  // Players find it through clues, not the front page. The way in is the
+  // removed Starlit site ~glasswings (homepages/site.html?u=glasswings).
 };
 
 /*

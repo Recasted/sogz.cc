@@ -1,0 +1,40 @@
+/*
+  mirror.css - the look of the hidden site: an old monitor left on.
+  Change --glow to change the text colour.
+*/
+:root {
+  --bg: #050806;
+  --glow: #b8f5c8;        /* normal text */
+  --dim: #4f7a5c;         /* ## lines */
+  --cmd: #ffffff;         /* what the player typed */
+  --font: "Lucida Console", "Courier New", monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); }
+body { color: var(--glow); font: 15px/1.55 var(--font); min-height: 100vh; }
+.crt { max-width: 760px; margin: 0 auto; padding: 28px 16px 60vh; text-shadow: 0 0 4px rgba(184,245,200,.45); }
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.25) 0 1px, transparent 1px 3px);
+}
+.line { white-space: pre-wrap; word-wrap: break-word; min-height: 1.55em; }
+.line.dim { color: var(--dim); text-shadow: none; }
+.line.cmd { color: var(--cmd); }
+#prompt { display: flex; gap: 8px; margin-top: 4px; }
+#prompt input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; color: var(--cmd); font: inherit; caret-color: var(--glow); }
+.drawbox {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 5;
+  background: #111; border: 1px solid var(--dim); padding: 6px; max-width: calc(100% - 24px);
+  box-shadow: 0 0 40px rgba(0,0,0,.8);
+}
+.drawbox[hidden] { display: none; }
+.drawbar { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 0 2px 6px; }
+.drawbar button { background: none; border: 1px solid var(--dim); color: var(--glow); font: inherit; cursor: pointer; }
+#page12 { display: block; width: 360px; max-width: 100%; height: auto; background: #fff; touch-action: none; cursor: crosshair; }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.tools button { background: #0b130d; border: 1px solid var(--dim); color: var(--glow); font: 12px var(--font); padding: 3px 8px; cursor: pointer; }
+.tools .save { margin-left: auto; border-color: var(--glow); }
+@media (prefers-reduced-motion: no-preference) {
+  .crt { animation: flicker 6s infinite; }
+  @keyframes flicker { 0%, 96%, 100% { opacity: 1; } 97% { opacity: .86; } 98% { opacity: 1; } 99% { opacity: .92; } }
+}

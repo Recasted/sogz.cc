@@ -14,7 +14,8 @@
   who     list of character ids from characters.js
   event   what happened, in one line
   seenOn  where players can find it: "orbitspace", "messenger", "hub",
-          "music", "blog" (Starlit homepages), "forum" (nightshift) (list as many as apply)
+          "music", "blog" (Starlit homepages), "forum" (nightshift),
+          "mystery" (the hidden site) (list as many as apply)
   type    "fact"   = plainly shown
           "hint"   = only hinted at, players have to notice it
           "clue"   = deliberately placed for the mystery
@@ -39,6 +40,7 @@ window.ANGEL_TIMELINE =
     { "date": "2007-12-31 23:59", "who": ["angel"], "event": "angel is last seen. The hub's 'most users ever online' record (5) is set at the same minute", "seenOn": ["orbitspace", "hub"], "type": "clue" },
     { "date": "2007-12-31 23:59", "who": ["angel"], "event": "a. leaves a password-protected post in the Glass Wings thread asking Theo to finish the last page", "seenOn": ["forum"], "type": "clue" },
     { "date": "2008-01-01", "who": ["angel", "theo"], "event": "a. never signs on for the last page. a.'s Starlit site, glasswings, is removed", "seenOn": ["blog"], "type": "clue" },
+    { "date": "2008-01-01", "who": ["angel"], "event": "A mirror service keeps a cached copy of a.'s deleted site ~glasswings (the hidden site at angel-exe/1159/). Its last login is a. at 23:59 on Dec 31", "seenOn": ["mystery"], "type": "clue" },
     { "date": "2008-01-15", "who": ["theo"], "event": "Theo notices angel's profile is gone", "seenOn": ["blog"], "type": "fact" },
     { "date": "2008-02-14", "who": ["mara"], "event": "Mara's profile thanks a secret valentine", "seenOn": ["orbitspace"], "type": "hint" },
     { "date": "2008-03-01", "who": ["mara", "june"], "event": "Paper Hearts Club gets a Starlit site; June made the layout", "seenOn": ["blog"], "type": "fact" },
