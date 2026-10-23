@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<!--
+  One page for every profile. The ?u= part of the address picks who:
+    profile.html?u=theo.static
+  Edit the profile itself in data/members.js.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/social.css">
+  <link rel="icon" href="images/avatars/orbit.svg" type="image/svg+xml">
+  <title>OrbitSpace | Profile</title>
+</head>
+<body data-page="profile">
+<div class="page">
+  <div class="content" id="profileRoot"></div>
+</div>
+  <!-- Load order matters: site list, then data, then the page builder. -->
+  <script>window.ROOT = "../";</script>
+  <script src="../shared/sites.js"></script>
+  <script src="data/members.js"></script>
+  <script src="data/activity.js"></script>
+  <script src="js/social.js"></script>
+</body>
+</html>

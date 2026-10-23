@@ -1,0 +1,298 @@
+/*
+  social.css — the look of OrbitSpace.
+
+  QUICK CHANGES
+  - Site colours are the variables in :root just below. Change a colour
+    there and it changes everywhere.
+  - Fonts: change --font. Late-2000s sites mostly used Verdana, Arial,
+    Tahoma or Trebuchet MS.
+  - Page width: change --page-width (sites back then were ~800px wide).
+  - Each PROFILE has its own colours in data/members.js ("theme").
+*/
+
+:root {
+  --page-width: 800px;
+  --font: Verdana, Tahoma, Arial, sans-serif;
+  --text-size: 11px;
+
+  --site-bg: #dde6f4;
+  --site-text: #333333;
+  --site-link: #003399;
+  --site-link-visited: #551a8b;
+
+  --bar-top: #3f74c0;      /* header gradient, top */
+  --bar-bottom: #1d4f99;   /* header gradient, bottom */
+  --nav-bg: #6698cb;       /* the thin link strip under the header */
+  --nav-text: #ffffff;
+
+  --box-head: #6698cb;     /* the blue title strip on boxes */
+  --box-head-text: #ffffff;
+  --box-border: #6698cb;
+  --box-bg: #ffffff;
+  --box-alt: #e5ecf9;      /* light blue table rows */
+  --orange: #ff6600;       /* "Online Now!", section labels */
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--site-bg) url("../images/bg-tile.svg");
+  color: var(--site-text);
+  font-family: var(--font);
+  font-size: var(--text-size);
+  line-height: 1.35;
+}
+
+a { color: var(--site-link); }
+a:visited { color: var(--site-link-visited); }
+a:hover { color: #cc0000; }
+img { border: 0; }
+
+.page {
+  width: var(--page-width);
+  margin: 0 auto;
+  background: #fff;
+  border-left: 1px solid #9fb6d9;
+  border-right: 1px solid #9fb6d9;
+  min-height: 100vh;
+}
+
+/* ---------- header ---------- */
+.site-header {
+  height: 70px;
+  background: linear-gradient(var(--bar-top), var(--bar-bottom));
+  border-bottom: 1px solid #0f2f63;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px 0 8px;
+}
+.site-header .logo img { display: block; }
+.header-search {
+  color: #fff;
+  font-size: 10px;
+  text-align: right;
+}
+.header-search form { margin: 0 0 4px; display: flex; gap: 3px; align-items: center; }
+.header-search input[type="text"] {
+  width: 150px;
+  font: 11px var(--font);
+  border: 1px solid #7f9db9;
+  padding: 2px 3px;
+}
+.header-search select { font: 10px var(--font); }
+.header-search a { color: #dce9ff; }
+
+/* the classic grey beveled button */
+.btn {
+  font: 10px var(--font);
+  padding: 1px 6px;
+  color: #000;
+  background: linear-gradient(#ffffff, #dcdcdc);
+  border: 1px solid #8a8a8a;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.btn:hover { background: linear-gradient(#fff7e0, #ffd98a); border-color: #c58a00; }
+.btn:active { background: linear-gradient(#d0d0d0, #f4f4f4); }
+.btn[disabled] { color: #999; cursor: default; background: #eee; border-color: #bbb; }
+
+.site-nav {
+  background: var(--nav-bg);
+  color: var(--nav-text);
+  font-size: 10px;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-bottom: 1px solid #3a6aa8;
+}
+.site-nav a, .site-nav a:visited { color: var(--nav-text); text-decoration: none; }
+.site-nav a:hover { text-decoration: underline; }
+.site-nav a.here { color: #ffcc33; }
+.site-nav .sep { color: #c3d6ef; padding: 0 4px; font-weight: normal; }
+
+/* ---------- layout ---------- */
+.content { padding: 10px; }
+.cols { display: flex; gap: 10px; align-items: flex-start; }
+.col-left { width: 300px; flex: none; }
+.col-right { flex: 1; min-width: 0; }
+
+.box {
+  border: 1px solid var(--box-border);
+  background: var(--box-bg);
+  margin-bottom: 10px;
+}
+.box-head {
+  background: var(--box-head);
+  color: var(--box-head-text);
+  font-weight: bold;
+  padding: 3px 6px;
+  font-size: 11px;
+}
+.box-head .more { float: right; font-weight: normal; font-size: 10px; }
+.box-head .more a { color: var(--box-head-text); }
+.box-body { padding: 6px; }
+.orange { color: var(--orange); font-weight: bold; }
+.small { font-size: 9px; color: #777; }
+.muted { color: #888; }
+
+table.rows { width: 100%; border-collapse: collapse; }
+table.rows td { padding: 4px; vertical-align: top; border-bottom: 1px solid #fff; }
+table.rows tr:nth-child(odd) td { background: var(--box-alt); }
+table.rows td.label { width: 90px; font-weight: bold; color: #4a6ea8; }
+
+/* ---------- home page ---------- */
+.welcome {
+  background: linear-gradient(#fffbe6, #fff2b3);
+  border: 1px solid #e0c35c;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+.welcome h2 { margin: 0 0 4px; font-size: 14px; color: #cc6600; }
+
+.login-box label { display: block; font-weight: bold; margin-top: 4px; }
+.login-box input { width: 100%; font: 11px var(--font); border: 1px solid #7f9db9; padding: 2px; }
+.login-box .row { margin-top: 6px; display: flex; justify-content: space-between; align-items: center; }
+.notice {
+  background: #ffffe1;
+  border: 1px solid #c9b440;
+  padding: 4px 6px;
+  margin-top: 6px;
+  display: none;
+}
+.notice.show { display: block; }
+
+.cool-new-people { display: flex; justify-content: space-around; text-align: center; }
+.person-card { width: 110px; text-align: center; font-size: 10px; }
+.person-card img { width: 90px; height: 90px; border: 1px solid #999; display: block; margin: 3px auto; }
+
+.counter {
+  display: inline-block;
+  background: #000;
+  color: #3f3;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  padding: 1px 4px;
+  border: 2px inset #666;
+}
+
+/* ---------- feed ---------- */
+.feed { list-style: none; margin: 0; padding: 0; }
+.feed li {
+  display: flex;
+  gap: 6px;
+  padding: 4px 2px;
+  border-bottom: 1px dotted #b8c8e3;
+}
+.feed li img.icon { width: 16px; height: 16px; flex: none; margin-top: 1px; }
+.feed .when { color: #888; font-size: 9px; white-space: nowrap; margin-left: auto; padding-left: 8px; }
+.feed .day {
+  background: var(--box-alt);
+  font-weight: bold;
+  color: #4a6ea8;
+  border-bottom: 1px solid #b8c8e3;
+}
+
+.bulletin { border-bottom: 1px dotted #b8c8e3; padding: 6px 2px; }
+.bulletin h4 { margin: 0 0 2px; font-size: 11px; }
+.bulletin p { margin: 3px 0 0; white-space: pre-line; }
+
+/* ---------- browse ---------- */
+.browse-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.browse-grid .person-card { border: 1px solid #c5d4ec; background: #f7faff; padding: 4px; }
+
+/* ---------- profile page (colours come from each member's theme) ---------- */
+body.profile-page {
+  background-color: var(--p-bg, #e5ecf9);
+  background-image: var(--p-pattern, none);
+}
+.profile-page .content { background: var(--p-bg, #e5ecf9); background-image: var(--p-pattern, none); }
+.profile-page .box { border-color: var(--p-header); background: var(--p-panel); color: var(--p-text); }
+.profile-page .box-head { background: var(--p-header); color: var(--p-head-text); }
+.profile-page .box a, .profile-page .box a:visited { color: var(--p-link); }
+.profile-page table.rows tr:nth-child(odd) td { background: transparent; }
+.profile-page table.rows td.label { color: var(--p-link); }
+
+.profile-top { display: flex; gap: 8px; padding: 6px; }
+.profile-top h1 { margin: 0 0 4px; font-size: 16px; }
+.profile-top img.avatar { width: 120px; height: 120px; border: 1px solid #000; flex: none; }
+.profile-top .facts { font-size: 11px; }
+.profile-top .facts div { margin-bottom: 2px; }
+.online-now { color: #2e9a2e; font-weight: bold; display: inline-flex; gap: 3px; align-items: center; }
+.offline-now { color: #999; }
+
+.mood-line { padding: 0 6px 6px; }
+.mood-line b { color: var(--p-link); }
+
+.contact-table { width: 100%; border-collapse: collapse; }
+.contact-table td { width: 50%; padding: 3px 4px; font-size: 10px; }
+.contact-table a { display: inline-flex; gap: 3px; align-items: center; text-decoration: none; }
+.contact-table a:hover { text-decoration: underline; }
+
+.url-box { font-size: 10px; padding: 4px 6px; word-break: break-all; }
+
+.blurb h3 { margin: 6px 0 2px; font-size: 12px; color: var(--orange); }
+.blurb p { margin: 0 0 6px; white-space: pre-line; }
+
+.music-list { margin: 0; padding-left: 16px; }
+.music-list li { margin-bottom: 3px; }
+
+.friend-space .count { margin-bottom: 6px; }
+.friend-grid { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-start; }
+.friend-grid .person-card { width: 23%; }
+.friend-grid .person-card img { width: 70px; height: 70px; }
+
+.comments table { width: 100%; border-collapse: collapse; }
+.comments td { border: 1px solid var(--p-header); padding: 6px; vertical-align: top; }
+.comments td.who { width: 100px; text-align: center; font-size: 10px; }
+.comments td.who img { width: 70px; height: 70px; display: block; margin: 3px auto; border: 1px solid #000; }
+.comments .date { font-weight: bold; font-size: 10px; margin-bottom: 4px; }
+.comment-form textarea { width: 100%; height: 50px; font: 11px var(--font); }
+
+/* ---------- archive ---------- */
+.archive-entry { border: 1px dashed #999; background: #fafafa; padding: 6px; margin-bottom: 8px; }
+.archive-entry .stamp {
+  display: inline-block;
+  background: #fff3c4;
+  border: 1px solid #c9a227;
+  font-size: 9px;
+  padding: 0 4px;
+  margin-bottom: 4px;
+}
+.archive-entry p { white-space: pre-line; margin: 3px 0; }
+.hidden-version { color: #777; font-style: italic; }
+
+/* ---------- "page not found" / deleted profile ---------- */
+.gone {
+  text-align: center;
+  padding: 40px 10px;
+  color: #555;
+}
+.gone img { width: 96px; height: 96px; opacity: .6; }
+
+/* ---------- footer ---------- */
+.site-footer {
+  border-top: 1px solid #9fb6d9;
+  text-align: center;
+  font-size: 9px;
+  color: #666;
+  padding: 8px;
+  background: #f2f6fc;
+}
+.site-footer a { color: #335; }
+.site-footer .elsewhere { margin-bottom: 4px; }
+
+/* ---------- phones (sites in 2008 didn't do this, but it keeps the
+   page usable if you open it on your phone while testing) ---------- */
+@media (max-width: 820px) {
+  .page { width: 100%; border: 0; }
+  .cols { flex-direction: column; }
+  .col-left { width: 100%; }
+  .header-search { display: none; }
+  .friend-grid .person-card { width: 30%; }
+}
+
+/* keep the little "Online Now!" figure small inside person cards */
+.person-card .online-now img { width: 14px; height: 14px; border: 0; display: inline; margin: 0; }
+.profile-page .box-head a, .profile-page .box-head a:visited { color: var(--p-head-text); }

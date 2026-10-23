@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!-- Browse / search members. Search uses names, usernames, location and interests. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/social.css">
+  <link rel="icon" href="images/avatars/orbit.svg" type="image/svg+xml">
+  <title>OrbitSpace | Browse</title>
+</head>
+<body data-page="browse">
+<div class="page">
+  <div class="content">
+    <div class="box">
+      <div class="box-head"><span id="browseTitle">Browse Users</span> <span class="more"><span id="browseCount">0</span> found</span></div>
+      <div class="box-body">
+        <div class="browse-grid" id="browseGrid"></div>
+        <p class="small" style="margin-top:8px">Page 1 of 1 · « Prev | <b>1</b> | Next »</p>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Load order matters: site list, then data, then the page builder. -->
+  <script>window.ROOT = "../";</script>
+  <script src="../shared/sites.js"></script>
+  <script src="data/members.js"></script>
+  <script src="data/activity.js"></script>
+  <script src="js/social.js"></script>
+</body>
+</html>
