@@ -83,7 +83,8 @@ Only use real songs, and if you only know some of an album, set
 `tracksNote` to `"selected tracks"`.
 
 **A song without an album:** add it to `singles`, for example
-`{ artist: "snow-strippers", title: "Song name" }`.
+`{ artist: "snow-strippers", title: "Song name" }`. Snow Strippers' songs
+are all singles like this.
 
 **Playlists:** add a block to `playlists`. Each song is
 `{ artist: "artist-id", title: "Song title" }`, and the song must also be
@@ -93,10 +94,30 @@ on one of that artist's albums or in `singles`. `by` can be a character
 **Reviews and blog posts:** add blocks to `reviews` and `posts`. They are
 dated in the story's world (before 2008-10-23).
 
-**Playing music:** the player only plays files you own or have
-permission to share. Put the file in `lowlight/audio/` and change the
-song from `"Song name"` to `{ title: "Song name", audio: "audio/file.mp3" }`.
-Every other song shows **Listen on Spotify** and **YouTube** buttons.
+**Playing music:** every song plays as its YouTube video, in a small
+video window in the bottom right corner. It uses YouTube's own player,
+so nothing is copied. Next, previous, pause and volume all work, and
+when a video ends the next song starts.
+
+The videos are listed in the `videos` section of `lowlight/data/music.js`,
+grouped by artist. **To add a video:** open the song on YouTube, copy
+the address (`https://www.youtube.com/watch?v=...`) and add a line under
+that artist, for example `"Chasing Cars": "https://www.youtube.com/watch?v=GemKqzILV4w",`.
+The song title must be spelled exactly like it is on the album or in
+the playlist. Use official uploads (the artist's channel, their label,
+or "Artist - Topic") when you can, because fan uploads get deleted.
+
+If a video gets removed or its owner blocks embedding, the window says
+so, shows a "watch it on YouTube" link and skips to the next song after
+5 seconds. Then swap its link for another upload.
+
+Videos sometimes refuse to play when you open the page straight from
+your computer (YouTube wants a real website address). On sogz.cc they
+play normally.
+
+You can still play an audio file you're allowed to share: put it in
+`lowlight/audio/` and change the song from `"Song name"` to
+`{ title: "Song name", audio: "audio/file.mp3" }`.
 
 **Album covers:** each album gets a made-up cover automatically. To use
 a real one, see `lowlight/covers/README.txt`.

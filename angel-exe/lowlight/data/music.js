@@ -7,11 +7,14 @@
   list, list only the songs you know and keep "tracksNote" as
   "selected tracks".
 
-  NO MUSIC FILES YOU DON'T OWN. A song can play on the site only if you
-  put an audio file you're allowed to share in lowlight/audio/ and add
-  "audio": "audio/your-file.mp3" to that song. Otherwise the player
-  shows "Listen on Spotify" and "YouTube" buttons, which open the
-  official services.
+  SONGS PLAY AS YOUTUBE VIDEOS. The player embeds the song's YouTube
+  video (YouTube's own player, so nothing is copied or downloaded).
+  The videos are listed in the YOUTUBE VIDEOS section further down.
+  Pick official uploads (the artist's channel, their label, or the
+  "Artist - Topic" channel) when you can.
+  You can also play an audio file you're allowed to share: put it in
+  lowlight/audio/ and write the song as
+  { title: "Song name", audio: "audio/your-file.mp3" }.
 
   ADDING AN ARTIST
   Copy the TEMPLATE block at the bottom of the artists list, paste it
@@ -391,11 +394,211 @@ window.MUSIC = {
   ],
 
   /* ================================================================ */
+  /*  YOUTUBE VIDEOS                                                  */
+  /*  Every song plays as a YouTube video in the LowLight player.     */
+  /*  Each line is  "Song title": "YouTube link or video id",         */
+  /*  grouped by artist id. The song title must match the title used  */
+  /*  in the album, single or playlist exactly.                       */
+  /*  To add one: open the song on YouTube, copy the address from the */
+  /*  address bar (https://www.youtube.com/watch?v=...) and paste it. */
+  /*  A song with no line here shows a "YouTube" search link instead. */
+  /* ================================================================ */
+  videos: {
+    "linkin-park": {
+      "Papercut": "vjVkXlxsO8Q",
+      "One Step Closer": "4qlCC1GOwFw",
+      "With You": "M8UTS2iFXOo",
+      "Points of Authority": "TV5vfYOiwYU",
+      "Crawling": "Gd9OhYroLN0",
+      "Runaway": "ig-fyQqf510",
+      "By Myself": "wWBp-nlGX1o",
+      "In the End": "eVTXPUF4Oz4",
+      "A Place for My Head": "3t2WkCudwfY",
+      "Forgotten": "HNCgBuI2eJc",
+      "Cure for the Itch": "qqC5sdsHLq8",
+      "Pushing Me Away": "Ve1LNJEIKUE",
+      "Foreword": "U6R-twDkrcI",
+      "Don't Stay": "oWfGOVWrueo",
+      "Somewhere I Belong": "zsCD5XCu6CM",
+      "Lying from You": "NjdgcHdzvac",
+      "Hit the Floor": "oMals9XXQY8",
+      "Easier to Run": "M3nlvAb8Kc8",
+      "Faint": "LYU-8IFcDPw",
+      "Figure.09": "LpC0SKU6O00",
+      "Breaking the Habit": "v2H4l9RpkwM",
+      "From the Inside": "YLHpvjrFpe0",
+      "Nobody's Listening": "QJ87793QXes",
+      "Session": "lajZ56D6oIU",
+      "Numb": "kXYiU_JCYtU",
+      "What I've Done": "8sgycukafqQ",
+      "Shadow of the Day": "n1PCW0C1aiM",
+      "Bleed It Out": "OnuuYcqhzCE",
+      "Given Up": "0xyxtzD54rM",
+      "Leave Out All the Rest": "yZIummTz9mM"
+    },
+    "snow-strippers": {
+      "Under Your Spell": "fyIzF3zORRk",
+      "Just Your Doll": "qduZx7rhYlI",
+      "So What If I'm a Freak": "a4_vNINiFl8",
+      "Keep Holding On": "j3jNcAaiarQ",
+      "Tragic Surprise": "pYITPnmRXpY",
+      "Time Warp Angels": "SBGDA-v7qkc"
+    },
+    "paramore": {
+      "Pressure": "y-MaaxgdUT4",
+      "Emergency": "mgJ8BZi3vTA",
+      "All We Know": "4EHIpDcZvB0",
+      "Misery Business": "aCyGvGEtOwc",
+      "That's What You Get": "1kz6hNDlEEg",
+      "Hallelujah": "_TYlOXVdVcQ",
+      "crushcrushcrush": "ei8hPkyJ0bU"
+    },
+    "tegan-and-sara": {
+      "Walking with a Ghost": "jtCGODjuRq0",
+      "Speak Slow": "t7HjGx8nCVs",
+      "So Jealous": "GVmFjTmGXxk",
+      "The Con": "IK7THPiRw8Q",
+      "Back in Your Head": "Sc40JX3wTaI",
+      "Nineteen": "k2qeEu3fKOw"
+    },
+    "le-tigre": {
+      "Deceptacon": "Yz5bIGHycOc",
+      "Hot Topic": "Laa8xhgA_Oo"
+    },
+    "bright-eyes": {
+      "At the Bottom of Everything": "2GHyLhbdzN0",
+      "We Are Nowhere and It's Now": "MuS_v3HVB_8",
+      "Lua": "4QEy1efy1Yw",
+      "First Day of My Life": "xUBYzpCNQ1I",
+      "Road to Joy": "3TYVWtj4f48"
+    },
+    "the-postal-service": {
+      "The District Sleeps Alone Tonight": "xUIBnmdJJ50",
+      "Such Great Heights": "0wrsZog8qXg",
+      "Sleeping In": "doFdkLgoCy4",
+      "Nothing Better": "yiFLQklABUg",
+      "We Will Become Silhouettes": "0rKC7ElkTUQ",
+      "Brand New Colony": "-9GuBV9Mp7A"
+    },
+    "robyn": {
+      "Konichiwa Bitches": "G3Co9GxHJg0",
+      "Handle Me": "lY6XYkDqiNc",
+      "Be Mine!": "_PDNRTCuPyQ",
+      "With Every Heartbeat": "smKf_cQCdeo",
+      "Who's That Girl": "rdyxEps1uXY"
+    },
+    "antony-and-the-johnsons": {
+      "Hope There's Someone": "LyMGEq82uL4",
+      "You Are My Sister": "vskbBZ1h6ls",
+      "For Today I Am a Boy": "9a44B88zR2s",
+      "Fistful of Love": "mxon4OX8HSA"
+    },
+    "crystal-castles": {
+      "Untrust Us": "TQXHruZzLQM",
+      "Alice Practice": "u1W3kJ4Rza4",
+      "Crimewave": "sEKOczkt0tU",
+      "Courtship Dating": "DKOL1kYm_18",
+      "Air War": "QZUvP2AQsps",
+      "Vanished": "m_ZeOmmE_ec"
+    },
+    "lebanon-hanover": {
+      "Gallowdance": "iCGYM4sbPG4"
+    },
+    "system-of-a-down": {
+      "Toxicity": "iywaBOMvYLI",
+      "Chop Suey!": "CSvFpBOe8eY",
+      "Aerials": "L-iepu3EtyE",
+      "B.Y.O.B.": "zUzd9KyIDrM",
+      "Soldier Side": "KAEBfiaY6Rc"
+    },
+    "gary-jules": {
+      "Mad World": "etSbOs3aUqI"
+    },
+    "snow-patrol": {
+      "Spitting Games": "3MxcbB0SFao",
+      "Run": "jctgIaFOiag",
+      "You're All I Have": "C8AQPGKcZOk",
+      "Chasing Cars": "GemKqzILV4w",
+      "Open Your Eyes": "iQDEuHdemtQ",
+      "The Finish Line": "OC48cz4n5BY"
+    },
+    "green-day": {
+      "American Idiot": "Ee_uujKuJMI",
+      "Boulevard of Broken Dreams": "Soa3gO7tL-c",
+      "Wake Me Up When September Ends": "NU9JoFKlaZ0"
+    },
+    "death-cab-for-cutie": {
+      "Soul Meets Body": "uizQVriWp8M",
+      "I Will Follow You into the Dark": "3iV_1ESMHaI",
+      "Brothers on a Hotel Bed": "xvdwsGTk-18"
+    },
+    "red-hot-chili-peppers": {
+      "Dani California": "Sb5aq5HcS1A",
+      "Snow (Hey Oh)": "yuFI5KSPAt4",
+      "Stadium Arcadium": "j9qfClVvfIw"
+    },
+    "muse": {
+      "Time Is Running Out": "O2IuJPh6h_A",
+      "Hysteria": "3dm_5qWWDV8",
+      "Falling Away with You": "KyJxckIQ51U",
+      "Starlight": "Pgum6OT_VH8",
+      "Supermassive Black Hole": "Xsp3_a-PMTw",
+      "Knights of Cydonia": "G_sBOsh-vyI"
+    },
+    "taking-back-sunday": {
+      "MakeDamnSure": "4ldjbjwim4k"
+    },
+    "senses-fail": {
+      "Let It Enfold You": "tRL7Y1HRPb8",
+      "Rum Is for Drinking, Not for Burning": "nbYgSZzBpAw",
+      "Buried a Lie": "dUXZfybUbCM",
+      "Can't Be Saved": "yg4SuzZ6BWk"
+    },
+    "against-me": {
+      "New Wave": "JfF7fARLj9A",
+      "Thrash Unreal": "acN1d7cz06A",
+      "Don't Lose Touch": "1D2zZbpsYjg",
+      "Holy Shit!": "gvzZsKWbN4U"
+    },
+    "nickelback": {
+      "Photograph": "6R2X1tKWd5I",
+      "Far Away": "j4y-RzVGrHg",
+      "Rockstar": "DmeUuoxyt_E"
+    },
+    "radiohead": {
+      "2 + 2 = 5": "2w6kHS_IRrE",
+      "There There": "7AQSLozK7aA"
+    },
+    "she-wants-revenge": {
+      "Tear You Apart": "ixw_bLVUL34"
+    },
+    "fall-out-boy": {
+      "Sugar, We're Goin Down": "uhG-vLZrb-g",
+      "Dance, Dance": "C6MOKXm8x50"
+    },
+    "nine-inch-nails": {
+      "Survivalism": "qSsRt_1l740",
+      "Capital G": "ynvgArZWToE"
+    },
+    "arcade-fire": {
+      "Neighborhood #1 (Tunnels)": "TwisvB3PVpU",
+      "Wake Up": "sJRPPUr1yic",
+      "Rebellion (Lies)": "MQvZ4N1RfS8"
+    }
+  },
+
+  /* ================================================================ */
   /*  SINGLE SONGS that aren't on an album above                      */
   /*  (handy for newer artists or one-off songs from your playlist)   */
   /* ================================================================ */
   singles: [
-    // { artist: "snow-strippers", title: "Song name" },
+    // { artist: "artist-id", title: "Song name" },
+    { artist: "snow-strippers", title: "Under Your Spell" },
+    { artist: "snow-strippers", title: "Just Your Doll" },
+    { artist: "snow-strippers", title: "So What If I'm a Freak" },
+    { artist: "snow-strippers", title: "Keep Holding On" },
+    { artist: "snow-strippers", title: "Tragic Surprise" },
+    { artist: "snow-strippers", title: "Time Warp Angels" },
     { artist: "lebanon-hanover", title: "Gallowdance" },
     { artist: "gary-jules", title: "Mad World", note: "with Michael Andrews" }
   ],

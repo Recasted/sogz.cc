@@ -1,6 +1,7 @@
 /*
   lowlight.js - builds every LowLight page from data/music.js and runs
-  the music player at the top.
+  the music player at the top. Songs play as YouTube videos in a small
+  video window (bottom right), using YouTube's official embed player.
 
   You usually don't need to edit this file. Music, posts and playlists
   are in data/music.js. Colours and layout are in css/lowlight.css.
@@ -64,6 +65,22 @@ function artistLink(id) {
 function trackTitle(t) { return typeof t === "string" ? t : t.title; }
 function trackAudio(t) { return typeof t === "string" ? "" : (t.audio || ""); }
 
+// Turns a YouTube link (or a bare 11-character video id) into the video id.
+function ytId(v) {
+  v = String(v || "").trim();
+  if (/^[\w-]{11}$/.test(v)) return v;
+  var m = /(?:[?&]v=|youtu\.be\/|\/embed\/|\/shorts\/|\/live\/)([\w-]{11})/.exec(v);
+  return m ? m[1] : "";
+}
+// The YouTube video for a song: from the song itself, or from "videos" in data/music.js.
+function findVideo(artistId, title, t) {
+  if (t && typeof t === "object" && t.youtube) return ytId(t.youtube);
+  var list = (M.videos || {})[artistId] || {};
+  if (list[title]) return ytId(list[title]);
+  for (var k in list) if (k.toLowerCase() === String(title).toLowerCase()) return ytId(list[k]);
+  return "";
+}
+
 // Who wrote something: a character from shared/story/characters.js or a LowLight writer.
 function authorName(id) {
   var c = (window.ANGEL_CHARACTERS || {})[id];
@@ -113,9 +130,9 @@ function artistPic(ar) {
 /*  THE PLAYER                                                         */
 /* ================================================================== */
 var Player = {
-  queue: [], index: -1, audio: new Audio(),
+  queue: [], index: -1, audio: new Audio(), yt: null, ytReady: false, volume: 0.8, skipTimer: null,
 
-  // items: [{ artist: artistId, title: "...", audio: "" }]
+  // items: [{ artist: artistId, title: "...", youtube: "videoid", audio: "" }]
   load: function (items, start) {
     this.queue = items;
     this.play(start || 0);
@@ -123,39 +140,100 @@ var Player = {
   play: function (i) {
     if (i < 0 || i >= this.queue.length) return;
     this.index = i;
+    clearTimeout(this.skipTimer);
     var t = this.queue[i], ar = artist(t.artist);
     var who = ar ? ar.name : t.artist;
     $("#lcdNow").textContent = t.title;
+    $("#lcdBar").style.width = "0";
     var sub = $("#lcdSub");
-    sub.innerHTML = "";
+    sub.textContent = who;
     this.audio.pause();
     if (t.audio) {
+      VideoBox.hide();
+      this.pauseVideo();
       this.audio.src = t.audio;
       this.audio.play().catch(function () { sub.textContent = who + " · couldn't play the file"; });
-      sub.textContent = who;
+      $("#playBtn").textContent = "❚❚";
+    } else if (t.youtube) {
+      VideoBox.show(t.title + " · " + who, t.youtube);
+      this.playVideo(t.youtube);
       $("#playBtn").textContent = "❚❚";
     } else {
-      // No file on this site: offer the official services instead.
-      sub.appendChild(document.createTextNode(who + " · "));
-      var q = who + " " + t.title;
-      sub.appendChild(el("span", { class: "listen" }, [
-        el("a", { href: spotifySearch(q), target: "_blank", rel: "noopener", text: "Listen on Spotify" }),
-        el("a", { href: youtubeSearch(q), target: "_blank", rel: "noopener", text: "YouTube" })
-      ]));
+      // No video listed for this song: offer the official services instead.
+      VideoBox.hide();
+      this.pauseVideo();
+      this.offerLinks();
       $("#playBtn").textContent = "▶";
     }
     document.querySelectorAll("tr.playing").forEach(function (r) { r.classList.remove("playing"); });
     var row = document.querySelector('tr[data-key="' + (t.artist + "|" + t.title).replace(/"/g, "") + '"]');
     if (row) row.classList.add("playing");
   },
-  toggle: function () {
-    var t = this.queue[this.index];
-    if (!t) { if (this.queue.length) this.play(0); return; }
-    if (!t.audio) return;
-    if (this.audio.paused) { this.audio.play(); $("#playBtn").textContent = "❚❚"; }
-    else { this.audio.pause(); $("#playBtn").textContent = "▶"; }
+  // "Listen on Spotify" and "YouTube" links in the little screen.
+  offerLinks: function (note) {
+    var t = this.queue[this.index], ar = artist(t.artist), who = ar ? ar.name : t.artist;
+    var sub = $("#lcdSub"), q = who + " " + t.title;
+    sub.innerHTML = "";
+    sub.appendChild(document.createTextNode(who + " · " + (note ? note + " · " : "")));
+    sub.appendChild(el("span", { class: "listen" }, [
+      el("a", { href: t.youtube ? "https://www.youtube.com/watch?v=" + t.youtube : youtubeSearch(q), target: "_blank", rel: "noopener", text: "YouTube" }),
+      el("a", { href: spotifySearch(q), target: "_blank", rel: "noopener", text: "Spotify" })
+    ]));
   },
-  stop: function () { this.audio.pause(); this.audio.currentTime = 0; $("#playBtn").textContent = "▶"; },
+  playVideo: function (id) {
+    var self = this;
+    if (this.ytReady) { this.yt.loadVideoById(id); this.yt.setVolume(Math.round(this.volume * 100)); return; }
+    this.pendingVideo = id;
+    loadYouTube(function () {
+      if (self.yt) return;
+      var vars = { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1, iv_load_policy: 3 };
+      if (/^https?:$/.test(location.protocol)) vars.origin = location.origin;
+      self.yt = new YT.Player("ytFrame", {
+        width: "320", height: "180", host: "https://www.youtube-nocookie.com", videoId: self.pendingVideo, playerVars: vars,
+        events: {
+          onReady: function (e) { self.ytReady = true; e.target.setVolume(Math.round(self.volume * 100)); e.target.playVideo(); },
+          onStateChange: function (e) {
+            if (e.data === 0) self.next();                           // ended
+            else if (e.data === 1) $("#playBtn").textContent = "❚❚"; // playing
+            else if (e.data === 2) $("#playBtn").textContent = "▶";  // paused
+          },
+          onError: function (e) { self.videoError(e.data); }
+        }
+      });
+    }, function () { self.offerLinks("YouTube didn't load"); VideoBox.hide(); });
+  },
+  // The video can't play here (removed, or the owner turned off embedding).
+  videoError: function (code) {
+    var self = this;
+    $("#playBtn").textContent = "▶";
+    this.offerLinks("can't play here");
+    VideoBox.message("This video can't play on this site.", this.queue[this.index].youtube);
+    if ((code === 100 || code === 101 || code === 150) && this.index < this.queue.length - 1) {
+      this.skipTimer = setTimeout(function () { self.next(); }, 5000);
+    }
+  },
+  pauseVideo: function () { if (this.ytReady) this.yt.pauseVideo(); },
+  current: function () { return this.queue[this.index]; },
+  toggle: function () {
+    var t = this.current();
+    if (!t) { if (this.queue.length) this.play(0); return; }
+    if (t.audio) {
+      if (this.audio.paused) { this.audio.play(); $("#playBtn").textContent = "❚❚"; }
+      else { this.audio.pause(); $("#playBtn").textContent = "▶"; }
+    } else if (t.youtube && this.ytReady) {
+      if (this.yt.getPlayerState() === 1) this.yt.pauseVideo(); else this.yt.playVideo();
+    }
+  },
+  stop: function () {
+    this.audio.pause(); this.audio.currentTime = 0;
+    if (this.ytReady) this.yt.stopVideo();
+    clearTimeout(this.skipTimer);
+    $("#playBtn").textContent = "▶"; $("#lcdBar").style.width = "0";
+  },
+  setVolume: function (v) {
+    this.volume = v; this.audio.volume = v;
+    if (this.ytReady) this.yt.setVolume(Math.round(v * 100));
+  },
   next: function () { this.play(this.index + 1); },
   prev: function () { this.play(this.index - 1); }
 };
@@ -164,11 +242,61 @@ Player.audio.addEventListener("timeupdate", function () {
   if (bar && a.duration) bar.style.width = (100 * a.currentTime / a.duration) + "%";
 });
 Player.audio.addEventListener("ended", function () { Player.next(); });
+setInterval(function () {
+  var t = Player.current(), bar = $("#lcdBar");
+  if (!t || !t.youtube || !Player.ytReady || !bar || !Player.yt.getDuration) return;
+  var d = Player.yt.getDuration();
+  if (d) bar.style.width = (100 * Player.yt.getCurrentTime() / d) + "%";
+}, 500);
+
+// Loads YouTube's player script once. ok() runs when it's ready.
+var ytWaiting = [];
+function loadYouTube(ok, fail) {
+  if (window.YT && window.YT.Player) { ok(); return; }
+  ytWaiting.push(ok);
+  if (ytWaiting.length > 1) return;
+  window.onYouTubeIframeAPIReady = function () { ytWaiting.forEach(function (f) { f(); }); ytWaiting = []; };
+  var s = document.createElement("script");
+  s.src = "https://www.youtube.com/iframe_api";
+  s.onerror = function () { ytWaiting = []; if (fail) fail(); };
+  document.head.appendChild(s);
+}
+
+/* The little video window in the corner, styled like a 2008 media player. */
+var VideoBox = {
+  box: null,
+  build: function () {
+    var title = el("span", { class: "vtitle", id: "vTitle", text: "LowLight Video" });
+    var small = el("button", { class: "vbtn", type: "button", title: "make smaller / bigger", text: "_" });
+    var close = el("button", { class: "vbtn", type: "button", title: "stop and close", text: "×" });
+    small.addEventListener("click", function () { VideoBox.box.classList.toggle("mini"); });
+    close.addEventListener("click", function () { Player.stop(); VideoBox.hide(); });
+    this.box = el("div", { class: "videobox", id: "videoBox" }, [
+      el("div", { class: "vbar" }, [title, small, close]),
+      el("div", { class: "vscreen" }, [el("div", { id: "ytFrame" }), el("div", { class: "vmsg", id: "vMsg" })])
+    ]);
+    document.body.appendChild(this.box);
+  },
+  show: function (title, id) {
+    if (!this.box) this.build();
+    $("#vTitle").textContent = title;
+    $("#vMsg").style.display = "none";
+    this.box.style.display = "block";
+  },
+  message: function (text, id) {
+    var m = $("#vMsg");
+    m.innerHTML = "";
+    m.appendChild(el("div", { text: text }));
+    m.appendChild(el("a", { href: "https://www.youtube.com/watch?v=" + id, target: "_blank", rel: "noopener", text: "watch it on YouTube »" }));
+    m.style.display = "block";
+  },
+  hide: function () { if (this.box) this.box.style.display = "none"; }
+};
 
 function buildPlayer() {
   var vol = el("input", { type: "range", min: "0", max: "1", step: "0.05", value: "0.8", title: "volume" });
-  vol.addEventListener("input", function () { Player.audio.volume = +vol.value; });
-  Player.audio.volume = 0.8;
+  vol.addEventListener("input", function () { Player.setVolume(+vol.value); });
+  Player.setVolume(0.8);
   var btn = function (id, label, title, fn, big) {
     var b = el("button", { class: "pbtn" + (big ? " big" : ""), id: id, title: title, type: "button", text: label });
     b.addEventListener("click", fn);
@@ -183,7 +311,7 @@ function buildPlayer() {
     ]),
     el("div", { class: "lcd" }, [
       el("div", { class: "now", id: "lcdNow", text: "LowLight Player" }),
-      el("div", { class: "sub", id: "lcdSub", text: "press ▶ next to any song" }),
+      el("div", { class: "sub", id: "lcdSub", text: "press ▶ next to any song to play its video" }),
       el("div", { class: "bar" }, [el("span", { id: "lcdBar" })])
     ]),
     vol
@@ -223,7 +351,9 @@ function findAudio(artistId, title) {
   return found;
 }
 function items(list) {
-  return list.map(function (t) { return { artist: t.artist, title: t.title, audio: t.audio || findAudio(t.artist, t.title) }; });
+  return list.map(function (t) {
+    return { artist: t.artist, title: t.title, audio: t.audio || findAudio(t.artist, t.title), youtube: findVideo(t.artist, t.title, t) };
+  });
 }
 
 /* ---------- chrome ---------- */
@@ -339,7 +469,7 @@ PAGES.artists = function (main) {
     var match = !q || (a.name + " " + a.genres + " " + a.from).toLowerCase().indexOf(q) !== -1;
     (a.albums || []).forEach(function (al) {
       if (q && al.title.toLowerCase().indexOf(q) !== -1) match = true;
-      al.tracks.forEach(function (t) { if (q && trackTitle(t).toLowerCase().indexOf(q) !== -1) songHits.push({ artist: a.id, title: trackTitle(t), audio: trackAudio(t) }); });
+      al.tracks.forEach(function (t) { if (q && trackTitle(t).toLowerCase().indexOf(q) !== -1) songHits.push({ artist: a.id, title: trackTitle(t), audio: trackAudio(t), youtube: findVideo(a.id, trackTitle(t), t) }); });
     });
     if (!match) return;
     grid.appendChild(el("div", { class: "artist-card" }, [
@@ -389,7 +519,7 @@ PAGES.artist = function (main) {
 
   if ((a.albums || []).length) main.appendChild(el("h2", { class: "section", text: "Albums" }));
   (a.albums || []).slice().sort(function (x, y) { return x.year - y.year; }).forEach(function (al) {
-    var list = al.tracks.map(function (t) { return { artist: a.id, title: trackTitle(t), audio: trackAudio(t) }; });
+    var list = al.tracks.map(function (t) { return { artist: a.id, title: trackTitle(t), audio: trackAudio(t), youtube: findVideo(a.id, trackTitle(t), t) }; });
     var info = el("div", { class: "info" }, [
       el("h3", { text: al.title }),
       el("div", { class: "muted small", text: al.year + " · " + (al.tracksNote || "selected tracks") }),
