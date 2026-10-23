@@ -8,6 +8,8 @@
     sogz.cc/angel-exe/             the hub (the GAMES card links here)
     sogz.cc/angel-exe/orbitspace/  the social network
     sogz.cc/angel-exe/lowlight/    the music site
+    sogz.cc/angel-exe/homepages/   Starlit, the characters' personal homepages
+    sogz.cc/angel-exe/forum/       nightshift, the anonymous message board
   "url" is relative to the angel-exe folder, so the same links work
   on your computer and on sogz.cc.
 
@@ -48,18 +50,18 @@ window.SITES = {
     blurb: "music for the hours after midnight. Real artists, reviews and reader playlists."
   },
   blogs: {
-    name: "personal homepages",
-    storyDomain: "",
-    url: "",
-    status: "soon",
-    blurb: "Diaries, guestbooks, poetry and fanfic. (Milestone 4)"
+    name: "Starlit homepages",
+    storyDomain: "starlit.net",          // made-up, shown inside the story only
+    url: "homepages/index.html",
+    status: "open",
+    blurb: "Free personal homepages. Diaries, guestbooks, poetry, lyrics and fanfic."
   },
   forum: {
-    name: "anonymous boards",
-    storyDomain: "",
-    url: "",
-    status: "soon",
-    blurb: "Pseudonymous threads, archives and locked posts. (Milestone 4)"
+    name: "nightshift",
+    storyDomain: "nightshift.org",       // made-up, shown inside the story only
+    url: "forum/index.html",
+    status: "open",
+    blurb: "Anonymous boards for people who are awake when they shouldn't be."
   }
   // The experimental mystery site (Milestone 5) is deliberately NOT listed
   // here yet. Players should find it through clues, not the front page.

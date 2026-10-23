@@ -30,8 +30,8 @@
   accounts    their username on each site. "" = no account (yet)
               orbitspace = the social network
               messenger  = the instant messenger in the game
-              blog       = their personal homepage (Milestone 4)
-              forum      = their anonymous board name (Milestone 4)
+              blog       = their Starlit homepage (homepages/site.html?u=...)
+              forum      = the name they use on the nightshift board
   personality a few words to keep their voice consistent
   music       real artists they love (the music site links these later)
   publicNotes things players are allowed to know, for your reference
@@ -52,8 +52,8 @@ window.ANGEL_CHARACTERS =
     "accounts": {
       "orbitspace": "theo.static",
       "messenger": "theo_static",
-      "blog": "",
-      "forum": ""
+      "blog": "quiethours",
+      "forum": "inkhands"
     },
     "personality": "quiet, dry, lowercase, stays up too late, draws hands and hides the sketches",
     "music": ["Linkin Park", "Bright Eyes", "The Postal Service"],
@@ -74,8 +74,8 @@ window.ANGEL_CHARACTERS =
     "accounts": {
       "orbitspace": "marabelle",
       "messenger": "mara_hearts",
-      "blog": "",
-      "forum": ""
+      "blog": "paperheartsclub",
+      "forum": "riotgrrrl"
     },
     "personality": "loud, CAPS when excited, funny, protective of her friends, plays guitar in Paper Hearts Club",
     "music": ["Paramore", "Tegan and Sara", "Le Tigre"],
@@ -96,8 +96,8 @@ window.ANGEL_CHARACTERS =
     "accounts": {
       "orbitspace": "junebug",
       "messenger": "junebug.exe",
-      "blog": "",
-      "forum": ""
+      "blog": "junebug",
+      "forum": "moth"
     },
     "personality": "warm, sincere, lots of !! and stars, makes websites and pixel art, online friend from far away",
     "music": ["Robyn", "Antony and the Johnsons", "Crystal Castles"],
@@ -141,7 +141,7 @@ window.ANGEL_CHARACTERS =
       "orbitspace": "angel",
       "messenger": "",
       "blog": "",
-      "forum": ""
+      "forum": "a."
     },
     "personality": "unknown",
     "music": [],

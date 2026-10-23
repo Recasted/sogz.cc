@@ -8,9 +8,8 @@ sogz.cc inside the `angel-exe` folder, like your other tools:
 | sogz.cc/angel-exe/ | the **hub**, a 2008 forum front page that links every site. The GAMES card on sogz.cc opens it. | `index.html`, `hub/` |
 | sogz.cc/angel-exe/orbitspace/ | **OrbitSpace**, the social network (Milestone 1) | `orbitspace/` |
 | sogz.cc/angel-exe/lowlight/ | **LowLight**, the music site with real artists (Milestone 3) | `lowlight/` |
-
-The homepages and anonymous boards come in later milestones.
-They already appear on the hub as locked "coming soon" rows.
+| sogz.cc/angel-exe/homepages/ | **Starlit**, the free host with the characters' homepages (Milestone 4) | `homepages/` |
+| sogz.cc/angel-exe/forum/ | **nightshift**, the anonymous message board (Milestone 4) | `forum/` |
 
 Everything is plain HTML, CSS and JavaScript. There is nothing to install
 and no build step.
@@ -45,6 +44,19 @@ angel-exe/
     audio/              music files you own (see audio/README.txt)
     covers/             album cover pictures (see covers/README.txt)
     images/logo.svg     the LowLight wordmark
+  homepages/
+    index.html          the Starlit front page (list of homepages)
+    site.html           one page for every homepage (site.html?u=quiethours)
+    data/homepages.js   ALL the homepages: diaries, poems, lyrics, fanfic, guestbooks
+    css/starlit.css     Starlit's look, plus one look per homepage
+    js/starlit.js       builds the pages (you rarely need this)
+    images/             Starlit logo; put homepage pictures here too
+  forum/
+    index.html, board.html, thread.html
+    data/forum.js       ALL the boards, threads and posts
+    css/forum.css       nightshift's colours
+    js/nightshift.js    builds the pages (you rarely need this)
+    lock.html           YOUR tool for password-protected posts (not linked anywhere)
   shared/
     sites.js            THE list of every site: name, address, coming soon or open
     comments.js         the player comment box used on every site
@@ -125,6 +137,64 @@ a real one, see `lowlight/covers/README.txt`.
 OrbitSpace profiles link each favourite artist to their LowLight page.
 Artist pages show which characters are fans, using the `music` lists in
 `shared/story/characters.js`.
+
+## The homepages (Starlit)
+
+Everything is in `homepages/data/homepages.js`, and the top of that file
+explains every part. Each character's homepage is one block:
+
+- **Theo**: *the quiet hours* (`?u=quiethours`). Journal, the Glass Wings comic, links, guestbook.
+- **Mara**: *PAPER HEARTS CLUB* (`?u=paperheartsclub`). Band news, lyrics, photos, guestbook.
+- **June**: *junebug.exe* (`?u=junebug`). Diary, poems, fanfic, layouts, links, guestbook.
+
+**Adding a diary entry:** copy one `{ date: ..., text: ... }` line in that
+site's diary `entries`, paste it, and change it. Entries sort themselves
+by date. `"private": true` shows a locked entry instead.
+
+**Adding a page to someone's menu:** add a block to their `pages` list.
+The types are `intro`, `diary`, `writing` (poems, lyrics, stories),
+`gallery`, `links` and `guestbook`.
+
+**Pictures:** gallery items show a grey placeholder until you put a
+picture in `homepages/images/` and set `picture: "yourfile.png"`.
+
+**Looks:** each homepage has a `theme` (`night`, `punk` or `pastel`).
+The colours are in `homepages/css/starlit.css`, one section per theme.
+
+Players can sign every guestbook with their picked name and picture.
+Old guestbook entries written by the characters are in the `entries`
+of each guestbook page.
+
+`REMOVED_HOMEPAGES` at the bottom lists deleted sites. They show on the
+Starlit front page and their address says "removed". Never list June's
+old site: her old name is never shown.
+
+## The forum (nightshift)
+
+Everything is in `forum/data/forum.js`. There are 5 boards: general
+talk, art, web, paranormal, and a read-only archive.
+
+**Adding a thread:** copy a whole thread block (from `{` to `},`), paste
+it, and give it a new `id`. Each post has a `name` (leave it `""` for
+Anonymous), `by` (which character wrote it, or `""`), a `date` and the
+`text`. Start a line with `>` to make it green, and write `>>2` to point
+at post 2.
+
+The characters' board names are in `shared/story/characters.js` under
+`forum`: theo is **inkhands**, Mara is **riotgrrrl**, June is **moth**.
+
+Write `{player}` in a post and it shows the name the player picked for
+comments. angel's 11:59 post in the paranormal board uses it.
+
+`locked: "locked by mod: inactive"` stops replies. Players can reply to
+every other thread with their picked name, like comments elsewhere.
+
+**Password-protected posts:** double-click `forum/lock.html`, type the
+hint, the secret text and the password, click **make the code**, and
+copy the line it gives you into the post in place of `text`. The text
+is scrambled, so players can't read it with View Source. Dates work
+best as digits, and players can type them with slashes or dashes.
+Keep the password in your own notes, not in these files.
 
 ## The shared story files
 
@@ -282,6 +352,15 @@ No filter catches everything, which is why you approve every comment.
 - Theo's archived profile from Nov 2007 lists a friend called **angel**
   whose profile no longer exists. The hub's "most users ever online" date
   is Dec 31, 2007, the same day angel was last seen.
+- Theo and "a." were making a 12-page comic, *Glass Wings*. Theo drew 11
+  pages. The last page was meant to happen at midnight on New Year's Eve.
+  Every post by a. is stamped 11:59 pm, like angel's messages in the game.
+- The nightshift archive has a locked Glass Wings thread. a.'s last post
+  is password-protected and asks Theo to finish the last page.
+- On the paranormal board, someone gets IMs stamped 11:59 that use their
+  screen name, and a poster called "angel" replies to the player by name.
+- Mara's new song "february" is about her secret valentine. It never says who.
+- angel's identity is never named anywhere.
 - None of this is fixed plot. Delete or rewrite it whenever you like.
 
 The game uses the same characters. Their shared details are in

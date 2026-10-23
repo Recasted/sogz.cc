@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!-- Starlit: the free homepage host. This page is built by js/starlit.js from data/homepages.js. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Starlit | free homepages</title>
+  <link rel="icon" href="images/starlit.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../shared/comments.css">
+  <link rel="stylesheet" href="css/starlit.css">
+</head>
+<body data-page="directory">
+
+<!-- Load order matters: site list, story data, comments, homepage data, then the page builder. -->
+<script>window.ROOT = "../";</script>
+<script src="../shared/sites.js"></script>
+<script src="../shared/story/characters.js"></script>
+<script src="../shared/story/timeline.js"></script>
+<script src="../shared/comments-config.js"></script>
+<script src="../shared/approved-comments.js"></script>
+<script src="../shared/filter.js"></script>
+<script src="../shared/comments.js"></script>
+<script src="data/homepages.js"></script>
+<script src="js/starlit.js"></script>
+<script src="../shared/story/check.js"></script>
+</body>
+</html>

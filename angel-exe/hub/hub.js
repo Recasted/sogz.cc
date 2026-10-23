@@ -13,8 +13,8 @@ var HUB_STATS = {
   game:   { topics: 0,  posts: 0,   last: "No Posts" },
   social: { topics: 48, posts: 1203, last: "Thu Oct 23, 2008 1:14 am<br>theo.static" },
   music:  { topics: 27, posts: 214, last: "Tue Oct 21, 2008 9:12 pm<br>kestrel" },
-  blogs:  { topics: 0,  posts: 0,   last: "No Posts" },
-  forum:  { topics: 0,  posts: 0,   last: "No Posts" }
+  blogs:  { topics: 3,  posts: 31,  last: "Wed Oct 22, 2008 2:47 am<br>theo" },
+  forum:  { topics: 9,  posts: 53,  last: "Wed Oct 22, 2008 11:59 pm<br>angel" }
 };
 
 document.addEventListener("DOMContentLoaded", function () {

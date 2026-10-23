@@ -105,6 +105,40 @@
   });
   (window.BULLETINS || []).forEach(function (b) { future(b.date, "bulletin \"" + b.title + "\""); });
 
+  // Starlit homepages
+  (window.HOMEPAGES || []).forEach(function (hp) {
+    var c = chars[hp.owner];
+    if (!c) warn("homepage " + hp.id + " belongs to unknown character \"" + hp.owner + "\"");
+    else if (c.accounts && c.accounts.blog !== hp.id) warn("homepage " + hp.id + " belongs to " + hp.owner + ", whose blog in characters.js is \"" + c.accounts.blog + "\"");
+    future(hp.since, "homepage " + hp.id);
+    future(hp.updated, "homepage " + hp.id + " last update");
+    (hp.pages || []).forEach(function (pg) {
+      (pg.entries || []).concat(pg.pieces || []).forEach(function (e) {
+        future(e.date, hp.id + " / " + pg.label + " \"" + (e.title || e.text || "").slice(0, 30) + "\"");
+        if (day(e.date) < day(hp.since)) warn(hp.id + " / " + pg.label + " has something dated " + e.date + ", before the site existed (" + hp.since + ")");
+        if (pg.type !== "guestbook" && day(e.date) > day(hp.updated)) warn(hp.id + " / " + pg.label + " has something dated " + e.date + ", after the site's last update (" + hp.updated + ")");
+      });
+    });
+  });
+
+  // nightshift forum
+  if (window.FORUM) {
+    var boardIds = {};
+    window.FORUM.boards.forEach(function (b) { boardIds[b.id] = true; });
+    window.FORUM.threads.forEach(function (t) {
+      if (!boardIds[t.board]) warn("forum thread " + t.id + " is on unknown board \"" + t.board + "\"");
+      var prev = "";
+      t.posts.forEach(function (p, i) {
+        future(p.date, "forum post " + (i + 1) + " in " + t.id);
+        if (p.date < prev) warn("forum post " + (i + 1) + " in " + t.id + " is dated before the post above it");
+        prev = p.date;
+        if (p.by && !chars[p.by]) warn("forum post " + (i + 1) + " in " + t.id + " is by unknown character \"" + p.by + "\"");
+        var fname = p.by && chars[p.by] && chars[p.by].accounts && chars[p.by].accounts.forum;
+        if (fname && p.name && p.name !== fname) warn("forum post " + (i + 1) + " in " + t.id + " is by " + p.by + " but signed \"" + p.name + "\" (their forum name is \"" + fname + "\")");
+      });
+    });
+  }
+
   window.ANGEL_CONTINUITY_WARNINGS = warnings;
   if (!warnings.length) return;
   warnings.forEach(function (w) { console.warn("[angel.exe continuity] " + w); });
