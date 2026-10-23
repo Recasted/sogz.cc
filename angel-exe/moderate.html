@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!--
+  moderate.html — YOUR page for approving player comments.
+  It isn't linked from anywhere. Open it on your own computer
+  (double-click it in website\angel-exe). Nothing on this page is sent
+  anywhere: it only builds a new approved-comments.js file for you.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>angel.exe comment approval</title>
+  <style>
+    body { font: 13px/1.45 Verdana, Arial, sans-serif; background: #e5e5e5; margin: 0; padding: 12px; }
+    .frame { max-width: 1000px; margin: 0 auto; background: #fff; border: 1px solid #a9b8c2; padding: 12px; }
+    h1 { font-size: 18px; margin: 0 0 6px; }
+    h2 { font-size: 14px; margin: 16px 0 6px; background: #c7d0d7; padding: 4px 6px; }
+    textarea { width: 100%; height: 120px; font: 12px monospace; box-sizing: border-box; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; vertical-align: top; }
+    th { background: #dee3e7; }
+    tr.flagged td { background: #ffe3e3; }
+    .btn { font: inherit; padding: 3px 12px; cursor: pointer; background: linear-gradient(#fff, #dcdcdc); border: 1px solid #8a8a8a; border-radius: 2px; }
+    .note { color: #555; }
+    ol li { margin-bottom: 4px; }
+    .bad { color: #c00; font-weight: bold; }
+  </style>
+</head>
+<body>
+<div class="frame">
+  <h1>Approve player comments</h1>
+  <ol>
+    <li>Open your Google Form, click <b>Responses</b>, then the green <b>Sheets</b> icon.</li>
+    <li>Select the new rows (click the row numbers on the left, without the header row) and copy them (Ctrl+C).</li>
+    <li>Paste them in the box below (Ctrl+V) and click <b>Read rows</b>.</li>
+    <li>Tick the comments you want to keep. Comments the filter thinks are hateful are marked red and start unticked.</li>
+    <li>Click <b>Download new approved-comments.js</b>. On GitHub, open <code>angel-exe/shared/</code>, click <b>Add file &gt; Upload files</b>, drop the downloaded file in and click <b>Commit changes</b>.</li>
+  </ol>
+
+  <h2>1. Paste rows from the response sheet</h2>
+  <textarea id="paste" placeholder="Timestamp &#9; THREAD &#9; NAME &#9; AVATAR &#9; TEXT"></textarea>
+  <p><button class="btn" id="read">Read rows</button> <span class="note" id="readNote"></span></p>
+
+  <h2>2. Tick what goes on the site</h2>
+  <table id="table">
+    <tr><th>Keep</th><th>Where</th><th>Name</th><th>Date</th><th>Comment</th></tr>
+  </table>
+  <p class="note">Comments that are already approved are listed too. Untick one to remove it from the site.</p>
+
+  <h2>3. Save</h2>
+  <p><button class="btn" id="download">Download new approved-comments.js</button></p>
+</div>
+
+<script>window.ROOT = "";</script>
+<script src="shared/comments-config.js"></script>
+<script src="shared/approved-comments.js"></script>
+<script src="shared/filter.js"></script>
+<script>
+  var rows = (window.APPROVED_COMMENTS || []).map(function (c) { return { c: c, keep: true, old: true }; });
+
+  // Reads tab-separated text copied from Google Sheets (handles "quoted" cells with new lines).
+  function parseTSV(text) {
+    var out = [], row = [], cell = "", quoted = false;
+    for (var i = 0; i < text.length; i++) {
+      var ch = text[i];
+      if (quoted) {
+        if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+        else if (ch === '"') quoted = false;
+        else cell += ch;
+      } else if (ch === '"' && cell === "") quoted = true;
+      else if (ch === "\t") { row.push(cell); cell = ""; }
+      else if (ch === "\n" || ch === "\r") {
+        if (ch === "\r" && text[i + 1] === "\n") i++;
+        row.push(cell); cell = "";
+        if (row.join("").trim()) out.push(row);
+        row = [];
+      } else cell += ch;
+    }
+    row.push(cell);
+    if (row.join("").trim()) out.push(row);
+    return out;
+  }
+
+  function two(n) { return (n < 10 ? "0" : "") + n; }
+  function toDate(stamp) {
+    // Google uses your sheet's language for dates, e.g. 23/10/2026 19:55:00 or 10/23/2026 19:55:00
+    var m = /(\d{1,4})[\/.-](\d{1,2})[\/.-](\d{1,4})\D+(\d{1,2}):(\d{2})/.exec(stamp || "");
+    if (m) {
+      var a = +m[1], b = +m[2], c = +m[3], y, mo, d;
+      if (a > 999) { y = a; mo = b; d = c; } else { y = c; if (a > 12) { d = a; mo = b; } else { mo = a; d = b; } }
+      return y + "-" + two(mo) + "-" + two(d) + " " + two(+m[4]) + ":" + m[5];
+    }
+    var now = new Date();
+    return now.getFullYear() + "-" + two(now.getMonth() + 1) + "-" + two(now.getDate()) + " " + two(now.getHours()) + ":" + two(now.getMinutes());
+  }
+
+  function same(a, b) { return a.name === b.name && a.text === b.text && a.thread === b.thread; }
+
+  document.getElementById("read").addEventListener("click", function () {
+    var added = 0;
+    parseTSV(document.getElementById("paste").value).forEach(function (r) {
+      if (r.length < 5) return;
+      var c = { thread: r[1].trim(), name: r[2].trim(), avatar: r[3].trim(), date: toDate(r[0]), text: r[4].trim() };
+      if (!c.thread || !c.text || /^thread$/i.test(c.thread)) return;
+      if (rows.some(function (x) { return same(x.c, c); })) return;
+      var flagged = !AngelFilter.check(c.text).ok || !AngelFilter.check(c.name).ok;
+      rows.push({ c: c, keep: !flagged, flagged: flagged });
+      added++;
+    });
+    document.getElementById("readNote").textContent = added + " new comment(s) read.";
+    draw();
+  });
+
+  function draw() {
+    var t = document.getElementById("table");
+    while (t.rows.length > 1) t.deleteRow(1);
+    rows.forEach(function (r) {
+      var tr = t.insertRow();
+      if (r.flagged) tr.className = "flagged";
+      var box = document.createElement("input");
+      box.type = "checkbox"; box.checked = r.keep;
+      box.addEventListener("change", function () { r.keep = box.checked; });
+      tr.insertCell().appendChild(box);
+      [r.c.thread, r.c.name, r.c.date, r.c.text].forEach(function (v, i) {
+        var td = tr.insertCell();
+        td.textContent = v;
+        if (i === 3 && r.flagged) { var s = document.createElement("div"); s.className = "bad"; s.textContent = "filter flagged this"; td.appendChild(s); }
+        if (i === 3 && r.old) { var o = document.createElement("div"); o.className = "note"; o.textContent = "already on the site"; td.appendChild(o); }
+      });
+    });
+  }
+
+  document.getElementById("download").addEventListener("click", function () {
+    var keep = rows.filter(function (r) { return r.keep; }).map(function (r) { return r.c; });
+    var lines = keep.map(function (c) {
+      return "  " + JSON.stringify({ thread: c.thread, name: c.name, avatar: c.avatar, date: c.date, text: c.text });
+    });
+    var file = "/*\n  approved-comments.js: player comments YOU have approved.\n  Everyone who visits sees these, forever.\n  Made with moderate.html on " + new Date().toDateString() + ".\n*/\nwindow.APPROVED_COMMENTS = [\n" + lines.join(",\n") + "\n];\n";
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([file], { type: "text/javascript" }));
+    a.download = "approved-comments.js";
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  draw();
+</script>
+</body>
+</html>

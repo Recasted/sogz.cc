@@ -122,8 +122,7 @@ function buildChrome(currentPage) {
     el("div", { class: "header-search" }, [
       search,
       el("a", { href: "index.html#help", text: "Help" }), " | ",
-      el("a", { href: "index.html", text: "Sign Up" }), " | ",
-      el("a", { href: "index.html", text: "Log In" })
+      guestLink()
     ])
   ]);
 
@@ -170,8 +169,15 @@ function buildChrome(currentPage) {
   });
 }
 
-// Anything that would need a real account just shows a friendly notice.
-function needsLogin(target) {
+// Top-right link: "Pick a name" or "hi, <name>". Both open the home page box.
+function guestLink() {
+  var g = window.AngelComments && window.AngelComments.getGuest();
+  return el("a", { href: "index.html#guestBox", text: g ? "hi, " + g.name + "!" : "Pick a name" });
+}
+
+// Things a story website can't really do (add friends, send messages)
+// just show a friendly notice.
+function showNotice(target) {
   var n = $(target);
   if (n) { n.classList.add("show"); }
 }
@@ -193,10 +199,30 @@ PAGES.home = function () {
   var total = $("#memberCount");
   if (total) total.textContent = window.MEMBERS.length;
 
-  $("#loginForm").addEventListener("submit", function (e) {
+  drawGuestBox();
+  window.AngelComments.mount("#visitorComments", "orbitspace:home");
+};
+
+// "Who are you?" box on the home page.
+function drawGuestBox() {
+  var boxEl = $("#guestBox");
+  var g = window.AngelComments.getGuest();
+  boxEl.innerHTML = "";
+  if (!g) {
+    window.AngelComments.editIdentity(boxEl, function () { location.reload(); });
+    return;
+  }
+  var change = el("a", { href: "#", text: "change name or picture" });
+  change.addEventListener("click", function (e) {
     e.preventDefault();
-    needsLogin("#loginNotice");
+    window.AngelComments.editIdentity(boxEl, function () { location.reload(); });
   });
+  boxEl.appendChild(el("div", { class: "person-card", style: "width:auto" }, [
+    el("img", { src: window.AngelComments.avatarUrl(g.avatar), alt: "" }),
+    el("b", { text: g.name }), el("br"),
+    el("span", { class: "small", text: "You can comment on any profile. No account needed." }), el("br"),
+    change
+  ]));
 };
 
 /* ---------- feed.html ---------- */
@@ -293,13 +319,13 @@ PAGES.profile = function () {
     var tr = el("tr");
     [actions[i], actions[i + 1]].forEach(function (a) {
       var link = el("a", { href: "#" }, [el("img", { src: "images/icons/" + a[1] + ".svg", alt: "" }), a[0]]);
-      link.addEventListener("click", function (e) { e.preventDefault(); needsLogin("#profileNotice"); });
+      link.addEventListener("click", function (e) { e.preventDefault(); showNotice("#profileNotice"); });
       tr.appendChild(el("td", {}, [link]));
     });
     ct.appendChild(tr);
   }
   left.appendChild(box("Contacting " + m.displayName, null, [ct,
-    el("div", { class: "notice", id: "profileNotice", text: "You must be logged in to do that. (New sign-ups are closed right now. Sorry!)" })]));
+    el("div", { class: "notice", id: "profileNotice", text: "You can't add friends or send messages here, but you can leave " + m.displayName + " a comment below!" })]));
 
   left.appendChild(el("div", { class: "box" }, [
     el("div", { class: "url-box" }, [el("b", { text: "OrbitSpace URL: " }),
@@ -361,16 +387,14 @@ PAGES.profile = function () {
   });
   if (!m.comments.length) table.appendChild(el("tr", {}, [el("td", { text: "No comments yet." })]));
 
-  var form = el("form", { class: "comment-form" }, [
-    el("textarea", { placeholder: "Add a comment..." }),
-    el("button", { class: "btn", type: "submit", text: "Post Comment" }),
-    el("div", { class: "notice", id: "commentNotice", text: "You must be logged in to leave a comment." })
-  ]);
-  form.addEventListener("submit", function (e) { e.preventDefault(); needsLogin("#commentNotice"); });
-
   right.appendChild(box(m.displayName + "'s Friends Comments", el("span", { text: "Displaying " + m.comments.length + " of " + m.comments.length + " comments" }), [
-    el("div", { class: "comments" }, [table]), form
+    el("div", { class: "comments" }, [table])
   ]));
+
+  // Comments from real players (approved by you). See shared/comments.js.
+  var visitors = el("div", { id: "visitorComments" });
+  right.appendChild(box("Visitor Comments", null, [visitors]));
+  window.AngelComments.mount(visitors, "orbitspace:profile:" + m.username);
 
   root.appendChild(el("div", { class: "cols" }, [left, right]));
 };

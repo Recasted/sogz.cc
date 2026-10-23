@@ -35,8 +35,15 @@ angel-exe/
     hub.js              which sites go in which hub section, fake post counts
     logo.svg            the angel.exe wordmark
     folder*.svg         the little forum folder icons
+  moderate.html         YOUR page for approving player comments (not linked anywhere)
   shared/
     sites.js            THE list of every site: name, address, coming soon or open
+    comments.js         the player comment box used on every site
+    comments.css        how the comment box looks
+    comments-config.js  your Google Form link + the list of standard avatars
+    approved-comments.js  comments you approved (everyone sees these)
+    filter.js           the slur filter word lists
+    avatars/            the 5 standard player pictures
   orbitspace/
     index.html          home page
     profile.html        one page for every profile (profile.html?u=theo.static)
@@ -114,6 +121,55 @@ The `angel-exe` folder goes into the root of the sogz.cc repository, next to
 `sogsketch/` and `sog95/`. Once it is pushed, GitHub Pages serves it at
 sogz.cc/angel-exe/. The GAMES card in sogz.cc's `config.js` links to
 `angel-exe/`.
+
+## Player comments
+
+There are no accounts. A player picks a name and one of 5 standard
+pictures (in `shared/avatars/`), and every angel.exe site remembers it on
+their computer. They can comment in the hub guestbook, the OrbitSpace
+guestbook and the "Visitor Comments" box on every profile.
+
+How a comment travels:
+1. The filter (`shared/filter.js`) blocks racist and anti-LGBT slurs and
+   attacks, in names and in comments.
+2. The comment is sent to **your Google Form**. Only you can see it there.
+   The player sees their own comment right away, marked "waiting for
+   approval".
+3. You approve it with `moderate.html`. It goes into
+   `shared/approved-comments.js` and everyone sees it, forever.
+
+### One-time setup: the Google Form inbox
+
+1. Go to forms.google.com and make a new blank form called
+   "angel.exe comments".
+2. Add 4 **Short answer** questions, in this order: `thread`, `name`,
+   `avatar`, `text`. Make `text` a **Paragraph** question instead.
+3. Click the three dots (top right) > **Get pre-filled link**. Type
+   `THREAD`, `NAME`, `AVATAR` and `TEXT` (capital letters) in the four
+   boxes, click **Get link**, then **Copy link**.
+4. Open `shared/comments-config.js` and paste the link between the quotes
+   after `googleFormPrefilledLink:`. Save, and upload the file to GitHub.
+
+Until step 4 is done, comments only stay on the player's own computer.
+
+### Approving comments
+
+1. In the form, open **Responses** and click the green Sheets icon.
+2. Select the new rows and copy them.
+3. Double-click `moderate.html` (in `website\angel-exe`), paste, click
+   **Read rows**, tick the comments to keep (flagged ones are red) and
+   click **Download new approved-comments.js**.
+4. On GitHub, open `angel-exe/shared/`, click **Add file > Upload files**,
+   drop in the downloaded file and click **Commit changes**. The site
+   updates within a minute or two.
+
+To remove a comment later, open `moderate.html` again and untick it, or
+delete its line in `approved-comments.js`.
+
+### Editing the filter
+
+The word lists are at the top of `shared/filter.js`, with instructions.
+No filter catches everything, which is why you approve every comment.
 
 ## Story notes (placeholders, change freely)
 
