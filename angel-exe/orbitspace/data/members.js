@@ -4,13 +4,16 @@
   HOW TO EDIT
   - Each member is one block between { and }.
   - Text goes between "quotes". Keep the commas at the end of lines.
-  - "avatar" is a file in social/images/avatars/. Replace the .svg with
-    your own picture (a .png or .jpg is fine, just change the name here).
+  - "character" links the profile to a person in shared/story/characters.js.
+    Their age, location and picture come from there, so they match on
+    every site. You can still override them here (add "age": 17 etc.).
   - "friends" and "topFriends" use usernames from this file.
   - "theme" sets the colours of that person's profile page, the way people
     customised MySpace profiles. Any CSS colour works ("#ff66cc", "black").
   - "archive" holds OLD versions of the profile. The archive page shows
     them, so a profile can say one thing now and something else in 2007.
+
+  - The present day and the order of events are in shared/story/timeline.js.
 
   Dates use the format "2008-03-14 23:41" (year-month-day hour:minute).
   The story's "present day" on this site is 2008-10-23.
@@ -20,11 +23,9 @@ window.MEMBERS = [
   /* ------------------------------------------------------------------ */
   {
     username: "orbit",
+    character: "ori",
     displayName: "Ori from OrbitSpace",
-    avatar: "orbit.svg",
-    age: null,
     gender: "",
-    location: "the internet",
     joined: "2005-06-01",
     lastLogin: "2008-10-23",
     online: true,
@@ -53,11 +54,9 @@ window.MEMBERS = [
   /* ------------------------------------------------------------------ */
   {
     username: "theo.static",
+    character: "theo",
     displayName: "theo",
-    avatar: "theo.svg",
-    age: 16,
     gender: "Male",
-    location: "Larkfield",
     joined: "2006-09-02",
     lastLogin: "2008-10-23",
     online: true,
@@ -107,11 +106,9 @@ window.MEMBERS = [
   /* ------------------------------------------------------------------ */
   {
     username: "marabelle",
+    character: "mara",
     displayName: "~*MaRa*~",
-    avatar: "mara.svg",
-    age: 17,
     gender: "Female",
-    location: "Larkfield",
     joined: "2006-02-14",
     lastLogin: "2008-10-22",
     online: false,
@@ -150,7 +147,7 @@ window.MEMBERS = [
         status: "Mara is ♥ ♥ ♥",
         headline: "two years on orbitspace and i finally have a valentine",
         about: "hiiiii i'm mara!! guitar, bad singing.\n\nhappy valentine's day to the girl who knows who she is ;)",
-        topFriends: ["theo.static", "orbit"]
+        topFriends: ["orbit"]
       }
     ]
   },
@@ -158,11 +155,10 @@ window.MEMBERS = [
   /* ------------------------------------------------------------------ */
   {
     username: "junebug",
-    displayName: "june ☆",
-    avatar: "june.svg",
-    age: 16,
-    gender: "Female",
+    character: "june",
     location: "Fairhaven (far from you guys)",
+    displayName: "june ☆",
+    gender: "Female",
     joined: "2008-04-09",
     lastLogin: "2008-10-23",
     online: true,

@@ -54,8 +54,22 @@ function member(username) {
   return null;
 }
 
+// Character pictures live in shared/avatars/characters/ so every site uses the same ones.
 function avatarSrc(m) {
-  return "images/avatars/" + ((m && m.avatar) || "default.svg");
+  return "../shared/avatars/characters/" + ((m && m.avatar) || "default.svg");
+}
+
+// Fill in age, location and picture from shared/story/characters.js,
+// unless the profile in members.js sets its own.
+function applyCharacters() {
+  var people = window.ANGEL_CHARACTERS || {};
+  window.MEMBERS.forEach(function (m) {
+    var c = people[m.character];
+    if (!c) return;
+    if (m.age === undefined) m.age = c.age;
+    if (m.location === undefined) m.location = c.location;
+    if (m.avatar === undefined) m.avatar = c.avatar;
+  });
 }
 
 function profileHref(username) {
@@ -418,7 +432,7 @@ function applyTheme(t) {
 function renderGone(root, username) {
   var deleted = window.DELETED_MEMBERS && window.DELETED_MEMBERS[username];
   root.appendChild(el("div", { class: "gone" }, [
-    el("img", { src: "images/avatars/default.svg", alt: "" }),
+    el("img", { src: "../shared/avatars/characters/default.svg", alt: "" }),
     el("h2", { text: deleted ? "This profile is no longer available." : "Invalid Friend ID." }),
     el("p", { text: deleted
       ? "The user may have deleted their account."
@@ -472,6 +486,7 @@ PAGES.archive = function () {
 /* ---------- start ---------- */
 document.addEventListener("DOMContentLoaded", function () {
   var page = document.body.getAttribute("data-page");
+  applyCharacters();
   buildChrome(page);
   if (PAGES[page]) PAGES[page]();
 });
