@@ -12,7 +12,7 @@ var HUB_SECTIONS = [
 var HUB_STATS = {
   game:   { topics: 0,  posts: 0,   last: "No Posts" },
   social: { topics: 48, posts: 1203, last: "Thu Oct 23, 2008 1:14 am<br>theo.static" },
-  music:  { topics: 0,  posts: 0,   last: "No Posts" },
+  music:  { topics: 27, posts: 214, last: "Tue Oct 21, 2008 9:12 pm<br>kestrel" },
   blogs:  { topics: 0,  posts: 0,   last: "No Posts" },
   forum:  { topics: 0,  posts: 0,   last: "No Posts" }
 };
