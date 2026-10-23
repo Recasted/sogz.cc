@@ -43,7 +43,12 @@ angel-exe/
     comments-config.js  your Google Form link + the list of standard avatars
     approved-comments.js  comments you approved (everyone sees these)
     filter.js           the slur filter word lists
+    story/
+      characters.js     who everyone is, and their usernames on every site
+      timeline.js       every date the story mentions
+      check.js          the continuity check (yellow bar when testing locally)
     avatars/            the 5 standard player pictures
+      characters/       the character pictures, used on every site
   orbitspace/
     index.html          home page
     profile.html        one page for every profile (profile.html?u=theo.static)
@@ -54,18 +59,53 @@ angel-exe/
     js/social.js        builds the pages from the data (you rarely need this)
     data/members.js     profiles, friends, comments, music, archives
     data/activity.js    the activity feed and bulletins
-    images/             logo, avatars, icons, background patterns
+    images/             logo, icons, background patterns
 ```
+
+## The shared story files
+
+Two files describe the whole angel.exe world. Every site reads them, and
+the Godot game can read them too:
+
+- `shared/story/characters.js`: who everyone is. Name, pronouns, age,
+  birthday, town, school, picture, and their username on every site
+  (OrbitSpace, the messenger, their homepage and the forum).
+- `shared/story/timeline.js`: the story calendar. Every date the sites
+  mention, who was involved, where players can find it, and whether it's
+  a plain fact, a hint or a mystery clue. The present day is 2008-10-23.
+
+These two files use strict JSON (so Godot can read them). Keep every
+text in "double quotes" and put commas between items but not after the
+last one. The top of each file explains every field.
+
+**Everything in these files is public.** Anyone can read them with View
+Source. Keep secrets and twists in your own notes, not here.
+
+### The continuity check
+
+When you open a page from your own computer, `shared/story/check.js`
+looks for things that don't add up: a friend who doesn't exist, a date
+after the present day, an age that doesn't match a birthday, someone in
+Top Friends before they were friends, and more. If it finds anything, a
+yellow bar appears at the bottom of the page. Press F12 and open
+**Console** to read the list. Players on sogz.cc never see the bar.
+
+If a contradiction is deliberate (a clue), add a bit of its text to
+`IGNORE` at the top of `check.js` and the bar stops mentioning it.
 
 ## Changing content
 
 **Profiles** are in `orbitspace/data/members.js`. Each person is one block.
+Each profile has a `character` that links it to `shared/story/characters.js`,
+which is where their age, town and picture come from.
 You can change their name, mood, status, "About me", music, friends and
 comments. Keep the quotes and commas the way they are. To start a new line
 inside text, type `\n`.
 
-**Adding a character**: copy a whole block from `{` to `},`, paste it
-below, and change the `username` to something new. Then add that username
+**Adding a character**: first add them to `shared/story/characters.js`.
+Then, if they have an OrbitSpace profile, copy a whole block in
+`members.js` from `{` to `},`, paste it below, and change `username` and
+`character` to match. Then add that username
 to other people's `friends` or `topFriends` if they should know each other.
 
 **Activity feed and bulletins** are in `orbitspace/data/activity.js`. The
@@ -96,9 +136,11 @@ Every picture is an SVG file you can swap. Easiest way: make your picture,
 save it with the **same file name** in the same folder, and it appears
 everywhere.
 
-- Avatars: `orbitspace/images/avatars/` (theo.svg, mara.svg, june.svg,
-  orbit.svg, default.svg). To use a .png instead, put `theo.png` there and
-  change `avatar: "theo.svg"` to `avatar: "theo.png"` in `members.js`.
+- Character pictures: `shared/avatars/characters/` (theo.svg, mara.svg,
+  june.svg, orbit.svg, default.svg). Every site uses these. To use a .png
+  instead, put `theo.png` there and change `"avatar": "theo.svg"` to
+  `"avatar": "theo.png"` in `shared/story/characters.js`.
+- Player pictures: `shared/avatars/` (guest-cat.svg and the others).
 - Logos: `orbitspace/images/logo.svg` and `hub/logo.svg`.
 - Icons: `orbitspace/images/icons/`.
 
@@ -178,6 +220,5 @@ No filter catches everything, which is why you approve every comment.
   is Dec 31, 2007, the same day angel was last seen.
 - None of this is fixed plot. Delete or rewrite it whenever you like.
 
-The characters here (theo, Mara, June) are first drafts for the websites.
-In Milestone 2 they'll be matched up with the characters in the Godot game
-so both use the same names and history.
+The game uses the same characters. Their shared details are in
+`shared/story/characters.js` and `shared/story/timeline.js`.
