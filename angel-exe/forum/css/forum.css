@@ -1,0 +1,71 @@
+/*
+  forum.css - the look of nightshift, a 2008-style anonymous board.
+  Change colours here. The classic cream-and-maroon look is on purpose.
+*/
+:root {
+  --bg: #ffffee;          /* page */
+  --text: #800000;        /* most text */
+  --post: #f0e0d6;        /* reply boxes */
+  --post-edge: #d9bfb7;
+  --subject: #cc1105;     /* thread titles */
+  --name: #117743;        /* poster names */
+  --green: #789922;       /* > quote lines */
+  --link: #0000ee;
+  --font: Tahoma, Verdana, Arial, sans-serif;
+  --text-size: 13px;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 6px 12px; background: var(--bg); color: var(--text); font: var(--text-size)/1.4 var(--font); }
+a { color: var(--link); }
+a:hover { color: #dd0000; }
+.small { font-size: 11px; }
+.boardlist { font-size: 11px; padding: 2px 0; }
+.boardlist a { text-decoration: none; }
+.page { max-width: 1000px; margin: 0 auto; }
+.logo { text-align: center; margin: 12px 0 6px; }
+.logo img { max-width: 100%; height: auto; }
+.logo-sub { font: bold 22px Tahoma, sans-serif; color: #af0a0f; letter-spacing: -1px; }
+.board-desc { text-align: center; font-size: 12px; margin-bottom: 10px; }
+hr { border: 0; border-top: 1px solid var(--post-edge); clear: both; }
+.box { background: #fff; border: 1px solid var(--post-edge); padding: 6px 14px 10px; margin: 10px auto; max-width: 760px; }
+.box h2 { font-size: 14px; background: #fca; margin: 4px -14px 8px; padding: 3px 14px; color: var(--text); }
+.box h3 { font-size: 13px; margin: 8px 0 2px; }
+.boards { width: 100%; border-collapse: collapse; }
+.boards th { text-align: left; background: #ead6ca; font-size: 12px; padding: 3px 6px; }
+.boards td { border-top: 1px solid #ead6ca; padding: 4px 6px; vertical-align: top; }
+.boards .num { text-align: center; }
+.latest li { margin-bottom: 3px; }
+
+.post { margin: 4px 0; }
+.post.op { padding: 2px 0 6px; }
+.post.reply { display: table; background: var(--post); border: 1px solid var(--post-edge); border-left: 0; border-top: 0; padding: 3px 10px 4px; margin-left: 22px; max-width: calc(100% - 22px); }
+.post.reply::before { content: ">>"; position: absolute; margin-left: -32px; color: var(--post-edge); }
+.post-head { font-size: 12px; }
+.post-n { display: none; }
+.subject { color: var(--subject); font-weight: bold; }
+.name { color: var(--name); font-weight: bold; }
+.no { color: inherit; text-decoration: none; }
+.post-text { margin: 6px 16px 6px 22px; word-wrap: break-word; }
+.greentext { color: var(--green); }
+.quotelink { color: #000080; }
+:target.post.reply { background: #f0c0b0; }
+.omitted { color: #707070; font-size: 12px; margin: 2px 0 4px 22px; }
+.threadnav { margin: 4px 0 10px; font-size: 12px; }
+.closed { text-align: center; color: #707070; font-weight: bold; margin: 8px 0; }
+.replybox { max-width: 640px; margin: 10px auto; background: #ead6ca; border: 1px solid var(--post-edge); padding: 6px 10px; }
+.replytitle { font-weight: bold; margin-bottom: 4px; }
+
+.sealed { margin: 6px 16px 6px 22px; padding: 8px 10px; border: 1px dashed var(--text); background: #fff7f0; }
+.sealed-note { font-weight: bold; }
+.sealed-hint { font-style: italic; margin: 4px 0 6px; }
+.sealed-form input { font: 12px var(--font); width: 160px; }
+.sealed-msg { color: var(--subject); font-size: 12px; }
+.sealed.open { border-style: solid; background: transparent; padding: 0; border: 0; }
+.sealed.open .post-text { margin: 0; }
+
+.foot { text-align: center; font-size: 11px; margin: 14px 0 6px; color: #a06060; }
+@media (max-width: 600px) {
+  .post.reply { margin-left: 0; max-width: 100%; }
+  .post.reply::before { display: none; }
+  .post-text { margin-left: 6px; margin-right: 6px; }
+}

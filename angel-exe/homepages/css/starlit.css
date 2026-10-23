@@ -1,0 +1,152 @@
+/*
+  starlit.css - the look of Starlit (the free host) and of each homepage.
+
+  The top part is Starlit itself: its front page and the little ad bar
+  on top of every homepage. Below that, each homepage theme has its own
+  section: .theme-night (theo), .theme-punk (mara), .theme-pastel (june).
+  To make a new theme, copy one section, rename it, and set "theme" in
+  data/homepages.js to the new name.
+*/
+
+/* ================= Starlit, the host ================= */
+* { box-sizing: border-box; }
+body { margin: 0; font: 13px/1.5 Verdana, Tahoma, sans-serif; }
+body.host { background: #dfe8f7; color: #1b2440; }
+.host a { color: #1c3d8f; }
+.host-page { width: 900px; max-width: 100%; margin: 14px auto; background: #fff; border: 1px solid #8aa2d6; }
+.host-head { padding: 14px 18px 8px; background: linear-gradient(#ffffff, #e8efff); border-bottom: 1px solid #bccbeb; }
+.host-head img { display: block; max-width: 100%; height: auto; }
+.host-tag { color: #4a5a85; font-size: 12px; }
+.host-nav { background: linear-gradient(#3a64c4, #1c3d8f); padding: 4px 12px; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.host-nav a { color: #fff; font-weight: bold; font-size: 12px; text-decoration: none; }
+.host-nav a:hover { text-decoration: underline; }
+.host-main { padding: 6px 18px 18px; }
+.host-main h2 { font: bold 15px Trebuchet MS, Verdana, sans-serif; color: #1c3d8f; border-bottom: 2px solid #f0a800; padding-bottom: 2px; margin: 18px 0 8px; }
+.directory { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.site-card { border: 1px solid #bccbeb; padding: 10px; background: #f7f9ff; }
+.site-card .site-name { font: bold 15px Trebuchet MS, Verdana, sans-serif; }
+.site-card .site-tag { font-style: italic; color: #4a5a85; }
+.site-card .site-url { font-family: "Courier New", monospace; font-size: 12px; color: #2a7a2a; }
+.site-card.theme-night { border-left: 5px solid #26305a; }
+.site-card.theme-punk { border-left: 5px solid #ff2a8a; }
+.site-card.theme-pastel { border-left: 5px solid #c3a6ff; }
+.removed { font-family: "Courier New", monospace; font-size: 12px; color: #777; }
+.host-foot { text-align: center; font-size: 11px; color: #6b7aa3; padding: 8px; border-top: 1px solid #bccbeb; }
+.notfound { padding: 30px; text-align: center; }
+.small { font-size: 11px; }
+
+/* the ad bar at the top of every homepage */
+.hostbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+  background: linear-gradient(#ffffff, #dfe8f7); border-bottom: 1px solid #8aa2d6;
+  padding: 3px 10px; font: 11px Verdana, sans-serif; color: #1b2440;
+}
+.hostbar a { color: #1c3d8f; }
+.hostbar .hostlogo img { display: block; }
+.hostbar .hostad { flex: 1; min-width: 160px; color: #4a5a85; }
+.hostbar .hostme { color: #2a7a2a; }
+
+/* ================= parts every homepage shares ================= */
+.hp { width: 860px; max-width: 100%; margin: 16px auto; padding: 0 0 10px; }
+.hp-head { text-align: center; padding: 16px 10px 10px; }
+.hp-head h1 { margin: 0; }
+.hp-body { display: flex; gap: 14px; align-items: flex-start; padding: 0 10px; }
+.hp-menu { width: 160px; flex: none; display: flex; flex-direction: column; gap: 4px; }
+.hp-menu a { display: block; padding: 4px 8px; text-decoration: none; }
+.hp-content { flex: 1; min-width: 0; padding: 12px 16px; }
+.hp-content p { margin: 0 0 10px; }
+.page-title { margin-top: 0; }
+.owner-pic { float: right; width: 96px; height: 96px; margin: 0 0 8px 12px; }
+.entry { margin-bottom: 20px; padding-bottom: 12px; }
+.entry-date { font-size: 11px; font-weight: bold; }
+.entry-title { margin: 4px 0; }
+.entry-meta { font-size: 11px; display: flex; flex-wrap: wrap; gap: 4px 14px; opacity: .85; }
+.entry.private .entry-text { font-style: italic; opacity: .7; }
+.piece { margin-bottom: 22px; }
+.piece h3 { margin-bottom: 0; }
+.piece-date { font-size: 11px; opacity: .75; margin-bottom: 6px; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.thumb { text-align: center; font-size: 11px; }
+.thumb img, .thumb .nopic { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; margin-bottom: 4px; }
+.thumb .nopic { display: flex; align-items: center; justify-content: center; font-size: 11px; }
+.thumb b, .thumb span { display: block; }
+.linklist li { margin-bottom: 6px; }
+.linklist .dead span:first-child { text-decoration: line-through; }
+.webring { margin-top: 16px; text-align: center; font-size: 11px; }
+.gb-entry { margin: 10px 0; padding: 8px 10px; }
+.gb-date { font-size: 11px; opacity: .75; }
+.gb-text p { margin: 4px 0 0; }
+.gb-old { margin-top: 14px; }
+.hp-foot { text-align: center; margin-top: 18px; font-size: 12px; }
+.counter { font-family: "Courier New", monospace; background: #000; color: #3f3; padding: 1px 4px; letter-spacing: 2px; }
+.marquee { overflow: hidden; white-space: nowrap; padding: 3px 0; font-weight: bold; }
+.marquee span { display: inline-block; padding-left: 100%; animation: marquee 22s linear infinite; }
+@keyframes marquee { to { transform: translateX(-100%); } }
+@media (prefers-reduced-motion: reduce) { .marquee span { animation: none; padding-left: 10px; } }
+.pager { margin-top: 10px; }
+.toc { font-size: 12px; }
+
+@media (max-width: 640px) {
+  .hp-body { flex-direction: column; }
+  .hp-menu { width: auto; flex-direction: row; flex-wrap: wrap; }
+}
+
+/* ================= theme: night (theo) ================= */
+.theme-night {
+  background: #0b0f1f radial-gradient(circle at 20% 10%, #1b2448 0, transparent 50%) fixed;
+  color: #c9d1e3;
+  font-family: Georgia, "Times New Roman", serif;
+}
+.theme-night .hp-head h1 { font-weight: normal; font-size: 30px; letter-spacing: 2px; color: #e7ecf7; }
+.theme-night .tagline { font-style: italic; color: #7d88a8; }
+.theme-night a { color: #9fb4d6; }
+.theme-night .hp-menu a { border-left: 2px solid #2a3560; color: #9fb4d6; font-size: 13px; }
+.theme-night .hp-menu a.here, .theme-night .hp-menu a:hover { border-left-color: #c9d1e3; color: #fff; background: rgba(255,255,255,.04); }
+.theme-night .hp-content { background: rgba(9,12,26,.75); border: 1px solid #222b4d; }
+.theme-night .entry { border-bottom: 1px dotted #2a3560; }
+.theme-night .entry-date { color: #7d88a8; font-family: Verdana, sans-serif; }
+.theme-night .thumb .nopic { background: #141a33; border: 1px solid #2a3560; color: #4c5882; }
+.theme-night .thumb.missing .nopic { border-style: dashed; color: #c9d1e3; font-size: 28px; }
+.theme-night .gb-entry { border: 1px solid #222b4d; }
+.theme-night .counter { background: #000; color: #9fb4d6; }
+
+/* ================= theme: punk (mara) ================= */
+.theme-punk {
+  background: #111 repeating-linear-gradient(45deg, #161616 0 12px, #0d0d0d 12px 24px);
+  color: #f6f6f6;
+  font-family: "Arial Black", Impact, Arial, sans-serif;
+}
+.theme-punk .marquee { background: #ff2a8a; color: #000; }
+.theme-punk .hp-head h1 { font-family: Impact, "Arial Black", sans-serif; font-size: 46px; color: #ff2a8a; text-shadow: 3px 3px 0 #000, 5px 5px 0 #fff200; transform: rotate(-2deg); }
+.theme-punk .tagline { color: #fff200; text-transform: uppercase; font-size: 12px; }
+.theme-punk a { color: #ff7ac0; }
+.theme-punk .hp-menu a { background: #ff2a8a; color: #000; font-weight: bold; border: 2px solid #000; box-shadow: 3px 3px 0 #fff200; }
+.theme-punk .hp-menu a.here, .theme-punk .hp-menu a:hover { background: #fff200; box-shadow: 3px 3px 0 #ff2a8a; }
+.theme-punk .hp-content { background: #000; border: 3px solid #ff2a8a; font-family: Arial, sans-serif; font-size: 14px; }
+.theme-punk .entry-title, .theme-punk .piece h3, .theme-punk .page-title { font-family: Impact, "Arial Black", sans-serif; color: #fff200; text-transform: uppercase; letter-spacing: 1px; }
+.theme-punk .entry { border-bottom: 2px dashed #ff2a8a; }
+.theme-punk .entry-date { color: #ff7ac0; }
+.theme-punk .piece-text { font-family: "Courier New", monospace; }
+.theme-punk .thumb .nopic { background: #222; border: 2px solid #ff2a8a; color: #ff2a8a; transform: rotate(-1.5deg); }
+.theme-punk .gb-entry { border: 2px solid #fff200; }
+
+/* ================= theme: pastel (june) ================= */
+.theme-pastel {
+  background: #f6efff radial-gradient(#e6d8ff 1.5px, transparent 1.6px) 0 0 / 18px 18px;
+  color: #4a3a6b;
+  font-family: Verdana, Tahoma, sans-serif;
+  font-size: 12px;
+}
+.theme-pastel .marquee { background: #ffd6ec; color: #a2468a; border-top: 1px dashed #e29ccd; border-bottom: 1px dashed #e29ccd; }
+.theme-pastel .hp-head h1 { font-family: "Courier New", monospace; font-size: 34px; color: #8a64d6; text-shadow: 2px 2px 0 #ffd6ec; }
+.theme-pastel .tagline { color: #c06aa8; }
+.theme-pastel a { color: #8a64d6; }
+.theme-pastel .hp-menu a { background: #fff; border: 1px dashed #c3a6ff; border-radius: 10px; color: #8a64d6; }
+.theme-pastel .hp-menu a.here, .theme-pastel .hp-menu a:hover { background: #ffd6ec; border-style: solid; }
+.theme-pastel .hp-content { background: #fff; border: 2px dotted #c3a6ff; border-radius: 14px; }
+.theme-pastel .page-title, .theme-pastel .entry-title, .theme-pastel .piece h3 { color: #c06aa8; font-family: "Courier New", monospace; }
+.theme-pastel .entry { border-bottom: 1px dashed #e6d8ff; }
+.theme-pastel .entry-date { color: #a28bd0; }
+.theme-pastel .thumb .nopic { background: linear-gradient(#ffeaf6, #efe6ff); border: 1px dashed #c3a6ff; color: #a28bd0; border-radius: 8px; }
+.theme-pastel .gb-entry { background: #fdf8ff; border: 1px dashed #e29ccd; border-radius: 10px; }
+.theme-pastel .counter { background: #8a64d6; color: #fff; }

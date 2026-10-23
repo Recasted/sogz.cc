@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!-- YOUR tool for making password-protected posts on nightshift. Not linked anywhere. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>nightshift: make a locked post</title>
+  <link rel="stylesheet" href="css/forum.css">
+</head>
+<body>
+<div class="box">
+  <h2>make a password-protected post</h2>
+  <p>Write the secret text and pick a password. Click the button, then copy the line at the bottom into a post in <code>data/forum.js</code>, in place of that post's <code>text</code>.</p>
+  <p>Dates work best as digits (for example <code>12312007</code>). Players can type them with slashes or dashes too.</p>
+  <p><label>hint shown to players<br><input id="hint" style="width:100%" value="the password is..."></label></p>
+  <p><label>secret text<br><textarea id="text" rows="8" style="width:100%"></textarea></label></p>
+  <p><label>password <input id="pw"></label> <button id="make" type="button">make the code</button></p>
+  <p><textarea id="out" rows="4" style="width:100%" readonly></textarea></p>
+</div>
+<script>window.FORUM = { boards: [], threads: [], rules: [] }; window.siteLink = function () { return null; };</script>
+<script src="js/nightshift.js"></script>
+<script>
+document.getElementById("make").addEventListener("click", function () {
+  var pw = document.getElementById("pw").value.trim();
+  if (!pw) { alert("Pick a password first."); return; }
+  var code = sealText(document.getElementById("text").value, pw);
+  document.getElementById("out").value = 'sealed: { hint: ' + JSON.stringify(document.getElementById("hint").value) + ', code: "' + code + '" }';
+});
+</script>
+</body>
+</html>

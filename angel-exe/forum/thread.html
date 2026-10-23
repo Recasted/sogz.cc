@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!-- nightshift: the anonymous message board. This page is built by js/nightshift.js from data/forum.js. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>nightshift</title>
+  <link rel="icon" href="images/nightshift.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../shared/comments.css">
+  <link rel="stylesheet" href="css/forum.css">
+</head>
+<body data-page="thread">
+
+<!-- Load order matters: site list, story data, comments, forum data, then the page builder. -->
+<script>window.ROOT = "../";</script>
+<script src="../shared/sites.js"></script>
+<script src="../shared/story/characters.js"></script>
+<script src="../shared/story/timeline.js"></script>
+<script src="../shared/comments-config.js"></script>
+<script src="../shared/approved-comments.js"></script>
+<script src="../shared/filter.js"></script>
+<script src="../shared/comments.js"></script>
+<script src="data/forum.js"></script>
+<script src="js/nightshift.js"></script>
+<script src="../shared/story/check.js"></script>
+</body>
+</html>
