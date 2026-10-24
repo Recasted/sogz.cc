@@ -203,7 +203,7 @@ window.HOMEPAGES = [
     theme: "pastel",
     since: "2008-04-09",
     counter: 4127,
-    updated: "2008-10-17",
+    updated: "2008-10-23",
     marquee: "☆ welcome to my little corner!! ☆ sign my guestbook ☆ free layouts (credit me!!) ☆",
     pages: [
       {
@@ -213,6 +213,8 @@ window.HOMEPAGES = [
       {
         id: "diary", label: "☆ diary", type: "diary",
         entries: [
+          { date: "2008-10-23 00:20", mood: "curious", music: "The Postal Service - We Will Become Silhouettes", title: "mirrors",
+            text: "theo's links page still has a link to a's old site. it just says removed. i know, i checked. (sorry theo.)\n\nbut starlit keeps a cached copy of removed sites. there's a tiny 'mirror service' link at the bottom if you look. i didn't click it. it felt like reading someone's diary.\n\ni'm writing it here so i stop thinking about clicking it." },
           { date: "2008-10-17 03:33", mood: "spooky", music: "Crystal Castles - Vanished", title: "internet ghosts",
             text: "made a survey on orbitspace at 3:33am because i thought it'd be funny. it was a little less funny at 3:34.\n\ndo you think people stay online after they stop being online? like accounts that keep 'last seen'-ing. there's a thread about it on nightshift. someone said they get messages that are always stamped 11:59. probably a time zone thing!! probably." },
           { date: "2008-10-17 01:10", mood: "cozy", music: "Robyn - With Every Heartbeat", title: "playlist!!",
@@ -260,6 +262,7 @@ window.HOMEPAGES = [
           { label: "PAPER HEARTS CLUB (mara)", href: "site.html?u=paperheartsclub" },
           { label: "lowlight", site: "music" },
           { label: "nightshift boards (spooky)", site: "forum" },
+          { label: "starlit's recently removed sites (sad to look at)", href: "index.html" },
           { label: "lantern kids forum", dead: true }
         ]
       },

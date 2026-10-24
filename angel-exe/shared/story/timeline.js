@@ -42,6 +42,7 @@ window.ANGEL_TIMELINE =
     { "date": "2008-01-01", "who": ["angel", "theo"], "event": "a. never signs on for the last page. a.'s Starlit site, glasswings, is removed", "seenOn": ["blog"], "type": "clue" },
     { "date": "2008-01-01", "who": ["angel"], "event": "A mirror service keeps a cached copy of a.'s deleted site ~glasswings (the hidden site at angel-exe/1159/). Its last login is a. at 23:59 on Dec 31", "seenOn": ["mystery"], "type": "clue" },
     { "date": "2008-01-15", "who": ["theo"], "event": "Theo notices angel's profile is gone", "seenOn": ["blog"], "type": "fact" },
+    { "date": "2008-01-20", "who": [], "event": "Kestrel edits the LowLight request post: a.'s link, starlit.net/~glasswings, says 'removed' now", "seenOn": ["music"], "type": "clue" },
     { "date": "2008-02-14", "who": ["mara"], "event": "Mara's profile thanks a secret valentine", "seenOn": ["orbitspace"], "type": "hint" },
     { "date": "2008-03-01", "who": ["mara", "june"], "event": "Paper Hearts Club gets a Starlit site; June made the layout", "seenOn": ["blog"], "type": "fact" },
     { "date": "2008-04-09", "who": ["june"], "event": "June joins OrbitSpace under her new name and hides her old profile version", "seenOn": ["orbitspace"], "type": "fact" },
@@ -49,6 +50,7 @@ window.ANGEL_TIMELINE =
     { "date": "2008-05-02", "who": ["june", "mara"], "event": "June and Mara share coming out stories on nightshift", "seenOn": ["forum"], "type": "fact" },
     { "date": "2008-09-30", "who": ["mara", "theo"], "event": "Mara and Theo become OrbitSpace friends", "seenOn": ["orbitspace"], "type": "fact" },
     { "date": "2008-10-01", "who": ["ori"], "event": "Ori announces the server move. 'Profile archives are saved automatically'", "seenOn": ["orbitspace"], "type": "hint" },
+    { "date": "2008-10-03 09:12", "who": [], "event": "nightshift: an anonymous poster explains Starlit's mirror service for removed sites ('like someone is still logged in')", "seenOn": ["forum"], "type": "clue" },
     { "date": "2008-10-15", "who": ["theo"], "event": "Theo sends LowLight his playlist 'songs for not sleeping'", "seenOn": ["music"], "type": "fact" },
     { "date": "2008-10-16 23:59", "who": [], "event": "An anonymous nightshift thread: IMs from an old account, always stamped 11:59 pm, using the reader's screen name", "seenOn": ["forum"], "type": "clue" },
     { "date": "2008-10-17", "who": ["june"], "event": "June sends LowLight her playlist '3am html'", "seenOn": ["music"], "type": "fact" },
@@ -59,6 +61,8 @@ window.ANGEL_TIMELINE =
     { "date": "2008-10-21", "who": ["theo", "mara"], "event": "Theo leaves his sketchbook in the band room; Mara finds it", "seenOn": ["orbitspace"], "type": "fact" },
     { "date": "2008-10-22 02:47", "who": ["theo"], "event": "Theo's journal: eleven pages, there were supposed to be twelve", "seenOn": ["blog"], "type": "hint" },
     { "date": "2008-10-22 23:59", "who": [], "event": "'angel' replies in the 11:59 thread, using the player's own name", "seenOn": ["forum"], "type": "clue" },
+    { "date": "2008-10-22 23:59", "who": ["angel"], "event": "The deleted account 'angel' shows up in OrbitSpace's friend activity: viewed theo's profile", "seenOn": ["orbitspace"], "type": "clue" },
+    { "date": "2008-10-23 00:20", "who": ["june"], "event": "June's diary: Starlit keeps mirrors of removed sites. She didn't click", "seenOn": ["blog"], "type": "clue" },
     { "date": "2008-10-23", "who": ["theo", "mara", "june"], "event": "Present day: the game begins", "seenOn": ["messenger"], "type": "fact" },
     { "date": "2008-10-31", "who": ["mara"], "event": "Paper Hearts Club Halloween show (after the present day, not happened yet)", "seenOn": [], "type": "fact" }
   ]

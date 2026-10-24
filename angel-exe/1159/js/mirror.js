@@ -82,13 +82,42 @@ function passwordMatches(typed, real) {
   // yyyymmdd typed for an mmddyyyy password
   return digits.length === 8 && /^(19|20)/.test(digits) && digits.slice(4) + digits.slice(0, 4) === String(real);
 }
+// For typos: the file whose name is closest to what was typed, if it's close enough.
+function closestFile(name) {
+  function distance(a, b) {
+    var row = [], i, j, prev, tmp;
+    for (j = 0; j <= b.length; j++) row[j] = j;
+    for (i = 1; i <= a.length; i++) {
+      prev = row[0]; row[0] = i;
+      for (j = 1; j <= b.length; j++) {
+        tmp = row[j];
+        row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+        prev = tmp;
+      }
+    }
+    return row[b.length];
+  }
+  var typed = String(name).toLowerCase(), best = null, bestScore = 4;
+  D.FILES.forEach(function (f) {
+    if (f.hidden) return;
+    [f.path, f.path.split("/").pop()].forEach(function (candidate) {
+      var d = distance(typed, candidate);
+      if (d < bestScore) { bestScore = d; best = f; }
+    });
+  });
+  return best;
+}
 function openFile(name) {
   var f = findFile(name);
   if (!name) { say("open what?"); return; }
-  if (!f) { say("no file called " + name + ". (try ls)"); return; }
+  if (!f) {
+    var near = closestFile(name);
+    say(near ? ["no file called " + name + ".", "## did you mean " + near.path + "?"] : "no file called " + name + ". (try ls)");
+    return;
+  }
   if (f.draw) { openDrawing(); return; }
   if (f.sealed && unlocked().indexOf(f.path) === -1) {
-    say(["this file is locked.", "password:"]);
+    say(["this file is locked.", "password:"].concat(f.hint ? [f.hint] : []));
     waitingFor = function (typed) {
       if (passwordMatches(typed, f.sealed)) {
         var u = unlocked(); u.push(f.path); save("angelexe.mirror.unlocked", u);
