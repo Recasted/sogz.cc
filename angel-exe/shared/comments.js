@@ -81,11 +81,8 @@
   }
 
   /* ---------- dates ---------- */
-  function now() {
-    var d = new Date();
-    function two(n) { return (n < 10 ? "0" : "") + n; }
-    return d.getFullYear() + "-" + two(d.getMonth() + 1) + "-" + two(d.getDate()) + " " + two(d.getHours()) + ":" + two(d.getMinutes());
-  }
+  // Dates come from the story clock (shared/clock.js), so they always say 2008.
+  function now() { return window.AngelClock.stamp(); }
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   function pretty(s) {
     var p = String(s).split(/[- :]/);
@@ -149,7 +146,7 @@
     var body = el("div", "ac-body");
     var head = el("div", "ac-head");
     head.appendChild(el("b", null, c.name));
-    head.appendChild(document.createTextNode(" · " + pretty(c.date)));
+    head.appendChild(document.createTextNode(" · " + pretty(window.AngelClock.fix(c.date))));
     if (pending) head.appendChild(el("span", "ac-wait", " waiting for approval (only you can see this)"));
     body.appendChild(head);
     body.appendChild(el("div", "ac-text", c.text));
