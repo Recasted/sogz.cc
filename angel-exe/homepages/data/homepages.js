@@ -34,6 +34,9 @@
   WRITING        { title: "", date: "", kind: "poem", text: "" }
   GALLERY        { title: "", caption: "", picture: "" }   picture is an
                  image file in homepages/images/. "" draws a placeholder.
+                 "missing": true draws an empty "?" page. With
+                 "drawnByPlayer": true too, it shows the page the player
+                 drew on the hidden mirror site, once they've drawn one.
   LINKS          { label: "", site: "social" } for another angel.exe site,
                  { label: "", href: "site.html?u=junebug" } for a link,
                  or { label: "", dead: true } for a link that's broken.
@@ -104,7 +107,7 @@ window.HOMEPAGES = [
           { title: "page 9", caption: "hands (sorry)", picture: "" },
           { title: "page 10", caption: "", picture: "" },
           { title: "page 11", caption: "almost", picture: "" },
-          { title: "page 12", caption: "not drawn yet", picture: "", missing: true }
+          { title: "page 12", caption: "not drawn yet", picture: "", missing: true, drawnByPlayer: true }
         ]
       },
       {
@@ -276,9 +279,11 @@ window.HOMEPAGES = [
   Sites that were deleted. They appear on the Starlit front page under
   "Recently removed", and their address shows a "removed" page.
   Never list June's old site here: her old name is never shown.
+  "mirror" (optional) adds a small link on the removed page to a cached
+  copy. glasswings points to the hidden mystery site.
 */
 window.REMOVED_HOMEPAGES = [
   { id: "skaterboi89", removed: "2008-09-02" },
-  { id: "glasswings", removed: "2008-01-01" },
+  { id: "glasswings", removed: "2008-01-01", mirror: "../1159/index.html" },
   { id: "simsforever", removed: "2007-10-14" }
 ];

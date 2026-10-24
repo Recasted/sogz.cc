@@ -51,6 +51,9 @@ angel-exe/
     css/starlit.css     Starlit's look, plus one look per homepage
     js/starlit.js       builds the pages (you rarely need this)
     images/             Starlit logo; put homepage pictures here too
+  1159/                 the hidden mystery site (not linked from the hub)
+    data/mirror.js      everything it says: files, logs, replies
+    css/mirror.css, js/mirror.js
   forum/
     index.html, board.html, thread.html
     data/forum.js       ALL the boards, threads and posts
@@ -195,6 +198,32 @@ copy the line it gives you into the post in place of `text`. The text
 is scrambled, so players can't read it with View Source. Dates work
 best as digits, and players can type them with slashes or dashes.
 Keep the password in your own notes, not in these files.
+
+## The hidden mystery site
+
+`1159/` is not on the hub and not in `shared/sites.js`, on purpose. It
+looks like an old terminal someone left logged in: a "mirror" of a.'s
+deleted Starlit site. Players type commands (`help`, `ls`, `open`, `who`,
+`whoami`, `time`), read files and logs, and can open a locked script with
+the password from the forum.
+
+**How players find it:** Theo's links page has "a's site", which goes to
+the removed `~glasswings` page. That page has a small "mirror service" link.
+
+**Page 12:** typing `open glass_wings/page12` opens a drawing window.
+Players can draw the last page of Glass Wings and save it. It's kept in
+their own browser, and from then on Theo's Glass Wings page on Starlit
+shows their drawing in place of the missing page, "drawn by" their name.
+
+**Editing it:** everything it says is in `1159/data/mirror.js`, and the
+top of that file explains every part. Add a file to `FILES` or a reply
+to `WORDS` (things players might type). `{player}` becomes the player's
+picked name and `{now}` their own date and time. The locked file's
+password is written in that file, so it's only a soft lock: anyone who
+reads the code can see it.
+
+It also reads the player's own comments from their browser and quotes
+them back on `whoami`. Nothing leaves their computer.
 
 ## The shared story files
 
@@ -360,6 +389,9 @@ No filter catches everything, which is why you approve every comment.
 - On the paranormal board, someone gets IMs stamped 11:59 that use their
   screen name, and a poster called "angel" replies to the player by name.
 - Mara's new song "february" is about her secret valentine. It never says who.
+- The hidden site at `1159/` is a "mirror" of a.'s deleted site. Its
+  `who` command lists 5 users online at 23:59 on Dec 31 2007 (the hub's
+  record), and the player as a 6th.
 - angel's identity is never named anywhere.
 - None of this is fixed plot. Delete or rewrite it whenever you like.
 

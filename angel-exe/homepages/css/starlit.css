@@ -150,3 +150,8 @@ body.host { background: #dfe8f7; color: #1b2440; }
 .theme-pastel .thumb .nopic { background: linear-gradient(#ffeaf6, #efe6ff); border: 1px dashed #c3a6ff; color: #a28bd0; border-radius: 8px; }
 .theme-pastel .gb-entry { background: #fdf8ff; border: 1px dashed #e29ccd; border-radius: 10px; }
 .theme-pastel .counter { background: #8a64d6; color: #fff; }
+
+/* the page 12 a player drew, and the mirror link on removed pages */
+.thumb.drawn img { border: 1px solid #c9d1e3; background: #fff; }
+.mirror-note { color: #8a96b8; margin-top: 18px; }
+.mirror-note a { color: #8a96b8; }
