@@ -77,8 +77,15 @@ function postBody(text, t) {
 /* ---------- sealed (password) posts ---------- */
 // The text is mixed with the password, so it can't be read with View Source.
 // lock.html uses the same two functions to make new sealed posts.
+// A short fingerprint of the text is sealed with it, so a password that is
+// only almost right (12312006) can't "open" the post into scrambled text.
+function fingerprint(text) {
+  var h = 2166136261;
+  for (var i = 0; i < text.length; i++) { h ^= text.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return ("0000000" + h.toString(16)).slice(-8);
+}
 function sealText(text, password) {
-  var bytes = new TextEncoder().encode("OK:" + text), key = new TextEncoder().encode(password), out = "";
+  var bytes = new TextEncoder().encode("OK:" + fingerprint(text) + ":" + text), key = new TextEncoder().encode(password), out = "";
   for (var i = 0; i < bytes.length; i++) out += String.fromCharCode(bytes[i] ^ key[i % key.length]);
   return btoa(out);
 }
@@ -87,7 +94,8 @@ function unsealText(code, password) {
     var raw = atob(code), key = new TextEncoder().encode(password), bytes = new Uint8Array(raw.length);
     for (var i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i) ^ key[i % key.length];
     var text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-    return text.indexOf("OK:") === 0 ? text.slice(3) : null;
+    var m = /^OK:([0-9a-f]{8}):([\s\S]*)$/.exec(text);
+    return m && fingerprint(m[2]) === m[1] ? m[2] : null;
   } catch (e) { return null; }
 }
 // People type dates in different ways. Try what they typed, and the digits only.

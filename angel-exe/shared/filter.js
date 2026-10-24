@@ -47,11 +47,13 @@
     "kill yourself", "kill urself", "kys", "go die", "neck yourself",
     "rope yourself", "you should die", "gas the", "hitler was right",
     "white power", "white pride", "gay is a sin", "trans is a mental illness",
-    "groomer", "groomers", "41%", "41 percent", "god hates"
+    "groomer", "groomers", "41%", "41 percent", "god hates",
+    "kill all gays", "kill the gays", "kill gays", "kill all trans", "kill trans people",
+    "death to gays", "death to trans", "burn the gays", "hang the gays"
   ];
 
   // Real words that contain a blocked word by accident. Removed before checking.
-  var ALLOWED_WORDS = ["nigeria", "nigerian", "scunthorpe"];
+  var ALLOWED_WORDS = ["nigeria", "nigerian", "scunthorpe", "spicy", "spicier", "spiciest", "snigger", "sniggers", "sniggered", "sniggering"];
 
   var SWAPS = { "4": "a", "@": "a", "3": "e", "1": "i", "!": "i", "|": "i",
                 "0": "o", "5": "s", "$": "s", "7": "t", "+": "t", "8": "b",
