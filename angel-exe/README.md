@@ -207,8 +207,9 @@ deleted Starlit site. Players type commands (`help`, `ls`, `open`, `who`,
 `whoami`, `time`), read files and logs, and can open a locked script with
 the password from the forum.
 
-**How players find it:** Theo's links page has "a's site", which goes to
-the removed `~glasswings` page. That page has a small "mirror service" link.
+**How players find it:** every road ends at the removed `~glasswings`
+page on Starlit, which has a small "mirror service" link. See "The clue
+trail" below for all the roads.
 
 **Page 12:** typing `open glass_wings/page12` opens a drawing window.
 Players can draw the last page of Glass Wings and save it. It's kept in
@@ -224,6 +225,46 @@ reads the code can see it.
 
 It also reads the player's own comments from their browser and quotes
 them back on `whoami`. Nothing leaves their computer.
+
+## The clue trail
+
+Every site has at least one clue, and they point at each other. Players
+can start anywhere. Nothing names who angel is.
+
+**Roads to the hidden mirror** (all end at Starlit's removed ~glasswings page):
+- Starlit: Theo's links page has "a's site". The Starlit front page lists
+  removed sites and each one is now a link. June's links page links to
+  that list too.
+- Starlit: June's newest diary entry ("mirrors") says removed sites have a
+  tiny "mirror service" link, and that she didn't click it.
+- OrbitSpace: angel shows up in Theo's 2007 archived top friends. The
+  deleted profile now shows "Last Login: Dec 31, 2007 11:59 PM" and the old
+  website link, starlit.net/~glasswings. angel also appears in Friend
+  Activity at 11:59 pm on Oct 22, having "viewed theo's profile".
+- LowLight: kestrel's Dec 2007 request post has an edit from January 2008
+  that mentions a.'s dead Starlit link.
+- nightshift: in the "server move" thread, an anon explains the mirror
+  service. In the 11:59 thread, an anon points to the archived Glass
+  Wings thread.
+
+**The password** for the locked script and a.'s sealed forum post is the
+night the comic was meant to be finished:
+- a.'s sealed post hint says "the night we were going to finish it (mmddyyyy)".
+- a.'s forum post and Theo's Dec 28 journal entry say the last page happens
+  at midnight on New Year's.
+- Theo's Jan 1 2008 journal entry, angel's last login, the hub's "most
+  users ever online" record and every a. timestamp all point to the same
+  night and the same minute.
+- In the terminal, the password prompt says "the night it was supposed to
+  be finished."
+
+**Clues pointing back out:** the terminal's `bookmarks.txt` lists Theo's
+profile, his Starlit page, LowLight and the two nightshift boards.
+`log/lowlight_request.txt` points to LowLight, and `.last_page` (only shown
+by `ls -a`) is the reward for looking harder.
+
+If you add a clue, add a line to `shared/story/timeline.js` with
+"type": "clue" so the story stays in one place.
 
 ## The shared story files
 

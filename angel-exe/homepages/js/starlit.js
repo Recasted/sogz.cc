@@ -260,7 +260,7 @@ function buildDirectory() {
   main.appendChild(el("h2", { text: "Recently removed" }));
   main.appendChild(el("p", { class: "small", text: "Sites deleted by their owners or for inactivity. Their addresses can't be claimed for 12 months." }));
   var gone = el("ul", { class: "removed" });
-  (window.REMOVED_HOMEPAGES || []).forEach(function (r) { gone.appendChild(el("li", { text: HOST_DOMAIN + "/~" + r.id + "  (removed " + pretty(r.removed) + ")" })); });
+  (window.REMOVED_HOMEPAGES || []).forEach(function (r) { gone.appendChild(el("li", {}, [el("a", { href: "site.html?u=" + r.id, text: HOST_DOMAIN + "/~" + r.id }), "  (removed " + pretty(r.removed) + ")"])); });
   main.appendChild(gone);
 
   main.appendChild(el("h2", { id: "signup", text: "Get your own homepage" }));

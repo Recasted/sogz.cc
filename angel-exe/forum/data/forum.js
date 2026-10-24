@@ -118,7 +118,8 @@ window.FORUM = {
         { name: "", by: "", date: "2008-10-02 19:12", text: "orbitspace says they're moving servers and starlit closed sign-ups 'while we move'. back up your pages people. when hosts move, things go missing" },
         { name: "", by: "", date: "2008-10-02 19:40", text: "orbitspace says archives are saved automatically. so old versions of profiles are still around somewhere" },
         { name: "", by: "", date: "2008-10-02 20:02", text: ">>2\n>somewhere\nthat's the scary part" },
-        { name: "moth", by: "june", date: "2008-10-03 00:15", text: "deleted starlit sites show up in a list on the starlit front page. the addresses stay reserved for a year. kind of sad to look at" }
+        { name: "moth", by: "june", date: "2008-10-03 00:15", text: "deleted starlit sites show up in a list on the starlit front page. the addresses stay reserved for a year. kind of sad to look at" },
+        { name: "", by: "", date: "2008-10-03 09:12", text: ">>4\nthey're not even really gone. starlit has a 'mirror service' that keeps a cached copy of removed sites. tiny link at the bottom of the removed page. it's slow and the copies are weird but it works\n\n>the copies are weird\nweird how\n\nlike someone is still logged in" }
       ]
     },
 
@@ -133,6 +134,7 @@ window.FORUM = {
         { name: "inkhands", by: "theo", date: "2008-10-17 03:45", text: ">>4\nit's a time zone thing. go to sleep." },
         { name: "", by: "", date: "2008-10-18 01:02", text: "what was the account called" },
         { name: "", by: "", date: "2008-10-18 23:59", text: ">>6\nit doesn't have a name anymore. it just says angel" },
+        { name: "", by: "", date: "2008-10-19 00:40", text: ">>7\nthere's an old thread in the archive by someone who posted at 11:59 every time. a comic thing. glass wings. the last post is locked with a password.\n\nprobably nothing" },
         { name: "angel", by: "", date: "2008-10-22 23:59", text: "{player}.\n\nyou found the board.\n\nyou're up late too." }
       ]
     },

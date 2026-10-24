@@ -10,6 +10,8 @@
   "text" is what appears after the person's name.
 */
 window.ACTIVITY = [
+  /* CLUE: a deleted account still shows up in the feed, at 11:59 pm. */
+  { date: "2008-10-22 23:59", who: "angel",       type: "status",  text: "viewed theo's profile" },
   { date: "2008-10-23 01:14", who: "theo.static", type: "mood",    text: "changed their mood to: blank" },
   { date: "2008-10-23 00:58", who: "junebug",     type: "layout",  text: "updated their profile layout" },
   { date: "2008-10-22 00:31", who: "theo.static", type: "comment", text: "commented on ~*MaRa*~'s profile" },

@@ -18,6 +18,7 @@
                         shows. Dates work as digits (12312007), slashes or
                         dashes. This one is NOT scrambled, so it's only a
                         soft lock: anyone reading this file can see it.
+                hint    (with sealed) a dim line shown under "password:"
                 draw    true = this "file" is the drawing page (page 12)
   WORDS       things players might type that aren't commands. The reply
               is shown. Keys are lowercase.
@@ -79,7 +80,7 @@ window.MIRROR = {
     { path: "glass_wings/script_p11.txt",
       text: "PAGE 11\n\npanel 1: the roof again. snow now.\npanel 2: she looks down at the street. it's full of people.\npanel 3: everyone is looking up.\npanel 4: she can't fly. she knows she can't fly.\n\n## t. drew this one in two nights. the hands are good. don't tell him." },
 
-    { path: "glass_wings/script_p12.txt", sealed: "12312007",
+    { path: "glass_wings/script_p12.txt", sealed: "12312007", hint: "## the night it was supposed to be finished.",
       text: "PAGE 12\n\npanel 1: \npanel 2: \npanel 3: \npanel 4: \n\n## i never wrote it down. i was going to tell you at midnight.\n## you know how it ends. you always did.\n## draw it. type: open glass_wings/page12" },
 
     { path: "glass_wings/page12", draw: true, text: "" },
@@ -92,6 +93,10 @@ window.MIRROR = {
 
     { path: "guestbook_backup.txt",
       text: "[2007-12-29 23:59] a.: page twelve is the best one. you'll see.\n[2008-10-22 03:01] june: eleven is a good number.\n[{now}] {player}: " },
+
+    /* CLUE: points back out to the other sites. Uses the in-story addresses. */
+    { path: "bookmarks.txt",
+      text: "## bookmarks, last saved 2007-12-31 23:58\n\norbitspace.com/theo.static      ## top friends. i was first.\nstarlit.net/~quiethours         ## page 11 is up. the hands are good.\nlowlight                        ## ask kestrel for the song again\nnightshift.org /archive/        ## our thread. don't let the mods delete it.\nnightshift.org /para/           ## (new) they're talking about the clock\n\n## the last one wasn't there when i saved this." },
 
     { path: ".last_page", hidden: true,
       text: "you found the hidden one. nobody types ls -a anymore.\n\nwhen the last page is drawn, the comic is finished.\nwhen the comic is finished, nobody has to wait at midnight." }

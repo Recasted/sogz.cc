@@ -437,6 +437,8 @@ function renderGone(root, username) {
     el("p", { text: deleted
       ? "The user may have deleted their account."
       : "This user has either cancelled their membership, or their account has been deleted." }),
+    deleted && deleted.lastSeen ? el("p", { class: "small", text: "Last Login: " + prettyDate(deleted.lastSeen, true) }) : null,
+    deleted && deleted.website ? el("p", { class: "small" }, ["Website: ", el("a", { href: deleted.website.href, text: deleted.website.label })]) : null,
     el("p", {}, [el("a", { href: "index.html", text: "« Back to OrbitSpace Home" })])
   ]));
 }

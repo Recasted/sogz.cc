@@ -94,7 +94,7 @@ window.MEMBERS = [
         mood: "hopeful",
         status: "theo is thinking about someone",
         headline: "ask me about my sketchbook",
-        about: "i'm theo. i draw stuff. me and a are going to make a comic together over winter break.",
+        about: "i'm theo. i draw stuff. me and a are going to make a comic together over winter break. it's going on a's starlit when it's done.",
         topFriends: ["angel", "orbit"]
         /* CLUE HOOK (placeholder, change or remove freely):
            "angel" is in Theo's old top friends but no longer exists on
@@ -210,7 +210,15 @@ window.MEMBERS = [
 /*
   Profiles that USED to exist. Visiting them shows a "no longer
   available" page instead of an error. Add or remove usernames freely.
+    lastSeen   "YYYY-MM-DD HH:MM", shown as "Last Login"
+    website    (optional) { label: "what's shown", href: "link" }: the
+               homepage that used to be on the profile. CLUE: angel's
+               points to the removed Starlit site, which leads to the
+               hidden mirror.
 */
 window.DELETED_MEMBERS = {
-  "angel": { lastSeen: "2007-12-31" }
+  "angel": {
+    lastSeen: "2007-12-31 23:59",
+    website: { label: "starlit.net/~glasswings", href: "../homepages/site.html?u=glasswings" }
+  }
 };

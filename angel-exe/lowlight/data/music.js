@@ -707,7 +707,7 @@ window.MUSIC = {
     {
       id: "requests-dec07", date: "2007-12-30", by: "kestrel", title: "reader requests: end of the year",
       artists: ["the-postal-service", "bright-eyes"],
-      text: "Lots of requests this week. Someone signing their email only as \"a.\" asked for 'We Will Become Silhouettes' and said \"for the comic we're never going to finish\". Hope you finish it, a. Also by popular demand: more Bright Eyes. You people are so sad and I love you."
+      text: "Lots of requests this week. Someone signing their email only as \"a.\" asked for 'We Will Become Silhouettes' and said \"for the comic we're never going to finish\". Hope you finish it, a. Also by popular demand: more Bright Eyes. You people are so sad and I love you.\n\n[edit, January 2008: a. also sent me a link to their comic, starlit.net/~glasswings. It says 'removed' now. If anyone knows a., tell them the song is still on the playlist.]"
     },
     {
       id: "crystal-castles-2008", date: "2008-04-28", by: "kestrel", title: "the loudest album of the year so far",
