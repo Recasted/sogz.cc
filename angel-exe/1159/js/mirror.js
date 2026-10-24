@@ -29,10 +29,8 @@ function save(key, value) {
 function guest() { return load("angelexe.guest", null); }
 function playerName() { var g = guest(); return g && g.name ? g.name : "you"; }
 function pad(n) { return (n < 10 ? "0" : "") + n; }
-function nowText() {
-  var d = new Date();
-  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
-}
+// The story clock (shared/clock.js): real time of day, but always 2008.
+function nowText() { return AngelClock.stamp(); }
 function fill(text) { return String(text).replace(/\{player\}/g, playerName()).replace(/\{now\}/g, nowText()); }
 var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -116,7 +114,7 @@ var COMMANDS = {
   open: openFile, cat: openFile, read: openFile, type: openFile,
   who: function () {
     var lines = D.WHO.map(function (w) { return (w.name + "        ").slice(0, 10) + w.line + "    " + w.when; });
-    var d = new Date(), months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    var d = AngelClock.date(), months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     lines.push((playerName() + "        ").slice(0, 10) + "tty6    " + months[d.getMonth()] + " " + d.getDate() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()));
     lines.push("", "## 6 users. there were only ever 5.");
     say(lines);

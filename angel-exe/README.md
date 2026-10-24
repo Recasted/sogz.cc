@@ -256,6 +256,15 @@ yellow bar appears at the bottom of the page. Press F12 and open
 If a contradiction is deliberate (a clue), add a bit of its text to
 `IGNORE` at the top of `check.js` and the bar stops mentioning it.
 
+## The story clock
+
+Every site shows dates from `shared/clock.js`, never the real date. The
+date is always the story's present day (2008-10-23) and only the time of
+day is real, so a comment posted at 2 am says "Oct 23, 2008 2:00 AM".
+Old comments saved with a real date are shown on the story day too.
+To move the story to another day, change STORY_DAY in clock.js and
+presentDay in shared/story/timeline.js.
+
 ## Changing content
 
 **Profiles** are in `orbitspace/data/members.js`. Each person is one block.
