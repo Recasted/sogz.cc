@@ -96,7 +96,7 @@ window.MIRROR = {
 
     /* CLUE: points back out to the other sites. Uses the in-story addresses. */
     { path: "bookmarks.txt",
-      text: "## bookmarks, last saved 2007-12-31 23:58\n\norbitspace.com/theo.static      ## top friends. i was first.\nstarlit.net/~quiethours         ## page 11 is up. the hands are good.\nlowlight                        ## ask kestrel for the song again\nnightshift.org /archive/        ## our thread. don't let the mods delete it.\nnightshift.org /para/           ## (new) they're talking about the clock\n\n## the last one wasn't there when i saved this." },
+      text: "## bookmarks, last saved 2007-12-31 23:58\n\norbitspace.net/theo.static      ## top friends. i was first.\nstarlit.net/~quiethours         ## page 11 is up. the hands are good.\nlowlight                        ## ask kestrel for the song again\nnightshift.org /archive/        ## our thread. don't let the mods delete it.\nnightshift.org /para/           ## (new) they're talking about the clock\n\n## the last one wasn't there when i saved this." },
 
     { path: ".last_page", hidden: true,
       text: "you found the hidden one. nobody types ls -a anymore.\n\nwhen the last page is drawn, the comic is finished.\nwhen the comic is finished, nobody has to wait at midnight." }
