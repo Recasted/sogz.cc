@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-page="sogtext" data-veil="chrome">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -61,6 +61,38 @@
     .card pre { margin:0; overflow:hidden; color:var(--text); font-family:var(--mono); font-size:9px; line-height:1.05; white-space:pre; }
     .toast { position:fixed; left:50%; bottom:22px; z-index:50; padding:9px 16px; border:1px solid #444; border-radius:3px; background:#1d1d1d; opacity:0; pointer-events:none; transform:translate(-50%,8px); transition:.2s; }
     .toast.show { opacity:1; transform:translate(-50%,0); }
+
+    /* Text / Image tabs */
+    .mode-tabs { display:flex; gap:2px; margin-left:18px; padding:2px; border:1px solid var(--line); border-radius:3px; }
+    .mode-tabs button { padding:5px 14px; border:0; border-radius:2px; background:transparent; color:var(--muted); font-size:11px; letter-spacing:.16em; text-transform:uppercase; cursor:pointer; }
+    .mode-tabs button.on { color:#fff; background:var(--red); }
+    body[data-mode="image"] #textMode, body[data-mode="text"] #imageMode { display:none; }
+
+    /* Image mode */
+    #imageMode .panel { max-height:calc(100vh - 44px); overflow-y:auto; scrollbar-color:#333 transparent; }
+    .presets { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }
+    .preset { padding:7px 4px 6px; border:1px solid var(--line); border-radius:3px; background:var(--panel2); cursor:pointer; text-align:center; font-size:11px; }
+    .preset i { display:block; height:12px; margin-bottom:5px; border-radius:2px; }
+    .preset:hover { border-color:#444; }
+    .preset.on { border-color:var(--red2); }
+    .slider { display:grid; grid-template-columns:1fr 40px; align-items:center; gap:8px; }
+    .slider input { width:100%; accent-color:var(--red2); }
+    .slider output { color:var(--muted); font:11px var(--mono); text-align:right; }
+    .stops { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
+    .stops label { display:grid; gap:3px; color:var(--muted); font-size:10px; text-align:center; }
+    .checks { display:flex; flex-wrap:wrap; gap:6px 14px; margin:8px 0; color:#cfc9bf; }
+    .checks input { accent-color:var(--red2); }
+    input[type=text].charset { width:100%; height:30px; padding:4px 7px; border:1px solid var(--line); border-radius:3px; outline:0; background:var(--bg); font-family:var(--mono); }
+    .img-stage { position:relative; display:grid; place-items:center; min-height:calc(100vh - 44px); padding:22px; background:#020202; }
+    .img-stage canvas { display:block; max-width:100%; max-height:calc(100vh - 120px); box-shadow:0 20px 70px rgba(0,0,0,.8), 0 0 0 1px #141010; image-rendering:auto; }
+    .img-stage canvas.pixelated { image-rendering:pixelated; }
+    .img-drop { display:grid; place-items:center; gap:12px; width:min(560px,100%); padding:42px 20px; border:1px dashed #3a1a1d; border-radius:4px; color:var(--muted); text-align:center; }
+    .img-drop pre { margin:0; color:#4a2226; font:11px/1.1 var(--mono); }
+    .img-drop strong { color:var(--text); font-size:15px; font-weight:400; }
+    .img-stage.over .img-drop, .img-stage.over canvas { outline:1px dashed var(--red2); outline-offset:6px; }
+    .img-meta { position:absolute; left:22px; bottom:10px; color:#4d4844; font:10px var(--mono); letter-spacing:.1em; }
+    .compare { position:absolute; right:22px; bottom:8px; }
+    .compare button { padding:4px 10px; border:1px solid var(--line); background:var(--panel); color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; }
     @media (max-width:820px) {
       main { grid-template-columns:1fr; }
       .panel { border-right:0; border-bottom:1px solid var(--line); }
@@ -69,11 +101,17 @@
       .bar nav a:not(.on) { display:none; }
     }
   </style>
+  <link rel="stylesheet" href="../assets/veil.css?v=1" />
+  <script src="../assets/veil.js?v=1" defer></script>
 </head>
-<body>
+<body data-mode="text">
   <header class="bar">
     <a class="brand" href="../">sogz<b>'</b></a>
     <span class="app-name">SogText</span>
+    <div class="mode-tabs" id="modeTabs" role="tablist">
+      <button type="button" data-mode="text" class="on">Text</button>
+      <button type="button" data-mode="image">Image</button>
+    </div>
     <nav>
       <a href="../sogcii/">Sogcii</a>
       <a class="on" href="./">SogText</a>
@@ -82,7 +120,7 @@
     </nav>
   </header>
 
-  <main>
+  <main id="textMode">
     <aside class="panel">
       <h2>Your text</h2>
       <textarea id="text" spellcheck="false" maxlength="400">sogz</textarea>
@@ -137,10 +175,124 @@
       <div class="gallery" id="gallery"></div>
     </section>
   </main>
+
+  <main id="imageMode">
+    <aside class="panel">
+      <h2>Image</h2>
+      <div class="actions" style="margin-top:0">
+        <button class="btn primary" type="button" id="imgOpen">Open image…</button>
+      </div>
+      <input id="imgFile" type="file" accept="image/*" hidden />
+      <p class="hint" style="margin-top:8px">or drop / paste an image anywhere on this page</p>
+
+      <h2>Look</h2>
+      <div class="presets" id="imgPresets"></div>
+
+      <h2>Render as</h2>
+      <div class="seg" id="imgMode">
+        <button type="button" data-v="glyphs" class="on">Glyphs</button>
+        <button type="button" data-v="pixels">Pixels</button>
+        <button type="button" data-v="blocks">Blocks</button>
+      </div>
+      <label class="row">Detail <span class="slider"><input id="imgCols" type="range" min="40" max="320" value="160" /><output></output></span></label>
+      <label class="row" id="charsetRow">Characters
+        <select id="imgCharset">
+          <option value=" .'`^,:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$">Dense</option>
+          <option value=" .:-=+*#%@">Classic</option>
+          <option value=" ·:;+=xX$&">Soft</option>
+          <option value=" ░▒▓█">Shade blocks</option>
+          <option value=" 01">Binary</option>
+          <option value=" .oO@">Bubbles</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </label>
+      <label class="row" id="customRow" hidden>Custom <input class="charset" id="imgCustom" type="text" value=" .sogz'#" /></label>
+
+      <h2>Tone</h2>
+      <label class="row">Exposure <span class="slider"><input id="imgExposure" type="range" min="-2" max="2" step=".05" value="0" /><output></output></span></label>
+      <label class="row">Contrast <span class="slider"><input id="imgContrast" type="range" min="-1" max="2" step=".05" value="0" /><output></output></span></label>
+      <label class="row">Gamma <span class="slider"><input id="imgGamma" type="range" min=".3" max="3" step=".05" value="1" /><output></output></span></label>
+      <label class="row">Crush blacks <span class="slider"><input id="imgBlack" type="range" min="0" max=".8" step=".01" value="0" /><output></output></span></label>
+      <label class="row">Clip whites <span class="slider"><input id="imgWhite" type="range" min=".2" max="1" step=".01" value="1" /><output></output></span></label>
+      <label class="row">Levels <span class="slider"><input id="imgLevels" type="range" min="2" max="32" step="1" value="12" /><output></output></span></label>
+      <label class="row">Dither
+        <select id="imgDither">
+          <option value="none">None</option>
+          <option value="bayer">Ordered (Bayer)</option>
+          <option value="floyd">Diffusion (Floyd)</option>
+          <option value="noise">Noise</option>
+        </select>
+      </label>
+      <div class="checks"><label><input id="imgInvert" type="checkbox" /> Invert</label><label><input id="imgEdges" type="checkbox" /> Edge boost</label></div>
+
+      <h2>Color grade</h2>
+      <div class="stops">
+        <label>Shadows<input id="imgC0" type="color" value="#000000" /></label>
+        <label>Low<input id="imgC1" type="color" value="#3a0509" /></label>
+        <label>High<input id="imgC2" type="color" value="#b3121c" /></label>
+        <label>Light<input id="imgC3" type="color" value="#f1e6dc" /></label>
+      </div>
+      <label class="row">Original color <span class="slider"><input id="imgOrig" type="range" min="0" max="1" step=".01" value="0" /><output></output></span></label>
+      <label class="row">Saturation <span class="slider"><input id="imgSat" type="range" min="0" max="2" step=".05" value="1" /><output></output></span></label>
+      <label class="row">Background <input id="imgBg" type="color" value="#000000" /></label>
+
+      <h2>Atmosphere</h2>
+      <label class="row">Glow <span class="slider"><input id="imgGlow" type="range" min="0" max="1" step=".01" value=".25" /><output></output></span></label>
+      <label class="row">Grain <span class="slider"><input id="imgGrain" type="range" min="0" max="1" step=".01" value=".15" /><output></output></span></label>
+      <label class="row">Static <span class="slider"><input id="imgStatic" type="range" min="0" max="1" step=".01" value="0" /><output></output></span></label>
+      <label class="row">Vignette <span class="slider"><input id="imgVignette" type="range" min="0" max="1" step=".01" value=".35" /><output></output></span></label>
+      <label class="row">Scanlines <span class="slider"><input id="imgScan" type="range" min="0" max="1" step=".01" value="0" /><output></output></span></label>
+      <label class="row">Split color <span class="slider"><input id="imgSplit" type="range" min="0" max="12" step="1" value="0" /><output></output></span></label>
+
+      <h2>Text on top</h2>
+      <label class="row">Show
+        <select id="imgTextPos">
+          <option value="off">Off</option>
+          <option value="top">Top</option>
+          <option value="center">Center</option>
+          <option value="bottom">Bottom</option>
+        </select>
+      </label>
+      <label class="row">Size <span class="slider"><input id="imgTextSize" type="range" min=".15" max="1" step=".01" value=".6" /><output></output></span></label>
+      <label class="row">Color <input id="imgTextColor" type="color" value="#e9e2d8" /></label>
+      <label class="row">Opacity <span class="slider"><input id="imgTextAlpha" type="range" min="0" max="1" step=".01" value=".9" /><output></output></span></label>
+      <p class="hint" style="margin-top:2px">Uses the big letters from the Text tab (same font and words).</p>
+
+      <h2>Export</h2>
+      <label class="row">PNG size
+        <select id="imgScale">
+          <option value="1">1× (preview)</option>
+          <option value="2" selected>2×</option>
+          <option value="3">3×</option>
+          <option value="4">4×</option>
+        </select>
+      </label>
+      <div class="actions">
+        <button class="btn primary" type="button" id="imgSave">Save PNG</button>
+        <button class="btn" type="button" id="imgCopyTxt">Copy as text</button>
+        <button class="btn" type="button" id="imgReset">Reset</button>
+      </div>
+    </aside>
+
+    <section class="img-stage" id="imgStage">
+      <div class="img-drop" id="imgDrop">
+<pre>   ▄▄▄▄▄▄▄
+  █ ░░▒▒▓▓ █
+  █ ▓▒░  ░▒█
+   ▀▀▀▀▀▀▀ </pre>
+        <strong>Drop an image here</strong>
+        <span>it never leaves your device</span>
+      </div>
+      <canvas id="imgOut" hidden></canvas>
+      <span class="img-meta" id="imgMeta"></span>
+      <div class="compare" hidden id="compareWrap"><button type="button" id="imgCompare">hold to see original</button></div>
+    </section>
+  </main>
   <div class="toast" id="toast"></div>
 
   <script src="figlet.js"></script>
   <script src="fonts.js"></script>
+  <script src="image.js?v=1"></script>
   <script>
   const FONT_DATA_B64 = window.SOG_FONTS.replace(/\s+/g, "");
   (async () => {
@@ -240,6 +392,8 @@
       art = addBorder(art, els.border.value);
       current = art;
       els.output.textContent = art;
+      window.SOGTEXT_ART = art;
+      dispatchEvent(new Event("sogtext:art"));
       els.outWrap.style.setProperty("--out-fg", els.fg.value);
       els.outWrap.style.setProperty("--out-bg", els.bg.value);
       try { localStorage.setItem("sogtext", JSON.stringify({ font: els.font.value, text: els.text.value })); } catch {}

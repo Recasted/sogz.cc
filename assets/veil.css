@@ -1,0 +1,133 @@
+/* ─────────────────────────────────────────────────────────────
+   sogz' veil — the shared darker / more mysterious layer.
+   Every page links this file after its own stylesheet and sets
+   <html data-page="..."> so the overrides below only hit that page.
+   The overlays themselves are added by veil.js.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --veil-black: #030303;
+  --veil-ink: #080708;
+  --veil-blood: #7d0810;
+  --veil-blood-hot: #b3121c;
+  --veil-bone: #d6cfc4;
+  --veil-ash: #5f5954;
+}
+
+::selection { color: #fff; background: var(--veil-blood); }
+
+/* ── overlays (created by veil.js) ─────────────────────────── */
+.veil-layer { position: fixed; inset: 0; pointer-events: none; }
+.veil-grain {
+  z-index: 2147482000;
+  inset: -50%;
+  opacity: .075;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  animation: veilGrain .9s steps(6) infinite;
+}
+.veil-vignette {
+  z-index: 2147481900;
+  background:
+    radial-gradient(ellipse 85% 75% at 50% 45%, transparent 55%, rgba(0,0,0,.55) 100%),
+    linear-gradient(180deg, rgba(60,0,4,.10), transparent 22%, transparent 78%, rgba(40,0,3,.16));
+}
+.veil-scan {
+  z-index: 2147481950;
+  opacity: .05;
+  background: repeating-linear-gradient(180deg, #000 0 1px, transparent 1px 3px);
+}
+.veil-whisper {
+  position: fixed;
+  z-index: 2147482100;
+  margin: 0;
+  color: var(--veil-blood-hot);
+  font: 11px/1.2 "Cascadia Mono", Consolas, "DejaVu Sans Mono", Menlo, monospace;
+  letter-spacing: .32em;
+  text-transform: lowercase;
+  white-space: pre;
+  opacity: 0;
+  pointer-events: none;
+  text-shadow: 0 0 8px rgba(179,18,28,.7);
+  filter: blur(.3px);
+  animation: veilWhisper 4.2s ease-in-out forwards;
+}
+@keyframes veilGrain {
+  0% { transform: translate(0,0); } 20% { transform: translate(-3%,2%); } 40% { transform: translate(2%,-4%); }
+  60% { transform: translate(-4%,-1%); } 80% { transform: translate(3%,3%); } 100% { transform: translate(0,0); }
+}
+@keyframes veilWhisper {
+  0% { opacity: 0; letter-spacing: .6em; }
+  12% { opacity: .55; }
+  16% { opacity: .1; }
+  20% { opacity: .6; }
+  70% { opacity: .35; letter-spacing: .3em; }
+  100% { opacity: 0; letter-spacing: .26em; filter: blur(3px); }
+}
+
+/* editors only get the edges, never noise over the canvas */
+html[data-veil="chrome"] .veil-grain,
+html[data-veil="chrome"] .veil-scan { display: none; }
+html[data-veil="chrome"] .veil-vignette { background: linear-gradient(180deg, rgba(60,0,4,.12), transparent 8%, transparent 94%, rgba(40,0,3,.18)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .veil-grain { animation: none; }
+  .veil-whisper { display: none; }
+}
+
+/* ── tool bars shared by Sogcii / SogText ──────────────────── */
+html[data-page="sogcii"], html[data-page="sogtext"] {
+  --bg: #050505; --panel: #0a0a0a; --panel2: #101010; --line: #1d1b1b;
+  --text: #d9d2c7; --muted: #6c6660; --red: #8a0a13; --red2: #b3121c;
+}
+html[data-page="sogcii"] .bar, html[data-page="sogtext"] .bar { background: rgba(5,5,5,.94); border-bottom-color: #1a0d0e; }
+html[data-page="sogcii"] .brand, html[data-page="sogtext"] .brand { letter-spacing: .02em; text-shadow: 0 0 14px rgba(179,18,28,.35); }
+html[data-page="sogcii"] .app-name, html[data-page="sogtext"] .app-name { color: #4d4844; }
+html[data-page="sogcii"] .app-name::before, html[data-page="sogtext"] .app-name::before { content: "▚ "; color: var(--red2); animation: veilBlink 2.4s steps(1) infinite; }
+@keyframes veilBlink { 50% { opacity: 0; } }
+
+/* ── SogSketch ─────────────────────────────────────────────── */
+html[data-page="sogsketch"] {
+  --bg: #0c0c0c; --panel: #161515; --panel2: #1d1b1c; --line: #070707; --line2: #332a2c;
+  --text: #cfc9c1; --muted: #78716c; --accent: #8a0a13;
+}
+html[data-page="sogsketch"] body { background: #080808; }
+html[data-page="sogsketch"] .menu-bar { background: #0e0d0d; border-bottom-color: #1e0b0d; }
+html[data-page="sogsketch"] .menu { background: #141313; border-color: #000; }
+html[data-page="sogsketch"] .menus details[open] summary,
+html[data-page="sogsketch"] .menus summary:hover,
+html[data-page="sogsketch"] button:hover { background: #2a1416; }
+html[data-page="sogsketch"] .brand { text-shadow: 0 0 14px rgba(179,18,28,.4); }
+
+/* ── sogz editor ───────────────────────────────────────────── */
+html[data-page="sogzeditor"] {
+  --bg: #0e0e0e; --panel: #171616; --panel2: #1e1c1d; --line: #2b2526; --text: #d2ccc4; --muted: #7c756f;
+}
+html[data-page="sogzeditor"] body { background: #090909; }
+html[data-page="sogzeditor"] .app-menu { background: #0d0c0c; border-bottom-color: #1e0b0d; }
+html[data-page="sogzeditor"] .app-menu button:hover,
+html[data-page="sogzeditor"] .brand:hover { background: #2a1416; }
+html[data-page="sogzeditor"] .support-link { border-color: #4a1015; color: #e9c9cc; background: #1c0a0c; }
+
+/* ── Sog95 download page (was white) ───────────────────────── */
+html[data-page="sog95"] { color-scheme: dark; --ink: #d5cec4; --muted: #7d766f; --line: #1f1b1b; --soft: #0d0c0c; --red: #8a0a13; --red-dark: #4d0509; }
+html[data-page="sog95"] body { background: #060606; color: var(--ink); }
+html[data-page="sog95"] a { color: #c94a52; }
+html[data-page="sog95"] .site-header { background: #050505; border-bottom: 1px solid #1e0b0d; }
+html[data-page="sog95"] nav a { color: #8f8881; }
+html[data-page="sog95"] .title-band {
+  background:
+    repeating-linear-gradient(180deg, rgba(0,0,0,.25) 0 1px, transparent 1px 3px),
+    linear-gradient(105deg, #120203 0, #3d0408 55%, #160203 100%);
+  box-shadow: inset 0 1px #5a0a10, inset 0 -1px #000;
+}
+html[data-page="sog95"] .title-band h1 { text-shadow: 0 0 22px rgba(179,18,28,.55); letter-spacing: .02em; }
+html[data-page="sog95"] .eyebrow { color: #c94a52; letter-spacing: .4em; }
+html[data-page="sog95"] .notice { background: #120a05; border-color: #3a2a12; border-left-color: #8a6a10; }
+html[data-page="sog95"] .download-row { background: linear-gradient(#0f0e0e, #090808); border-color: #221d1d; box-shadow: 0 10px 30px rgba(0,0,0,.6); }
+html[data-page="sog95"] .download-button { background: linear-gradient(#a3111b, #6a070d); border-color: #3d0307; box-shadow: inset 0 1px #c0303a, 0 0 18px rgba(179,18,28,.25); }
+html[data-page="sog95"] .download-button:hover { background: linear-gradient(#bd1620, #7d0810); }
+html[data-page="sog95"] .smartscreen { color: #9a938b; border-left-color: #4a1015; }
+html[data-page="sog95"] .windows-mark i { background: #6f0a12; }
+html[data-page="sog95"] footer { background: #030303; border-top-color: #4d0509; color: #5f5954; }
+html[data-page="sog95"] footer a { color: #a49c93; }
