@@ -9,7 +9,7 @@
 
   /* ── controls ─────────────────────────────────────────── */
   const ranges = ["imgCols", "imgExposure", "imgContrast", "imgGamma", "imgBlack", "imgWhite", "imgLevels",
-    "imgOrig", "imgSat", "imgGlow", "imgGrain", "imgStatic", "imgVignette", "imgScan", "imgSplit", "imgTextSize", "imgTextAlpha"];
+    "imgOrig", "imgSat", "imgGlow", "imgGrain", "imgStatic", "imgVignette", "imgScan", "imgSplit", "imgTextSize", "imgTextAlpha", "imgTxtCols"];
   const others = ["imgCharset", "imgCustom", "imgDither", "imgInvert", "imgEdges", "imgC0", "imgC1", "imgC2", "imgC3",
     "imgBg", "imgTextPos", "imgTextColor"];
   const ctl = Object.fromEntries([...ranges, ...others].map((id) => [id, $(id)]));
@@ -18,7 +18,7 @@
   const DEFAULTS = {
     mode: "glyphs", imgCols: 160, imgExposure: 0, imgContrast: 0, imgGamma: 1, imgBlack: 0, imgWhite: 1, imgLevels: 12,
     imgOrig: 0, imgSat: 1, imgGlow: .25, imgGrain: .15, imgStatic: 0, imgVignette: .35, imgScan: 0, imgSplit: 0,
-    imgTextSize: .6, imgTextAlpha: .9, imgCharset: " .:-=+*#%@", imgCustom: " .sogz'#", imgDither: "none",
+    imgTextSize: .6, imgTextAlpha: .9, imgTxtCols: 100, imgCharset: " .:-=+*#%@", imgCustom: " .sogz'#", imgDither: "none",
     imgInvert: false, imgEdges: false, imgC0: "#000000", imgC1: "#3a0509", imgC2: "#b3121c", imgC3: "#f1e6dc",
     imgBg: "#000000", imgTextPos: "off", imgTextColor: "#e9e2d8"
   };
@@ -99,7 +99,7 @@
     img.onload = () => { source = img; sourceName = name; showCanvas(); schedule(); };
     img.src = url;
   };
-  const showCanvas = () => { $("imgDrop").hidden = true; out.hidden = false; $("compareWrap").hidden = false; };
+  const showCanvas = () => { $("imgDrop").hidden = true; out.hidden = false; $("compareWrap").hidden = false; $("imgBar").hidden = false; };
   $("imgOpen").addEventListener("click", () => $("imgFile").click());
   $("imgFile").addEventListener("change", (e) => { load(e.target.files[0]); e.target.value = ""; });
   const sample = document.createElement("button");
@@ -194,7 +194,6 @@
 
   /* ── render ───────────────────────────────────────────── */
   const out = $("imgOut"), octx = out.getContext("2d");
-  let lastGrid = null;
 
   const render = (s, scale, target = out) => {
     const ctx = target.getContext("2d");
@@ -260,7 +259,6 @@
         text.push(line.replace(/\s+$/, ""));
       }
     }
-    lastGrid = text.join("\n");
 
     // static: specks in the dark like stars / dust (stable between renders)
     if (s.imgStatic > 0) {
@@ -388,6 +386,7 @@
   for (const ev of ["pointerup", "pointerleave", "pointercancel"]) $("imgCompare").addEventListener(ev, schedule);
 
   /* ── export ───────────────────────────────────────────── */
+  const baseName = () => "sogtext-" + (sourceName.replace(/\.[^.]+$/, "").replace(/[^\w-]/g, "").slice(0, 24) || "image");
   const toast = (msg) => {
     const t = $("toast"); t.textContent = msg; t.classList.add("show");
     clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 1600);
@@ -404,16 +403,57 @@
       render(s, scale, c);
       c.toBlob((b) => {
         const a = document.createElement("a"); a.href = URL.createObjectURL(b);
-        a.download = "sogtext-" + (sourceName.replace(/\.[^.]+$/, "").replace(/[^\w-]/g, "").slice(0, 24) || "image") + ".png";
+        a.download = baseName() + ".png";
         a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
         toast("Saved");
       }, "image/png");
     }, 30);
   });
-  $("imgCopyTxt").addEventListener("click", async () => {
-    if (!lastGrid) return toast("Open an image first");
-    try { await navigator.clipboard.writeText(lastGrid); toast("Copied as text"); }
-    catch { toast("Couldn't copy"); }
+  // ASCII text export. Built separately from the preview so it keeps the picture's
+  // proportions in every mode: letters are about twice as tall as they are wide.
+  const charsFor = (s) => s.mode === "blocks" ? " ░▒▓█" : (s.imgCharset === "custom" ? (s.imgCustom || " #") : s.imgCharset);
+  const asText = (s, cols) => {
+    const rows = Math.max(1, Math.round(cols * (source.naturalHeight / source.naturalWidth) * .5));
+    const { Q } = analyse(s, cols, rows), chars = charsFor(s), top = chars.length - 1, lines = [];
+    for (let y = 0; y < rows; y++) {
+      let line = "";
+      for (let x = 0; x < cols; x++) line += chars[Math.round(Q[y * cols + x] * top)] || " ";
+      lines.push(line.replace(/\s+$/, ""));
+    }
+    while (lines.length && !lines[0]) lines.shift();
+    while (lines.length && !lines[lines.length - 1]) lines.pop();
+    return lines.join("\n");
+  };
+  const copyText = async (str, msg) => {
+    try { await navigator.clipboard.writeText(str); }
+    catch {
+      // Older browsers / blocked clipboard: fall back to a hidden textarea.
+      const ta = document.createElement("textarea"); ta.value = str; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand("copy"); ta.remove();
+      if (!ok) return toast("Your browser blocked copying — use Save .txt");
+    }
+    toast(msg);
+  };
+  $("imgCopyTxt").addEventListener("click", () => {
+    if (!source) return toast("Open an image first");
+    const s = get();
+    copyText(asText(s, s.imgTxtCols), `Copied ASCII (${s.imgTxtCols} characters wide)`);
+  });
+  $("imgCopyDiscord").addEventListener("click", () => {
+    if (!source) return toast("Open an image first");
+    // Discord messages max out at 2000 characters, so shrink until it fits.
+    const s = get();
+    let cols = s.imgTxtCols, txt = asText(s, cols);
+    while (cols > 12 && txt.length + 8 > 2000) { cols -= 4; txt = asText(s, cols); }
+    copyText("```\n" + txt + "\n```", cols < s.imgTxtCols ? `Copied for Discord (shrunk to ${cols} wide to fit)` : "Copied for Discord");
+  });
+  $("imgSaveTxt").addEventListener("click", () => {
+    if (!source) return toast("Open an image first");
+    const s = get(), blob = new Blob([asText(s, s.imgTxtCols) + "\n"], { type: "text/plain;charset=utf-8" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = baseName() + ".txt";
+    a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast("Saved .txt");
   });
 
   /* ── start ────────────────────────────────────────────── */
