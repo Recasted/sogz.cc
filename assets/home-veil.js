@@ -2,16 +2,24 @@
 (() => {
   const scene = document.querySelector("#scene");
   const canvas = document.querySelector("#staticField");
-  if (!scene || !canvas) return;
+  const lens = document.querySelector("#staticLens");
+  const lantern = scene && scene.querySelector(".lantern");
+  if (!scene || !canvas || !lens || !lantern) return;
   const ctx = canvas.getContext("2d");
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const touch = matchMedia("(pointer: coarse)").matches;
 
   // Lantern position, eased so it drifts behind the cursor.
   let tx = innerWidth * .5, ty = innerHeight * .42, x = tx, y = ty;
-  const setVars = () => {
-    scene.style.setProperty("--mx", x.toFixed(1) + "px");
-    scene.style.setProperty("--my", y.toFixed(1) + "px");
+  // Only transforms change here: no style recalc, no repaint, just the GPU sliding layers.
+  const LENS = 240;
+  let drawnX = NaN, drawnY = NaN;
+  const place = () => {
+    if (Math.abs(x - drawnX) < .25 && Math.abs(y - drawnY) < .25) return; // settled: do nothing
+    drawnX = x; drawnY = y;
+    lantern.style.transform = `translate3d(${x - innerWidth}px, ${y - innerHeight}px, 0)`;
+    lens.style.transform = `translate3d(${x - LENS}px, ${y - LENS}px, 0)`;
+    canvas.style.transform = `translate3d(${LENS - x}px, ${LENS - y}px, 0)`;
   };
   addEventListener("pointermove", (e) => { tx = e.clientX; ty = e.clientY; }, { passive: true });
   if (touch) {
@@ -29,18 +37,19 @@
     canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
     canvas.style.width = innerWidth + "px"; canvas.style.height = innerHeight + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font = "12px Consolas, 'Cascadia Mono', Menlo, monospace"; // set once; resizing the canvas resets it
+    ctx.textBaseline = "top";
+    drawnX = NaN;
     cols = Math.ceil(innerWidth / CELL_W); rows = Math.ceil(innerHeight / CELL_H);
     grid = Array.from({ length: cols * rows }, () => Math.random() < .55 ? -1 : Math.floor(Math.random() * GLYPHS.length));
     drawAll();
   };
-  ctx.textBaseline = "top";
   const drawCell = (i) => {
     const cx = (i % cols) * CELL_W, cy = Math.floor(i / cols) * CELL_H;
     ctx.clearRect(cx, cy, CELL_W, CELL_H);
     const g = grid[i]; if (g < 0) return;
     const hot = (g * 7 + i) % 23 === 0;
     ctx.fillStyle = hot ? "rgba(190,22,32,.9)" : "rgba(214,207,196,.55)";
-    ctx.font = "12px Consolas, 'Cascadia Mono', Menlo, monospace";
     ctx.fillText(GLYPHS[g], cx + 2, cy + 1);
   };
   const drawAll = () => { ctx.clearRect(0, 0, innerWidth, innerHeight); for (let i = 0; i < grid.length; i++) drawCell(i); };
@@ -50,7 +59,7 @@
   let last = 0;
   const frame = (now) => {
     x += (tx - x) * .09; y += (ty - y) * .09;
-    setVars();
+    place();
     if (!calm && now - last > 70) {
       last = now;
       for (let k = 0; k < 40; k++) {
