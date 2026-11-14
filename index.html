@@ -2,16 +2,38 @@
 <html lang="en" data-page="home" data-veil="full">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="description" content="A personal archive." />
-  <title>sogz' — archive</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#030303" />
+  <title>sogz' — websites &amp; software</title>
+  <meta name="description" content="sogz' designs and builds websites, web apps and desktop software from scratch. Portfolio sites, browser tools and creative, interactive work." />
+  <meta property="og:title" content="sogz' — websites & software" />
+  <meta property="og:description" content="Websites, web apps and desktop software, designed and built from scratch." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://sogz.cc/" />
+  <meta property="og:image" content="https://sogz.cc/assets/work/sogtext.jpg" />
   <link rel="icon" href="assets/favicon.svg?v=2" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css?v=23" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="style.css?v=24" />
   <link rel="stylesheet" href="assets/veil.css?v=1" />
 </head>
 <body>
+  <!-- ─────────────── top bar ─────────────── -->
+  <header class="site-nav" id="siteNav">
+    <a class="nav-logo" href="#top" aria-label="sogz' — back to top">sogz<span>'</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+      <a href="#process">Process</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="btn btn-primary btn-small" href="#contact">Start a project</a>
+  </header>
+
+  <!-- ─────────────── hero: the floating cards live here ─────────────── -->
   <main class="scene" id="scene">
+    <span id="top"></span>
     <div class="background-image" id="backgroundImage" aria-hidden="true"></div>
     <div class="ink-wash" aria-hidden="true"></div>
     <div class="halftone" aria-hidden="true"></div>
@@ -20,43 +42,34 @@
     <div class="scratches" aria-hidden="true"></div>
     <div class="lantern" aria-hidden="true"></div>
     <button class="focus-overlay" id="focusOverlay" type="button" aria-label="Close open card"></button>
+    <button class="card-return" id="returnButton" type="button">← back</button>
 
-    <header class="corner-nav">
-      <button class="wire-button" id="returnButton" type="button">← return</button>
-      <div class="nav-right">
-        <button class="wire-button" id="imageButton" type="button">change image</button>
-        <button class="wire-button" id="resetButton" type="button">reset</button>
-        <button class="wire-button" id="archiveButton" type="button">archives</button>
+    <section class="hero-copy" aria-labelledby="heroTitle">
+      <p class="status"><i></i> Available for new projects</p>
+      <h1 class="hero-title" id="heroTitle" data-text="Websites & software with a pulse.">Websites &amp; software <em>with a pulse.</em></h1>
+      <p class="hero-lede">I'm sogz — I design and build portfolio sites, web apps and desktop tools from scratch. Fast, hand-made, and as dark or as clean as you need it.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#contact">Start a project</a>
+        <a class="btn btn-ghost" href="#work">See my work ↓</a>
       </div>
-    </header>
-
-    <input id="backgroundPicker" type="file" accept="image/*" hidden />
-
-    <section class="wordmark" aria-label="sogz">
-      <span class="sparkle sparkle-a" aria-hidden="true">✦</span>
-      <span class="sparkle sparkle-b" aria-hidden="true">✧</span>
-      <h1 data-text="sogz'">sogz<span>'</span></h1>
-      <span class="sparkle sparkle-c" aria-hidden="true">⋆</span>
-      <p class="whisper-line">you were expected</p>
+      <ul class="hero-facts">
+        <li><b>6</b> live projects</li>
+        <li><b>Web</b> + desktop</li>
+        <li><b>0</b> templates</li>
+      </ul>
     </section>
 
-    <section class="card-field" id="cardField" aria-label="Movable profile cards"></section>
+    <section class="card-field" id="cardField" aria-label="Floating cards: drag them, click one to open it"></section>
 
-    <aside class="help" id="help">
-      <span>drag the cards</span>
-      <span>click a card to play</span>
-      <span>the light follows you</span>
-    </aside>
-
-    <footer class="bottom-bar">
+    <footer class="hero-bar">
       <div class="music-controls">
-        <button class="wire-button" id="soundButton" type="button">music: tap to start</button>
+        <button class="pill" id="soundButton" type="button">music: tap to start</button>
         <div class="now-playing" aria-live="polite">
-          <span>now playing:</span>
+          <span>now playing</span>
           <strong id="nowPlayingText">Einfach Sein</strong>
         </div>
       </div>
-      <p><i></i> interactive archive</p>
+      <p class="hero-hint">drag the cards · click one to open · <button class="link-button" id="resetButton" type="button">reset</button></p>
     </footer>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -64,9 +77,158 @@
     <audio id="cardAudio" autoplay preload="auto"></audio>
   </main>
 
-  <script src="config.js?v=33"></script>
-  <script src="script.js?v=25"></script>
-  <script src="assets/home-veil.js?v=2"></script>
+  <div class="page">
+    <!-- ─────────────── selected work ─────────────── -->
+    <section class="section" id="work">
+      <header class="section-head reveal">
+        <p class="eyebrow">01 — Selected work</p>
+        <h2>Things I've <em>built</em></h2>
+        <p class="section-lede">Everything here is live on this site and built from scratch. Click any project to use it.</p>
+      </header>
+
+      <div class="work-grid">
+        <a class="work-card reveal" href="sogsketch/">
+          <div class="work-shot"><img src="assets/work/sogsketch.jpg" alt="SogSketch painting studio with the new canvas dialog open" loading="lazy" width="960" height="600" /></div>
+          <div class="work-body">
+            <span class="work-index">01</span>
+            <h3>SogSketch</h3>
+            <p>A painting studio in the browser: layers, brushes, selections and guides, plus a desktop build.</p>
+            <ul class="tags"><li>TypeScript</li><li>Canvas</li><li>Electron</li></ul>
+          </div>
+        </a>
+        <a class="work-card reveal" href="sogzeditor/">
+          <div class="work-shot"><img src="assets/work/sogzeditor.jpg" alt="sogz editor showing preset canvas sizes for social media" loading="lazy" width="960" height="600" /></div>
+          <div class="work-body">
+            <span class="work-index">02</span>
+            <h3>sogz editor</h3>
+            <p>An image editor for posts and banners, with ready-made sizes for every platform. Nothing to install.</p>
+            <ul class="tags"><li>JavaScript</li><li>Canvas</li></ul>
+          </div>
+        </a>
+        <a class="work-card reveal" href="sogcii/">
+          <div class="work-shot"><img src="assets/work/sogcii.jpg" alt="Sogcii video to ASCII converter" loading="lazy" width="960" height="600" /></div>
+          <div class="work-body">
+            <span class="work-index">03</span>
+            <h3>Sogcii</h3>
+            <p>Turns any video, image or webcam into ASCII art and exports it as a video with sound.</p>
+            <ul class="tags"><li>Canvas</li><li>Web Audio</li><li>MediaRecorder</li></ul>
+          </div>
+        </a>
+        <a class="work-card reveal" href="sogtext/">
+          <div class="work-shot"><img src="assets/work/sogtext.jpg" alt="SogText showing big ASCII letters in many fonts" loading="lazy" width="960" height="600" /></div>
+          <div class="work-body">
+            <span class="work-index">04</span>
+            <h3>SogText</h3>
+            <p>ASCII lettering in 332 fonts, plus an image mode with dithering and four-color grading.</p>
+            <ul class="tags"><li>FIGlet</li><li>Canvas</li><li>Image processing</li></ul>
+          </div>
+        </a>
+        <a class="work-card reveal" href="angel-exe/">
+          <div class="work-shot"><img src="assets/work/angel-exe.jpg" alt="angel.exe community index styled like a 2008 forum" loading="lazy" width="960" height="600" /></div>
+          <div class="work-body">
+            <span class="work-index">05</span>
+            <h3>angel.exe</h3>
+            <p>A web of fictional 2008 websites for a game: a social network, a music site, homepages and a forum that share one story.</p>
+            <ul class="tags"><li>HTML / CSS / JS</li><li>Worldbuilding</li></ul>
+          </div>
+        </a>
+        <a class="work-card reveal" href="sog95/">
+          <div class="work-shot"><img src="assets/work/sog95.jpg" alt="Sog95 download page" loading="lazy" width="960" height="600" /></div>
+          <div class="work-body">
+            <span class="work-index">06</span>
+            <h3>Sog95</h3>
+            <p>A Windows app that turns rough notes into neat, structured ASCII documents, wrapped in a Windows 95 look.</p>
+            <ul class="tags"><li>Python</li><li>Windows</li></ul>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ─────────────── services ─────────────── -->
+    <section class="section" id="services">
+      <header class="section-head reveal">
+        <p class="eyebrow">02 — Services</p>
+        <h2>What I can <em>make</em> for you</h2>
+      </header>
+      <div class="service-grid">
+        <article class="service reveal">
+          <span class="service-glyph" aria-hidden="true">▚</span>
+          <h3>Websites &amp; portfolios</h3>
+          <p>Personal sites, artist and band pages, landing pages. Designed around you, not a template.</p>
+          <ul><li>Custom design</li><li>Fast on phones</li><li>Domain &amp; hosting setup</li></ul>
+        </article>
+        <article class="service reveal">
+          <span class="service-glyph" aria-hidden="true">▞</span>
+          <h3>Web apps &amp; tools</h3>
+          <p>Editors, generators and dashboards that run straight in the browser. No installs for your users.</p>
+          <ul><li>Canvas &amp; media</li><li>Import / export</li><li>Works offline-friendly</li></ul>
+        </article>
+        <article class="service reveal">
+          <span class="service-glyph" aria-hidden="true">▙</span>
+          <h3>Desktop software</h3>
+          <p>Small, focused Windows apps and browser tools packaged as desktop apps.</p>
+          <ul><li>Python &amp; Electron</li><li>Installers &amp; downloads</li><li>Simple, clear interfaces</li></ul>
+        </article>
+        <article class="service reveal">
+          <span class="service-glyph" aria-hidden="true">▜</span>
+          <h3>Creative &amp; interactive</h3>
+          <p>The strange stuff: ASCII art, glowing scenes, story-driven sites and things people want to click.</p>
+          <ul><li>Motion &amp; effects</li><li>Audio &amp; visuals</li><li>Hidden details</li></ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ─────────────── process ─────────────── -->
+    <section class="section" id="process">
+      <header class="section-head reveal">
+        <p class="eyebrow">03 — Process</p>
+        <h2>How a project <em>goes</em></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal"><span>01</span><h3>Talk</h3><p>You tell me what you need and who it's for. I come back with a plan, a timeline and a price.</p></li>
+        <li class="reveal"><span>02</span><h3>Build</h3><p>You get a private preview link early and watch it come together. Feedback goes straight in.</p></li>
+        <li class="reveal"><span>03</span><h3>Launch</h3><p>I put it live on your domain, check it on every screen and hand everything over.</p></li>
+      </ol>
+    </section>
+
+    <!-- ─────────────── contact ─────────────── -->
+    <section class="section contact" id="contact">
+      <div class="contact-panel reveal">
+        <p class="eyebrow">04 — Contact</p>
+        <h2>Have a project <em>in mind?</em></h2>
+        <p class="section-lede">Send me a message with what you're building and when you need it. Small jobs welcome.</p>
+        <div class="contact-actions">
+          <!-- To add email, copy this line and put your address in:
+          <a class="btn btn-primary" href="mailto:you@example.com">Email me</a> -->
+          <a class="btn btn-primary" href="https://www.instagram.com/_sogz0/" target="_blank" rel="noopener noreferrer">Message on Instagram</a>
+          <a class="btn btn-ghost" href="https://t.me/cartelleader" target="_blank" rel="noopener noreferrer">Telegram</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <a class="nav-logo" href="#top">sogz<span>'</span></a>
+      <nav aria-label="Tools">
+        <a href="sogsketch/">SogSketch</a>
+        <a href="sogzeditor/">sogz editor</a>
+        <a href="sogcii/">Sogcii</a>
+        <a href="sogtext/">SogText</a>
+        <a href="sog95/">Sog95</a>
+        <a href="angel-exe/">angel.exe</a>
+      </nav>
+      <nav aria-label="Elsewhere">
+        <a href="https://www.instagram.com/_sogz0/" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://www.youtube.com/@ForageCR" target="_blank" rel="noopener noreferrer">YouTube</a>
+        <a href="https://www.twitch.tv/p62_" target="_blank" rel="noopener noreferrer">Twitch</a>
+        <a href="https://ko-fi.com/sogz0/goal" target="_blank" rel="noopener noreferrer">Ko-fi</a>
+      </nav>
+      <p>© <span id="year">2026</span> sogz' · designed &amp; built by hand</p>
+    </footer>
+  </div>
+
+  <script src="config.js?v=34"></script>
+  <script src="script.js?v=26"></script>
+  <script src="assets/home-veil.js?v=3"></script>
   <script src="assets/veil.js?v=1" defer></script>
 </body>
 </html>

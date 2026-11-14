@@ -1,5 +1,6 @@
 // PERSONALIZE THE SITE HERE.
 // Put your own images in the assets folder, then update the paths below.
+// x / y are where each floating card starts (in % of the hero); "mobile" is used on phones.
 window.ARCHIVE_CONFIG = {
   backgroundImage: "assets/default-background-eyes.png",
   backgroundPosition: "center center",
@@ -12,7 +13,7 @@ window.ARCHIVE_CONFIG = {
       title: "GAMES",
       subtitle: "angel.exe 001",
       image: "assets/card-01.jpg",
-      x: 15, y: 56, rotation: -6, theme: "pulse", audio: "",
+      x: 60, y: 33, rotation: -6, mobile: { x: 14, y: 80 }, theme: "pulse", audio: "",
       audioTracks: [
         { title: "baby me", src: "assets/audio/01-1-baby-me.mp3" },
         { title: "cold outside", src: "assets/audio/01-2-cold-outside.mp3" }
@@ -24,7 +25,7 @@ window.ARCHIVE_CONFIG = {
       ]
     },
     {
-      title: "GAMING", subtitle: "profiles 002", image: "assets/card-02.jpg", x: 36, y: 53, rotation: 3, theme: "glass", audio: "",
+      title: "GAMING", subtitle: "profiles 002", image: "assets/card-02.jpg", x: 82, y: 30, rotation: 4, mobile: { x: 38, y: 76 }, theme: "glass", audio: "",
       audioTracks: [
         { title: "MARY JANE", src: "assets/audio/02-1-mary-jane.mp3" },
         { title: "a song about america", src: "assets/audio/02-2-a-song-about-america.mp3" }
@@ -36,7 +37,7 @@ window.ARCHIVE_CONFIG = {
       ]
     },
     {
-      title: "CREATIVE / TOOLS", subtitle: "draw - edit - explore 003", image: "assets/card-03.jpg", x: 57, y: 55, rotation: -2, theme: "void", audio: "",
+      title: "CREATIVE / TOOLS", subtitle: "draw - edit - explore 003", image: "assets/card-03.jpg", x: 64, y: 71, rotation: 3, mobile: { x: 62, y: 81 }, theme: "void", audio: "",
       audioTracks: [
         { title: "RUN", src: "assets/audio/03-1-run.mp3" },
         { title: "reminding", src: "assets/audio/03-2-reminding.mp3" }
@@ -51,7 +52,7 @@ window.ARCHIVE_CONFIG = {
       ]
     },
     {
-      title: "SOCIALS", subtitle: "profiles 004", image: "assets/card-04.jpg", x: 80, y: 53, rotation: 7, theme: "dream", audio: "",
+      title: "SOCIALS", subtitle: "profiles 004", image: "assets/card-04.jpg", x: 85, y: 68, rotation: -5, mobile: { x: 86, y: 77 }, theme: "dream", audio: "",
       audioTracks: [
         { title: "I SELL CRACK!", src: "assets/audio/04-1-i-sell-crack.mp3" },
         { title: "BEAM!", src: "assets/audio/04-2-beam.mp3" }
