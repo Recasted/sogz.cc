@@ -90,6 +90,10 @@
     .img-drop pre { margin:0; color:#4a2226; font:11px/1.1 var(--mono); }
     .img-drop strong { color:var(--text); font-size:15px; font-weight:400; }
     .img-stage.over .img-drop, .img-stage.over canvas { outline:1px dashed var(--red2); outline-offset:6px; }
+    .img-stage:has(.img-bar:not([hidden])) { padding-top:64px; }
+    .img-bar { position:absolute; top:12px; left:22px; right:22px; z-index:2; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
+    .img-bar .btn { padding:7px 14px; font-size:12px; }
+    .img-bar .btn.primary { grid-column:auto; }
     .img-meta { position:absolute; left:22px; bottom:10px; color:#4d4844; font:10px var(--mono); letter-spacing:.1em; }
     .compare { position:absolute; right:22px; bottom:8px; }
     .compare button { padding:4px 10px; border:1px solid var(--line); background:var(--panel); color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; }
@@ -267,10 +271,10 @@
           <option value="4">4×</option>
         </select>
       </label>
+      <label class="row">Text width <span class="slider"><input id="imgTxtCols" type="range" min="20" max="300" value="100" /><output></output></span></label>
+      <p class="hint" style="margin-top:2px">Text width is how many characters wide the copied / saved ASCII is. Copy, .txt and PNG buttons are in the bar above the image.</p>
       <div class="actions">
-        <button class="btn primary" type="button" id="imgSave">Save PNG</button>
-        <button class="btn" type="button" id="imgCopyTxt">Copy as text</button>
-        <button class="btn" type="button" id="imgReset">Reset</button>
+        <button class="btn" type="button" id="imgReset">Reset settings</button>
       </div>
     </aside>
 
@@ -283,6 +287,12 @@
         <strong>Drop an image here</strong>
         <span>it never leaves your device</span>
       </div>
+      <div class="img-bar" id="imgBar" hidden>
+        <button class="btn" type="button" id="imgCopyTxt">Copy ASCII text</button>
+        <button class="btn" type="button" id="imgCopyDiscord">Copy for Discord</button>
+        <button class="btn" type="button" id="imgSaveTxt">Save .txt</button>
+        <button class="btn primary" type="button" id="imgSave">Download PNG</button>
+      </div>
       <canvas id="imgOut" hidden></canvas>
       <span class="img-meta" id="imgMeta"></span>
       <div class="compare" hidden id="compareWrap"><button type="button" id="imgCompare">hold to see original</button></div>
@@ -292,7 +302,7 @@
 
   <script src="figlet.js"></script>
   <script src="fonts.js"></script>
-  <script src="image.js?v=1"></script>
+  <script src="image.js?v=2"></script>
   <script>
   const FONT_DATA_B64 = window.SOG_FONTS.replace(/\s+/g, "");
   (async () => {

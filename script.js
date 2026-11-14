@@ -3,7 +3,7 @@ const scene = document.querySelector("#scene");
 const field = document.querySelector("#cardField");
 const picker = document.querySelector("#backgroundPicker");
 const audio = document.querySelector("#cardAudio");
-const storageKey = "interactive-archive-layout-v4";
+const storageKey = "interactive-archive-layout-v6"; // bumped for the floating tabs
 const backgroundKey = "interactive-archive-background-v2";
 const cardStates = [];
 let savedLayout = readLayout();
@@ -16,18 +16,18 @@ let audioQueueIndex = 0;
 let audioLabel = "default";
 let audioStarted = false;
  
-document.title = "sogz' — archive";
-const rememberedBackground = localStorage.getItem(backgroundKey);
-setBackground(rememberedBackground || config.backgroundImage);
+const narrow = () => innerWidth < 760;
+const defaultPos = (card) => (narrow() && card.mobile) ? { x: card.mobile.x, y: card.mobile.y, rotation: card.rotation } : { x: card.x, y: card.y, rotation: card.rotation };
+setBackground(config.backgroundImage);
 document.querySelector("#backgroundImage").style.setProperty("--scene-position", config.backgroundPosition || "center");
 config.cards.forEach((card, index) => createCard(card, index));
  
 function createCard(card, index) {
   const saved = savedLayout[index];
-  const state = saved || { x: card.x, y: card.y, rotation: card.rotation };
+  const state = saved || defaultPos(card);
   cardStates[index] = state;
   const element = document.createElement("article");
-  element.className = "profile-card";
+  element.className = "profile-card tab-card";
   element.dataset.index = index;
   element.setAttribute("role", "button");
   element.setAttribute("tabindex", "0");
@@ -37,15 +37,15 @@ function createCard(card, index) {
   const cardLinks = card.links?.length ? `<nav class="card-socials" aria-label="${card.title} profile links">
     ${card.links.map((link) => `<a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.label}</a>`).join("")}
   </nav>` : "";
+  // Floating tab: icon, title, one line, arrow. Opening it shows the links and plays its music.
   element.innerHTML = `<div class="card-inner">
-    <span class="card-index">0${index + 1}</span>
-    <div class="card-photo"><img src="${card.image}" alt="${card.title}" draggable="false"></div>
-    <strong class="card-title"><span class="card-title-track">${card.title}</span></strong>
-    <span class="card-subtitle">${card.subtitle}</span>
+    <span class="tab-glyph" aria-hidden="true">${card.glyph || "▚"}</span>
+    <span class="tab-text">
+      <strong class="card-title"><span class="card-title-track">${card.title}</span></strong>
+      <span class="card-subtitle">${card.subtitle}</span>
+    </span>
+    <span class="tab-arrow" aria-hidden="true">↗</span>
   </div>${cardLinks}`;
-  const photo = element.querySelector(".card-photo");
-  const image = photo.querySelector("img");
-  // Every card uses the same fixed photo frame (set in style.css), so no per-image sizing here.
   field.appendChild(element);
   const title = element.querySelector(".card-title");
   const titleTrack = element.querySelector(".card-title-track");
@@ -53,7 +53,7 @@ function createCard(card, index) {
     // Shrink long titles until they fit inside the card instead of running off the edge.
     title.style.fontSize = "";
     let size = parseFloat(getComputedStyle(title).fontSize);
-    while (title.scrollWidth > title.clientWidth + 1 && size > 8) {
+    while (title.scrollWidth > title.clientWidth + 1 && size > 6) {
       size -= 0.5;
       title.style.fontSize = `${size}px`;
     }
@@ -89,7 +89,7 @@ function makeInteractive(element, state, card, index) {
     element.classList.remove("is-dragging");
     if (element.hasPointerCapture(pointerId)) element.releasePointerCapture(pointerId);
     pointerId = undefined;
-    if (moved) { saveLayout(); document.querySelector("#help").classList.add("hidden"); }
+    if (moved) { saveLayout(); document.querySelector(".hero-hint")?.classList.add("used"); }
     else openCard(index, card);
   };
   element.addEventListener("pointerup", finish);
@@ -239,7 +239,7 @@ function readLayout() { try { return JSON.parse(localStorage.getItem(storageKey)
 function resetLayout() {
   localStorage.removeItem(storageKey);
   [...document.querySelectorAll(".profile-card")].forEach((element, index) => {
-    Object.assign(cardStates[index], { x: config.cards[index].x, y: config.cards[index].y, rotation: config.cards[index].rotation });
+    Object.assign(cardStates[index], defaultPos(config.cards[index]));
     renderCard(element, cardStates[index]);
   });
   showToast("layout reset");
@@ -285,11 +285,11 @@ document.addEventListener("pointermove", (event) => {
   plusCursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0) translate(-50%, -50%)`;
 });
 document.querySelector("#focusOverlay").addEventListener("click", closeCard);
-document.querySelector("#imageButton").addEventListener("click", () => picker.click());
-picker.addEventListener("change", () => applyBackground(picker.files[0]));
+document.querySelector("#imageButton")?.addEventListener("click", () => picker?.click());
+picker?.addEventListener("change", () => applyBackground(picker.files[0]));
 document.querySelector("#resetButton").addEventListener("click", resetLayout);
 document.querySelector("#returnButton").addEventListener("click", closeCard);
-document.querySelector("#archiveButton").addEventListener("click", () => showToast("four playable archive cards"));
+document.querySelector("#archiveButton")?.addEventListener("click", () => showToast("four playable archive cards"));
 document.querySelector("#soundButton").addEventListener("click", toggleMusic);
 document.addEventListener("pointerdown", startDefaultAudioOnFirstInteraction, { once: true, capture: true });
 document.addEventListener("keydown", startDefaultAudioOnFirstInteraction, { once: true, capture: true });
