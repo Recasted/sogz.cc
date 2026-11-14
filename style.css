@@ -658,3 +658,14 @@ a, button { cursor: pointer; }
   .profile-card.tab-card .card-socials { top: calc(100% + 12px); left: 0; width: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); transform: translateY(-8px); }
   .profile-card.tab-card.is-open .card-socials { transform: translateY(0); }
 }
+
+/* wide featured project card (SogSeek) */
+.work-card.wide { grid-column: 1 / -1; display: grid; grid-template-columns: 1.25fr 1fr; }
+.work-card.wide .work-shot { aspect-ratio: auto; min-height: 100%; border-bottom: 0; border-right: 1px solid var(--hair); }
+.work-card.wide .work-body { align-self: center; padding: 34px 34px 36px; }
+.work-card.wide h3 { font-size: 26px; }
+@media (max-width: 760px) {
+  .work-card.wide { grid-template-columns: 1fr; }
+  .work-card.wide .work-shot { aspect-ratio: 16 / 10; border-right: 0; border-bottom: 1px solid var(--hair); }
+  .work-card.wide .work-body { padding: 22px 24px 26px; }
+}
