@@ -252,7 +252,7 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 .toast { position: fixed; left: 50%; bottom: 58px; z-index: 200; padding: 6px 12px; border: 1px dotted #888; opacity: 0; color: #fff; background: #000; font-size: 11px; font-style: italic; transform: translate(-50%, 8px); transition: .2s; pointer-events: none; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
  
-.plus-cursor { position: fixed; left: 0; top: 0; z-index: 1000; width: 25px; height: 25px; pointer-events: none; transform: translate(-50%,-50%); mix-blend-mode: difference; }
+.plus-cursor { position: fixed; left: 0; top: 0; z-index: 1000; width: 25px; height: 25px; pointer-events: none; transform: translate(-50%,-50%); mix-blend-mode: difference; will-change: transform; }
 .plus-cursor::before, .plus-cursor::after { content: ""; position: absolute; left: 50%; top: 50%; background: #fff; box-shadow: 0 0 5px #fff; transform: translate(-50%,-50%); }
 .plus-cursor::before { width: 21px; height: 1px; }
 .plus-cursor::after { width: 1px; height: 21px; }
@@ -279,19 +279,28 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 
 /* ───────────── the veil: darker, quieter, something watching ───────────── */
 :root { --paper: #d3ccbf; --blood: #7d0810; }
-.scene { --mx: 50vw; --my: 42vh; background: #020202; }
+.scene { background: #020202; }
 .background-image { filter: grayscale(1) contrast(2.5) brightness(.48); opacity: .9; }
 
-.static-field {
+/* The static only shows through a 480px "lens" that follows the cursor.
+   The lens and the canvas inside it move with transforms only, so moving
+   the mouse never repaints anything. */
+.static-lens {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 0;
   z-index: -2;
+  width: 480px;
+  height: 480px;
+  overflow: hidden;
   pointer-events: none;
   opacity: .5;
-  -webkit-mask-image: radial-gradient(circle 240px at var(--mx) var(--my), #000 0, rgba(0,0,0,.35) 45%, transparent 100%);
-          mask-image: radial-gradient(circle 240px at var(--mx) var(--my), #000 0, rgba(0,0,0,.35) 45%, transparent 100%);
   mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(circle 240px at center, #000 0, rgba(0,0,0,.35) 45%, transparent 100%);
+          mask-image: radial-gradient(circle 240px at center, #000 0, rgba(0,0,0,.35) 45%, transparent 100%);
+  will-change: transform;
 }
+.static-field { position: absolute; left: 0; top: 0; will-change: transform; }
 
 .red-fog {
   position: absolute;
@@ -300,10 +309,10 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
   pointer-events: none;
   opacity: .55;
   background:
-    radial-gradient(ellipse 40% 30% at 20% 80%, rgba(125,8,16,.35), transparent 70%),
-    radial-gradient(ellipse 35% 28% at 80% 25%, rgba(90,4,10,.3), transparent 70%),
-    radial-gradient(ellipse 50% 22% at 55% 100%, rgba(125,8,16,.4), transparent 75%);
-  filter: blur(18px);
+    radial-gradient(ellipse 44% 34% at 20% 80%, rgba(125,8,16,.35), rgba(125,8,16,.12) 45%, transparent 76%),
+    radial-gradient(ellipse 39% 32% at 80% 25%, rgba(90,4,10,.3), rgba(90,4,10,.1) 45%, transparent 76%),
+    radial-gradient(ellipse 54% 26% at 55% 100%, rgba(125,8,16,.4), rgba(125,8,16,.14) 45%, transparent 80%);
+  will-change: transform;
   animation: fogDrift 38s ease-in-out infinite alternate;
 }
 @keyframes fogDrift {
@@ -315,11 +324,15 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 /* everything outside the light sinks a little further into the dark */
 .lantern {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 0;
   z-index: 15;
+  width: 200vw;
+  height: 200vh;
   pointer-events: none;
-  background: radial-gradient(circle 300px at var(--mx) var(--my), transparent 0, rgba(0,0,0,.14) 40%, rgba(0,0,0,.55) 100%);
+  background: radial-gradient(circle 300px at center, transparent 0, rgba(0,0,0,.14) 40%, rgba(0,0,0,.55) 100%);
   transition: opacity .6s;
+  will-change: transform;
 }
 .scene.card-open .lantern { opacity: 0; }
 
@@ -369,7 +382,7 @@ button, a { color: inherit; font: inherit; cursor: none; -webkit-tap-highlight-c
 .plus-cursor::before, .plus-cursor::after { box-shadow: 0 0 6px #fff, 0 0 12px rgba(179,18,28,.9); }
 
 @media (pointer: coarse) {
-  .lantern { background: radial-gradient(circle 260px at var(--mx) var(--my), transparent 0, rgba(0,0,0,.45) 100%); }
+  .lantern { background: radial-gradient(circle 260px at center, transparent 0, rgba(0,0,0,.45) 100%); }
 }
 @media (prefers-reduced-motion: reduce) {
   .red-fog, .whisper-line, .bottom-bar p i { animation: none; }

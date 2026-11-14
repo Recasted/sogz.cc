@@ -280,8 +280,9 @@ function nextCardLayer() {
   return String(topLayer);
 }
  
+const plusCursor = document.querySelector("#plusCursor");
 document.addEventListener("pointermove", (event) => {
-  const cursor = document.querySelector("#plusCursor"); cursor.style.left = `${event.clientX}px`; cursor.style.top = `${event.clientY}px`;
+  plusCursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0) translate(-50%, -50%)`;
 });
 document.querySelector("#focusOverlay").addEventListener("click", closeCard);
 document.querySelector("#imageButton").addEventListener("click", () => picker.click());
