@@ -3,7 +3,7 @@ const scene = document.querySelector("#scene");
 const field = document.querySelector("#cardField");
 const picker = document.querySelector("#backgroundPicker");
 const audio = document.querySelector("#cardAudio");
-const storageKey = "interactive-archive-layout-v5"; // bumped for the new hero layout
+const storageKey = "interactive-archive-layout-v6"; // bumped for the floating tabs
 const backgroundKey = "interactive-archive-background-v2";
 const cardStates = [];
 let savedLayout = readLayout();
@@ -27,7 +27,7 @@ function createCard(card, index) {
   const state = saved || defaultPos(card);
   cardStates[index] = state;
   const element = document.createElement("article");
-  element.className = "profile-card";
+  element.className = "profile-card tab-card";
   element.dataset.index = index;
   element.setAttribute("role", "button");
   element.setAttribute("tabindex", "0");
@@ -37,15 +37,15 @@ function createCard(card, index) {
   const cardLinks = card.links?.length ? `<nav class="card-socials" aria-label="${card.title} profile links">
     ${card.links.map((link) => `<a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.label}</a>`).join("")}
   </nav>` : "";
+  // Floating tab: icon, title, one line, arrow. Opening it shows the links and plays its music.
   element.innerHTML = `<div class="card-inner">
-    <span class="card-index">0${index + 1}</span>
-    <div class="card-photo"><img src="${card.image}" alt="${card.title}" draggable="false"></div>
-    <strong class="card-title"><span class="card-title-track">${card.title}</span></strong>
-    <span class="card-subtitle">${card.subtitle}</span>
+    <span class="tab-glyph" aria-hidden="true">${card.glyph || "▚"}</span>
+    <span class="tab-text">
+      <strong class="card-title"><span class="card-title-track">${card.title}</span></strong>
+      <span class="card-subtitle">${card.subtitle}</span>
+    </span>
+    <span class="tab-arrow" aria-hidden="true">↗</span>
   </div>${cardLinks}`;
-  const photo = element.querySelector(".card-photo");
-  const image = photo.querySelector("img");
-  // Every card uses the same fixed photo frame (set in style.css), so no per-image sizing here.
   field.appendChild(element);
   const title = element.querySelector(".card-title");
   const titleTrack = element.querySelector(".card-title-track");

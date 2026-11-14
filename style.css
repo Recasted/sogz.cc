@@ -587,3 +587,74 @@ a, button { cursor: pointer; }
   .reveal { opacity: 1; transform: none; transition: none; }
   html { scroll-behavior: auto; }
 }
+
+/* ── floating tabs (replace the old photo cards) ───────────────────────── */
+.profile-card.tab-card { width: clamp(270px, 21vw, 310px); color: var(--text); }
+.profile-card.tab-card .card-inner {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px 16px 16px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(24,20,20,.72), rgba(10,9,9,.72));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 22px 44px -22px #000, 0 0 0 rgba(179,18,28,0);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+          backdrop-filter: blur(14px) saturate(1.2);
+  transition: border-color .35s, box-shadow .4s, background .35s;
+}
+.profile-card.tab-card:hover .card-inner,
+.profile-card.tab-card:focus-visible .card-inner {
+  border-color: rgba(224,48,59,.55);
+  background: linear-gradient(180deg, rgba(36,16,18,.8), rgba(14,8,9,.8));
+  box-shadow: inset 0 1px 0 rgba(255,120,128,.12), 0 22px 44px -22px #000, 0 0 34px -6px rgba(179,18,28,.55);
+}
+.profile-card.tab-card:focus-visible { outline: none; }
+.tab-glyph {
+  flex: none; display: grid; place-items: center;
+  width: 46px; height: 46px; border-radius: 13px;
+  border: 1px solid rgba(224,48,59,.35);
+  background: radial-gradient(circle at 50% 30%, rgba(179,18,28,.35), rgba(60,4,8,.25) 70%);
+  color: #ff5a64; font: 18px/1 var(--mono);
+  text-shadow: 0 0 12px rgba(224,48,59,.9);
+  box-shadow: inset 0 0 12px rgba(179,18,28,.25);
+}
+.tab-text { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.profile-card.tab-card .card-title {
+  display: block; margin: 0; overflow: hidden;
+  font: 600 17px/1.2 var(--sans); font-style: normal; letter-spacing: -.005em;
+  text-align: left; text-transform: none; white-space: nowrap;
+}
+.profile-card.tab-card .card-subtitle {
+  display: block; margin: 0; overflow: hidden; opacity: 1;
+  color: var(--muted); font: 12px/1.35 var(--mono); letter-spacing: 0;
+  text-align: left; text-transform: none; text-overflow: ellipsis; white-space: nowrap;
+}
+.tab-arrow { flex: none; color: var(--muted); font-size: 15px; transition: color .3s, transform .3s; }
+.profile-card.tab-card:hover .tab-arrow { color: var(--red-hot); transform: translate(2px, -2px); }
+
+/* open: the tab moves to the middle and its links fan out underneath */
+.profile-card.tab-card.is-open { width: min(320px, 82vw); }
+.profile-card.tab-card.is-open .card-inner { border-color: rgba(224,48,59,.6); box-shadow: 0 0 60px -10px rgba(179,18,28,.7), inset 0 1px 0 rgba(255,120,128,.15); }
+.profile-card.tab-card .card-socials {
+  top: calc(100% + 14px); left: 0; right: 0; width: auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  transform: translateY(-8px);
+}
+.profile-card.tab-card.is-open .card-socials { transform: translateY(0); }
+.profile-card.tab-card .card-socials::before { content: "links"; grid-column: 1 / -1; color: var(--muted); font: 10px var(--mono); font-style: normal; letter-spacing: .14em; text-transform: uppercase; }
+.profile-card.tab-card .card-socials a {
+  padding: 10px 12px; border: 1px solid rgba(255,255,255,.12); border-radius: 10px;
+  background: rgba(10,9,9,.85); color: var(--text); font: 13px var(--sans); text-transform: none; letter-spacing: 0;
+}
+.profile-card.tab-card .card-socials a:hover,
+.profile-card.tab-card .card-socials a:focus-visible { border-color: rgba(224,48,59,.6); background: rgba(60,6,12,.85); box-shadow: 0 0 20px -6px rgba(179,18,28,.7); color: #fff; }
+
+@media (max-width: 760px) {
+  .profile-card.tab-card { width: min(168px, 44vw); }
+  .profile-card.tab-card .card-inner { gap: 10px; padding: 10px 10px 10px 10px; border-radius: 14px; }
+  .tab-glyph { width: 32px; height: 32px; border-radius: 9px; font-size: 14px; }
+  .profile-card.tab-card .card-title { font-size: 14px; }
+  .profile-card.tab-card .card-subtitle { font-size: 10px; }
+  .tab-arrow { display: none; }
+  .profile-card.tab-card .card-socials { top: calc(100% + 12px); left: 0; width: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); transform: translateY(-8px); }
+  .profile-card.tab-card.is-open .card-socials { transform: translateY(0); }
+}
