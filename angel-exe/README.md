@@ -370,6 +370,25 @@ its `url` there.
 `storyDomain` is a made-up address shown inside the story only (for example
 "www.orbitspace.net/theo.static" on a profile). It is not a real website.
 
+## Links from the game
+
+The angel.exe game opens these pages in the player's browser when they
+click a web address in a chat, a profile or the game's Internet window.
+The game turns made-up addresses into real pages like this (the list is
+`data/web.json` in the Godot project):
+
+| In the story | Opens |
+|---|---|
+| orbitspace.net/<username> | orbitspace/profile.html?u=<username> |
+| starlit.net/~<site> | homepages/site.html?u=<site> |
+| orbitspace.net, starlit.net, lowlight.fm, nightshift.org | that site's front page |
+
+So keep `profile.html?u=` and `site.html?u=` working if you rename things,
+and use the same made-up domains as `storyDomain` in `shared/sites.js`.
+OrbitSpace profiles also show the character's Glimmer Messenger screen
+name (from `accounts.messenger` in `shared/story/characters.js`), and a
+member's newest bulletin.
+
 ## Putting it online
 
 The `angel-exe` folder goes into the root of the sogz.cc repository, next to

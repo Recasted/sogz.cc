@@ -229,6 +229,8 @@ body.profile-page {
 .contact-table td { width: 50%; padding: 3px 4px; font-size: 11px; }
 .contact-table a { display: inline-flex; gap: 3px; align-items: center; text-decoration: none; }
 .contact-table a:hover { text-decoration: underline; }
+.im-line { margin-top: 6px; padding-top: 5px; border-top: 1px dotted #b8c7e0; font-size: 11px; display: flex; align-items: center; gap: 4px; }
+.im-line img { width: 12px; height: 12px; }
 
 .url-box { font-size: 11px; padding: 4px 6px; word-break: break-all; }
 

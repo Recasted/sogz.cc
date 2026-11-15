@@ -338,7 +338,12 @@ PAGES.profile = function () {
     });
     ct.appendChild(tr);
   }
+  // Their Glimmer Messenger screen name (from shared/story/characters.js),
+  // the same name they use in the angel.exe game.
+  var person = (window.ANGEL_CHARACTERS || {})[m.character];
+  var imName = person && person.accounts && person.accounts.messenger;
   left.appendChild(box("Contacting " + m.displayName, null, [ct,
+    imName ? el("div", { class: "im-line" }, [el("img", { src: "images/icons/online.svg", alt: "" }), "Glimmer Messenger: ", el("b", { text: imName })]) : null,
     el("div", { class: "notice", id: "profileNotice", text: "You can't add friends or send messages here, but you can leave " + m.displayName + " a comment below!" })]));
 
   left.appendChild(el("div", { class: "box" }, [
@@ -373,6 +378,18 @@ PAGES.profile = function () {
     el("h3", { text: "About me:" }), el("p", { text: m.about }),
     el("h3", { text: "Who I'd like to meet:" }), el("p", { text: m.whoToMeet })
   ])]));
+
+  // their newest bulletin, if they posted one
+  var latest = (window.BULLETINS || []).filter(function (b) { return b.who === m.username; }).sort(byDateDesc)[0];
+  if (latest) {
+    right.appendChild(box(m.displayName + "'s Latest Bulletin", el("a", { href: "feed.html#bulletins", text: "View All Bulletins" }), [
+      el("div", { class: "bulletin" }, [
+        el("h4", { text: latest.title }),
+        el("div", { class: "small", text: prettyDate(latest.date, true) }),
+        el("p", { text: latest.text })
+      ])
+    ]));
+  }
 
   // friend space
   var grid = el("div", { class: "friend-grid" });
